@@ -2,15 +2,20 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Redirect if already installed (skip during step 3 = installation in progress)
+// Redirect if fully installed (skip during step 3 = installation in progress)
 $step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 if ($step !== 3) {
     $dbFile = __DIR__ . '/database.php';
     if (file_exists($dbFile)) {
         @include_once $dbFile;
         if (!empty($conn) && @mysqli_ping($conn)) {
-            $r = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
-            if ($r && mysqli_num_rows($r) > 0) {
+            $required = ['users', 'menu_items', 'settings', 'hosting_plans', 'pages'];
+            $allExist = true;
+            foreach ($required as $tbl) {
+                $r = mysqli_query($conn, "SHOW TABLES LIKE '$tbl'");
+                if (!$r || mysqli_num_rows($r) == 0) { $allExist = false; break; }
+            }
+            if ($allExist) {
                 header('Location: ../index.php');
                 exit;
             }
