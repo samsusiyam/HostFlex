@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
         foreach ($names as $i => $name) {
             if (in_array($i, $deleted_btns)) continue;
-            if (!trim($name) || !trim($urls[$i] ?? '')) continue;
-            $icon = trim($icons[$i] ?? '💬');
+            if (!trim($urls[$i] ?? '')) continue;
+            $icon = trim($icons[$i] ?? '');
             if (isset($_FILES['social_buttons']['tmp_name']['icon'][$i]) && !empty($_FILES['social_buttons']['tmp_name']['icon'][$i])) {
                 $file = $_FILES['social_buttons'];
                 $ext = strtolower(pathinfo($file['name']['icon'][$i], PATHINFO_EXTENSION));
@@ -191,13 +191,19 @@ if ($social_buttons_raw) {
             <?php endif; ?>
             <?php foreach ($social_buttons as $i => $btn): ?>
             <?php $is_img_icon = (strpos($btn['icon'] ?? '', '/') !== false || strpos($btn['icon'] ?? '', '.') !== false); ?>
+            <?php $btn_name = trim($btn['name'] ?? ''); $btn_icon = trim($btn['icon'] ?? ''); ?>
             <div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200" data-idx="<?php echo $i; ?>">
-                <div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="<?php echo htmlspecialchars($btn['name'] ?? ''); ?>" placeholder="Name" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
+                <div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="<?php echo htmlspecialchars($btn_name); ?>" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
                 <div class="flex flex-col items-center gap-1">
-                    <img src="<?php echo $is_img_icon ? '../' . htmlspecialchars($btn['icon']) : ''; ?>" class="w-7 h-7 object-contain icon-preview<?php echo $is_img_icon ? '' : ' hidden'; ?>" alt="icon">
-                    <span class="text-xl icon-emoji<?php echo $is_img_icon ? ' hidden' : ''; ?>"><?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?></span>
+                    <div class="flex items-center gap-1">
+                        <img src="<?php echo $is_img_icon ? '../' . htmlspecialchars($btn_icon) : ''; ?>" class="w-7 h-7 object-contain icon-preview<?php echo $is_img_icon ? '' : ' hidden'; ?>" alt="icon">
+                        <span class="text-xl icon-emoji<?php echo $is_img_icon || !$btn_icon ? ' hidden' : ''; ?>"><?php echo htmlspecialchars($btn_icon); ?></span>
+                        <?php if (!$btn_icon && !$btn_name): ?>
+                        <span class="text-xs text-gray-400 italic">no icon</span>
+                        <?php endif; ?>
+                    </div>
                     <label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][<?php echo $i; ?>]" accept="image/*" class="hidden" onchange="var r=this.closest('.social-btn-row');r.querySelector('.icon-preview').src=window.URL.createObjectURL(this.files[0]);r.querySelector('.icon-preview').classList.remove('hidden');r.querySelector('.icon-preview').style.display='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-hidden').value=''"></label>
-                    <input type="hidden" name="social_buttons[icon][]" class="icon-hidden" value="<?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?>">
+                    <input type="hidden" name="social_buttons[icon][]" class="icon-hidden" value="<?php echo htmlspecialchars($btn_icon); ?>">
                 </div>
                 <div class="w-24"><input type="text" name="social_buttons[color][]" value="<?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left: 4px solid <?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>"></div>
                 <div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="<?php echo htmlspecialchars($btn['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
@@ -227,8 +233,8 @@ if ($social_buttons_raw) {
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
         <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 mr-2"></i> Add Social Button</h3>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" id="newBtnName" placeholder="WhatsApp" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-gray-400 font-normal">(optional — leave empty for icon only)</span></label><input type="text" id="newBtnName" placeholder="WhatsApp" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon <span class="text-gray-400 font-normal">(optional — leave empty for text only)</span></label>
                 <div class="flex gap-2 items-start">
                     <input type="text" id="newBtnIcon" value="💬" placeholder="Emoji or leave empty" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                     <div class="flex flex-col items-center gap-1">
@@ -274,21 +280,24 @@ function closeAddSocial() {
 }
 function addSocialBtn() {
     var name = document.getElementById('newBtnName').value.trim();
-    var icon = document.getElementById('newBtnIcon').value.trim() || '💬';
+    var icon = document.getElementById('newBtnIcon').value.trim();
     var color = document.getElementById('newBtnColor').value.trim() || '#25D366';
     var url = document.getElementById('newBtnUrl').value.trim();
     var fileInput = document.getElementById('newBtnIconFile');
     var hasFile = fileInput && fileInput.files.length > 0;
-    if (!name || !url) { alert('Name and URL are required.'); return; }
+    if (!url) { alert('URL is required.'); return; }
     var container = document.getElementById('socialButtonsContainer');
     var msg = document.getElementById('noSocialMsg');
     if (msg) msg.style.display = 'none';
     var rnd = Date.now();
     var html = '<div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
-    html += '<div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="' + escHtml(name) + '" placeholder="Name" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
+    html += '<div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="' + escHtml(name) + '" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
     html += '<div class="flex flex-col items-center gap-1">';
+    html += '<div class="flex items-center gap-1">';
     html += '<img src="' + (hasFile ? URL.createObjectURL(fileInput.files[0]) : '') + '" class="w-7 h-7 object-contain icon-preview"' + (hasFile ? '' : ' style="display:none"') + '>';
-    html += '<span class="text-xl icon-emoji' + (hasFile ? ' hidden' : '') + '">' + escHtml(icon) + '</span>';
+    html += '<span class="text-xl icon-emoji' + (hasFile || !icon ? ' hidden' : '') + '">' + escHtml(icon) + '</span>';
+    if (!icon && !hasFile && !name) html += '<span class="text-xs text-gray-400 italic">no icon</span>';
+    html += '</div>';
     html += '<label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][' + rnd + ']" accept="image/*" class="hidden" onchange="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-preview\').src=window.URL.createObjectURL(this.files[0]);r.querySelector(\'.icon-preview\').style.display=\'\';r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-hidden\').value=\'\'"></label>';
     html += '<input type="hidden" name="social_buttons[icon][]" class="icon-hidden" value="' + (hasFile ? '' : escHtml(icon)) + '">';
     html += '</div>';

@@ -25,36 +25,47 @@ $popup_enabled = getSetting('popup_notice_enabled');
 .fab-container { position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; }
 .fab-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .fab-overlay.show { opacity: 1; pointer-events: auto; }
-.fab-button { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd, #6610f2); box-shadow: 0 6px 20px rgba(13,110,253,0.4); display: flex; justify-content: center; align-items: center; color: white; font-size: 26px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; outline: none; position: relative; overflow: hidden; }
+.fab-button { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd, #6610f2); box-shadow: 0 6px 20px rgba(13,110,253,0.4); display: flex; justify-content: center; align-items: center; color: white; font-size: 26px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; outline: none; position: relative; overflow: hidden; z-index: 2; }
 .fab-button:hover { transform: scale(1.08); box-shadow: 0 8px 28px rgba(13,110,253,0.5); }
 .fab-button:active { transform: scale(0.95); }
 .fab-button .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.35); transform: scale(0); animation: rippleAnim 0.6s ease-out; }
 @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
 .fab-button.open { transform: rotate(45deg); box-shadow: 0 4px 14px rgba(13,110,253,0.3); }
-.fab-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.fab-options a { text-decoration: none; color: white; font-weight: 600; padding: 0; border-radius: 50px; font-family: 'Segoe UI', sans-serif; font-size: 14px; display: flex; align-items: center; gap: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; overflow: hidden; white-space: nowrap; }
-.fab-options.show a { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-.fab-options a .btn-icon { width: 40px; height: 40px; min-width: 40px; display: flex; justify-content: center; align-items: center; font-size: 18px; background: rgba(0,0,0,0.15); border-radius: 50px 0 0 50px; }
-.fab-options a .btn-label { padding: 0 16px 0 10px; font-size: 13px; }
-.fab-options a:hover { transform: translateY(-3px) scale(1.04) !important; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-.fab-options img { width: 20px; height: 20px; }
+.fab-options { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; margin-bottom: 14px; }
+.fab-option { display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; opacity: 0; transform: translateX(30px) scale(0.6); transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+.fab-options.show .fab-option { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+.fab-option .fab-circle { width: 48px; height: 48px; min-width: 48px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.25); text-decoration: none; transition: all 0.25s ease; position: relative; }
+.fab-option .fab-circle:hover { transform: scale(1.12); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+.fab-option .fab-circle img { width: 22px; height: 22px; border-radius: 0; }
+.fab-option .fab-circle .no-icon { font-size: 18px; font-weight: 700; }
+.fab-option .fab-label { font-family: 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: #fff; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); padding: 5px 14px; border-radius: 20px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.15); pointer-events: none; }
 </style>
 
 <div class="fab-overlay" id="fabOverlay" onclick="toggleFab()"></div>
 <div class="fab-container">
 <div class="fab-options" id="fabOptions">
 <?php $fi = 0; foreach ($social_buttons as $btn):
-    $bg_style = !empty($btn['color']) ? 'background:' . $btn['color'] : '';
+    $bg_style = !empty($btn['color']) ? 'background:' . $btn['color'] : 'background:#0d6efd';
+    $has_name = !empty(trim($btn['name'] ?? ''));
     $icon_html = '';
+    $has_icon = false;
     if (!empty($btn['icon'])) {
         if (strpos($btn['icon'], '/') !== false || strpos($btn['icon'], '.') !== false) {
             $icon_html = '<img src="' . htmlspecialchars($btn['icon']) . '" alt="' . htmlspecialchars($btn['name'] ?? '') . '">';
+            $has_icon = true;
         } else {
             $icon_html = htmlspecialchars($btn['icon']);
+            $has_icon = true;
         }
     }
+    if (!$has_icon && $has_name) {
+        $icon_html = '<span class="no-icon">' . htmlspecialchars(mb_substr(trim($btn['name']), 0, 1)) . '</span>';
+    }
 ?>
-<a href="<?php echo htmlspecialchars($btn['url'] ?? '#'); ?>" target="_blank" style="<?php echo $bg_style; ?>;transition-delay:<?php echo $fi * 0.04; ?>s"><span class="btn-icon"><?php echo $icon_html; ?></span><span class="btn-label"><?php echo htmlspecialchars($btn['name'] ?? ''); ?></span></a>
+<div class="fab-option" style="transition-delay:<?php echo $fi * 0.05; ?>s">
+    <?php if ($has_name): ?><span class="fab-label"><?php echo htmlspecialchars(trim($btn['name'])); ?></span><?php endif; ?>
+    <a href="<?php echo htmlspecialchars($btn['url'] ?? '#'); ?>" target="_blank" class="fab-circle" style="<?php echo $bg_style; ?>"><?php echo $icon_html ?: ''; ?></a>
+</div>
 <?php $fi++; endforeach; ?>
 </div>
 <button class="fab-button" id="fabBtn" onclick="toggleFab()"><?php echo $fab_icon; ?></button>
@@ -70,10 +81,6 @@ function toggleFab() {
         opts.classList.toggle("show");
         if (overlay) overlay.classList.toggle("show");
         if (btn) btn.classList.toggle("open");
-        if (!isOpen) {
-            var links = opts.querySelectorAll('a');
-            links.forEach(function(a, i) { a.style.transitionDelay = (i * 0.05) + 's'; });
-        }
     }
 }
 document.addEventListener('DOMContentLoaded', function() {
