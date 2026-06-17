@@ -126,8 +126,8 @@ if ($social_buttons_raw) {
             <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Popup Message</label><textarea name="popup_notice_message" rows="5" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($s['popup_notice_message'] ?? ''); ?></textarea></div>
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label><input type="text" name="popup_notice_bg_color" value="<?php echo htmlspecialchars($s['popup_notice_bg_color'] ?? 'rgba(255,255,255,0.8)'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="rgba(255,255,255,0.8)"></div>
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Text Color</label><input type="text" name="popup_notice_text_color" value="<?php echo htmlspecialchars($s['popup_notice_text_color'] ?? '#333'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="#333"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">"Don't show again" Label</label><input type="text" name="popup_hide_label" value="<?php echo htmlspecialchars($s['popup_hide_label'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="আজকের জন্য আর দেখাবেন না"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Close Button Text</label><input type="text" name="popup_close_text" value="<?php echo htmlspecialchars($s['popup_close_text'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="❌ বন্ধ করুন"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">"Don't show again" Label</label><input type="text" name="popup_hide_label" value="<?php echo htmlspecialchars($s['popup_hide_label'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Don't show again today"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Close Button Text</label><input type="text" name="popup_close_text" value="<?php echo htmlspecialchars($s['popup_close_text'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="❌ Close"></div>
         </div>
     </div>
 
@@ -144,6 +144,18 @@ if ($social_buttons_raw) {
             if ($social_links_raw) {
                 $decoded = json_decode($social_links_raw, true);
                 if (is_array($decoded)) $social_links = $decoded;
+            }
+            // Migrate old individual settings to new format
+            if (empty($social_links)) {
+                $old_links = [
+                    ['name' => 'Facebook', 'icon' => 'fab fa-facebook', 'color' => '#1877f2', 'url' => $s['facebook_url'] ?? ''],
+                    ['name' => 'Twitter', 'icon' => 'fab fa-twitter', 'color' => '#1da1f2', 'url' => $s['twitter_url'] ?? ''],
+                    ['name' => 'LinkedIn', 'icon' => 'fab fa-linkedin', 'color' => '#0a66c2', 'url' => $s['linkedin_url'] ?? ''],
+                    ['name' => 'YouTube', 'icon' => 'fab fa-youtube', 'color' => '#ff0000', 'url' => $s['youtube_url'] ?? ''],
+                ];
+                foreach ($old_links as $link) {
+                    if (!empty($link['url'])) $social_links[] = $link;
+                }
             }
             if (empty($social_links)): ?>
             <div id="noSocialLinksMsg" class="text-center py-8 text-gray-400">
