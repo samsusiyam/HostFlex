@@ -1,0 +1,30 @@
+RewriteEngine On
+
+# Deny access to sensitive files
+<FilesMatch "^(\.env|\.git|composer\.(json|lock|phar)|package\.json|package-lock\.json|yarn\.lock|webpack\.config\.*|vite\.config\.*|tsconfig\.*|\.editorconfig|\.prettierrc|\.browserslistrc)$">
+  Require all denied
+</FilesMatch>
+
+# Deny access to hidden files and directories
+<IfModule mod_rewrite.c>
+  RewriteRule "(^|/)\." - [F]
+</IfModule>
+
+# SEO-friendly URLs
+<IfModule mod_rewrite.c>
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  RewriteRule ^blog/([a-z0-9-]+)$ blog.php?slug=$1 [L,QSA]
+  RewriteRule ^page/([a-z0-9-]+)$ page.php?slug=$1 [L,QSA]
+  RewriteRule ^category/([a-z0-9-]+)$ category.php?slug=$1 [L,QSA]
+  RewriteRule ^blog$ blogs.php [L,QSA]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
