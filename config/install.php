@@ -31,10 +31,16 @@ function testDbConnection($host, $user, $pass, $name) {
     try {
         $conn = @mysqli_connect($host, $user, $pass);
     } catch (Throwable $e) {
-        return 'Could not connect to MySQL: ' . $e->getMessage();
+        return 'MySQL connection failed: ' . $e->getMessage();
     }
-    if (!$conn) return 'Could not connect to MySQL: ' . mysqli_connect_error();
-    if (!@mysqli_select_db($conn, $name)) return 'Database "' . htmlspecialchars($name) . '" not found. Create it first and try again.';
+    if (!$conn) {
+        $err = mysqli_connect_error();
+        return 'MySQL connection failed' . ($err ? ': ' . $err : '. Check host, username and password.');
+    }
+    if (!@mysqli_select_db($conn, $name)) {
+        $err = mysqli_error($conn);
+        return 'Cannot select database "' . htmlspecialchars($name) . '"' . ($err ? ': ' . $err : '. Create it first.');
+    }
     $r = @mysqli_query($conn, 'SELECT 1');
     if (!$r) return 'Database connected but query failed: ' . mysqli_error($conn);
     $r = @mysqli_query($conn, "SHOW TABLES");
@@ -64,6 +70,7 @@ function writeDatabaseConfig($host, $user, $pass, $name) {
 }
 
 function getDbConn() {
+    if (session_status() === PHP_SESSION_NONE) @session_start();
     // Try direct from session first (most reliable)
     if (!empty($_SESSION['install_db_host'])) {
         try {
