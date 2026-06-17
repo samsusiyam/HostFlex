@@ -185,7 +185,7 @@ if (!isset($sections)) {
                 'chat_url' => getSetting('hero_chat_url') ?: ''
             ]],
             ['type' => 'domain_search', 'enabled' => '1', 'sort_order' => 2, 'content' => [
-                'search_url' => getSetting('whmcs_domain_search_url') ?: 'https://my.hostnibo.com/domainchecker.php',
+                'search_url' => getSetting('whmcs_domain_search_url') ?: '#',
                 'pricing' => [
                     ['tld' => '.com', 'price' => '999'],
                     ['tld' => '.online', 'price' => '455'],

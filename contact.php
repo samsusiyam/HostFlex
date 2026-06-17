@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$error) {
         $query = "INSERT INTO contacts (name, email, subject, message) VALUES ('$name', '$email', '$subject', '$message')";
         if (mysqli_query($conn, $query)) {
-            $site_name = getSetting('site_name') ?: 'Host Nibo';
+            $site_name = getSetting('site_name') ?: 'HostFlex';
             $admin_email = getSetting('site_email');
 
             // Send auto-reply to submitter using Contact Auto-Reply template

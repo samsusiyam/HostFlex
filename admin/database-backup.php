@@ -14,7 +14,7 @@ if (isset($_GET['download'])) {
         $tables[] = $row[0];
     }
 
-    $output = "-- Host Nibo Database Backup\n";
+    $output = "-- HostFlex Database Backup\n";
     $output .= "-- Generated: " . date('Y-m-d H:i:s') . "\n\n";
 
     foreach ($tables as $table) {

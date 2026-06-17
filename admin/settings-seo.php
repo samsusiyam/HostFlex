@@ -35,7 +35,7 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($s['meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2" placeholder="hosting, domain, web hosting"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Author</label><input type="text" name="meta_author" value="<?php echo htmlspecialchars($s['meta_author'] ?? ''); ?>" class="w-full border rounded px-3 py-2" placeholder="Host Nibo"></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Author</label><input type="text" name="meta_author" value="<?php echo htmlspecialchars($s['meta_author'] ?? ''); ?>" class="w-full border rounded px-3 py-2" placeholder="HostFlex"></div>
         </div>
     </div>
     <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>

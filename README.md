@@ -1,6 +1,6 @@
 # HostFlex - Hosting Management Panel
 
-A full-featured hosting admin panel and website template built with PHP, MySQL, and Tailwind CSS.
+A white-label hosting admin panel and website template built with PHP, MySQL, and Tailwind CSS. Brand as your own — only the install wizard shows "Powered by HostNibo".
 
 ## Features
 
@@ -26,36 +26,26 @@ A full-featured hosting admin panel and website template built with PHP, MySQL, 
 - Apache with mod_rewrite (for SEO URLs)
 - PHP extensions: mysqli, zip, openssl
 
-## Installation
+## Installation (via Setup Wizard)
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/samsusiyam/HostFlex.git
    ```
 
-2. Import `database.sql` to your MySQL database
+2. Create a MySQL database (e.g. `hostflex`)
 
-3. Configure database connection in `config/database.php`
+3. Navigate to `http://yourdomain.com/` — you will be redirected to the install wizard
 
-4. Run installation:
-   ```
-   http://yourdomain.com/config/install.php
-   ```
+4. **Step 1**: Enter database credentials (host, user, password, database name) and submit
 
-5. Run system migration:
-   ```
-   http://yourdomain.com/config/migrate-system.php
-   ```
+5. **Step 2**: Configure site name, tagline, description, and create admin account
 
-6. Login at `/admin/dashboard.php` (default: admin / password)
+6. **Step 3**: Installation runs automatically — tables created, demo content seeded
 
-7. Configure settings: General → Logo & Branding → Homepage Editor → etc.
+7. Login at `/admin/index.php` with the admin credentials you provided
 
-## Default Admin Login
-
-- **URL**: `/admin/dashboard.php`
-- **Username**: `admin`
-- **Password**: `password`
+All tables, demo content (plans, categories, offers, blog posts, pages, testimonials, FAQ, partners, menu items) and settings are created automatically. No manual SQL import needed.
 
 ## Directory Structure
 

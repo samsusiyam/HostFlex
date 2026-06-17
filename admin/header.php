@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'Dashboard'; ?> - Host Nibo Admin</title>
+    <title><?php echo $page_title ?? 'Dashboard'; ?> - HostFlex Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
@@ -32,7 +32,7 @@
             <div class="flex items-center">
                 <button onclick="toggleSidebar()" class="md:hidden mr-3 text-gray-500 hover:text-blue-600"><i class="fa fa-bars text-xl"></i></button>
                 <a href="dashboard.php" class="flex items-center space-x-3">
-                    <img src="../images/bg.png" class="h-8" alt="Host Nibo">
+                    <img src="../images/bg.png" class="h-8" alt="HostFlex">
                     <span class="font-semibold text-gray-700 hidden sm:inline">Admin Panel</span>
                 </a>
             </div>

@@ -43,16 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Host Nibo</title>
+    <title>Admin Login - HostFlex</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-            <div class="text-center mb-8">
-                <img src="../images/bg.png" class="h-12 mx-auto mb-4" alt="Host Nibo">
-                <h1 class="text-2xl font-bold text-gray-800">Admin Login</h1>
-                <p class="text-gray-500">Host Nibo Management Panel</p>
+<body class="bg-gradient-to-br from-blue-600 to-indigo-800 min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <div class="text-center mb-8">
+            <img src="../images/bg.png" class="h-12 mx-auto mb-4" alt="HostFlex">
+            <h2 class="text-2xl font-bold text-gray-800">Admin Login</h2>
+            <p class="text-gray-500">HostFlex Management Panel</p>
             </div>
             
             <?php if ($error): ?>
