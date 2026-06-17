@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 // Check if installed; redirect to wizard if not
 if (!file_exists(__DIR__ . '/config/database.php')) { header('Location: config/install.php'); exit; }
 require_once 'config/database.php';
