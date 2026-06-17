@@ -293,6 +293,7 @@ if (mysqli_num_rows($blog_posts) > 0):
         <?php if ($bpost['image']): ?>
         <a href="blog.php?slug=<?php echo htmlspecialchars($bpost['slug']); ?>">
         <img src="<?php echo htmlspecialchars($bpost['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($bpost['title']); ?>"></a>
+        <?php endif; ?>
         <div class="p-4">
             <p class="text-xs text-gray-500"><?php echo date('F d, Y', strtotime($bpost['created_at'])); ?></p>
             <h3 class="text-lg font-bold mt-1 mb-2"><a href="blog.php?slug=<?php echo htmlspecialchars($bpost['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($bpost['title']); ?></a></h3>
