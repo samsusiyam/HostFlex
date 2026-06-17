@@ -42,7 +42,7 @@ $meta_kw = $post['meta_keywords'] ?? '';
     <?php if ($post['image']): ?>
     <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full max-h-[400px] object-cover rounded-xl mb-8" alt="<?php echo htmlspecialchars($post['title']); ?>">
     <?php endif; ?>
-    <div class="prose max-w-none text-gray-800 leading-relaxed">
+    <div class="blog-content text-gray-800 leading-relaxed">
         <?php echo $post['content']; ?>
     </div>
     <div class="mt-10 pt-6 border-t">
@@ -50,6 +50,17 @@ $meta_kw = $post['meta_keywords'] ?? '';
     </div>
 </div>
 </section>
+
+<style>
+.blog-content h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+.blog-content h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.blog-content p { margin-bottom: 1rem; line-height: 1.75; color: #374151; }
+.blog-content ul, .blog-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+.blog-content ul { list-style-type: disc; }
+.blog-content ol { list-style-type: decimal; }
+.blog-content li { margin-bottom: 0.25rem; line-height: 1.75; }
+.blog-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
+</style>
 
 <?php include "footer.php"; ?>
 <script src="../cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
