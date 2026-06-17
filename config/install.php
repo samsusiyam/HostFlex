@@ -52,19 +52,19 @@ function getDbConn() {
 }
 
 function runQueries($conn, $sql, &$log) {
-    $queries = explode(';', $sql);
+    $sql = preg_replace('/^CREATE DATABASE.*$/m', '', $sql);
+    $sql = preg_replace('/^USE .*$/m', '', $sql);
+    $queries = preg_split('/;\s*\n/', $sql);
     foreach ($queries as $q) {
         $q = trim($q);
         if (empty($q)) continue;
-        if (stripos($q, 'CREATE DATABASE') === 0 || stripos($q, 'USE ') === 0) continue;
         if (@mysqli_query($conn, $q)) {
             $short = substr($q, 0, 70);
             $log[] = 'OK: ' . $short . '...';
         } else {
             $err = mysqli_error($conn);
             if (stripos($err, 'already exists') !== false || stripos($err, 'Duplicate') !== false) {
-                $short = substr($q, 0, 70);
-                $log[] = 'SKIP (exists): ' . $short . '...';
+                $log[] = 'SKIP (exists): ' . substr($q, 0, 60) . '...';
             } else {
                 $log[] = 'ERROR: ' . $err;
             }
