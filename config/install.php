@@ -29,8 +29,14 @@ $success = '';
 
 function testDbConnection($host, $user, $pass, $name) {
     $conn = @mysqli_connect($host, $user, $pass);
-    if (!$conn) return 'Connection failed: ' . mysqli_connect_error();
-    if (!@mysqli_select_db($conn, $name)) return 'Database "' . htmlspecialchars($name) . '" not found. Create it and try again.';
+    if (!$conn) return 'Could not connect to MySQL: ' . mysqli_connect_error();
+    if (!@mysqli_select_db($conn, $name)) return 'Database "' . htmlspecialchars($name) . '" not found. Create it first and try again.';
+    $r = @mysqli_query($conn, 'SELECT 1');
+    if (!$r) return 'Database connected but query failed: ' . mysqli_error($conn);
+    $r = @mysqli_query($conn, "SHOW TABLES");
+    if ($r && mysqli_num_rows($r) > 0) {
+        return 'Database exists and has ' . mysqli_num_rows($r) . ' existing table(s). Installation will add missing tables.';
+    }
     mysqli_close($conn);
     return 'OK';
 }
@@ -54,7 +60,7 @@ function writeDatabaseConfig($host, $user, $pass, $name) {
 }
 
 function getDbConn() {
-    require_once __DIR__ . '/database.php';
+    include __DIR__ . '/database.php';
     global $conn;
     return $conn;
 }
@@ -88,13 +94,23 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['db_name'] ?? '');
 
     $test = testDbConnection($host, $user, $pass, $name);
-    if ($test !== 'OK') {
+    if (strpos($test, 'OK') === false && strpos($test, 'existing table') === false) {
         $error = $test;
         $step = 1;
     } else {
         if (!writeDatabaseConfig($host, $user, $pass, $name)) {
             $error = 'Cannot write config/database.php. Check directory permissions.';
             $step = 1;
+        } else {
+            // Verify the written config by making a fresh direct connection
+            $v = @mysqli_connect($host, $user, $pass, $name);
+            if (!$v || !@mysqli_ping($v)) {
+                $error = 'Database config written but connection failed. Check credentials and try again.';
+                $step = 1;
+                @unlink(__DIR__ . '/database.php');
+            } else {
+                mysqli_close($v);
+            }
         }
     }
 }
