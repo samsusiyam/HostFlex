@@ -60,6 +60,7 @@ function getDbConn() {
 }
 
 function runQueries($conn, $sql, &$log) {
+    if (!$conn) { $log[] = 'ERROR: No database connection.'; return; }
     $sql = preg_replace('/^CREATE DATABASE.*$/m', '', $sql);
     $sql = preg_replace('/^USE .*$/m', '', $sql);
     $queries = preg_split('/;\s*\n/', $sql);
@@ -112,6 +113,8 @@ if ($step === 3 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (strlen($admin_pass) < 4) $error = 'Password must be at least 4 characters.';
     else {
         $conn = getDbConn();
+        if (!$conn || !@mysqli_ping($conn)) $error = 'Database connection failed. Please go back to Step 1 and verify credentials.';
+        else {
         $log = [];
         $sql_schema = file_get_contents(__DIR__ . '/../database.sql');
         runQueries($conn, $sql_schema, $log);
@@ -148,6 +151,7 @@ if ($step === 3 && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $log[] = 'Admin user created: ' . htmlspecialchars($admin_user);
         $log[] = 'Installation complete!';
         $success = implode("\n", $log);
+        }
     }
 }
 
