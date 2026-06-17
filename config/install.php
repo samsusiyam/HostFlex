@@ -6,8 +6,8 @@ ini_set('display_errors', 1);
 $dbFile = __DIR__ . '/database.php';
 if (file_exists($dbFile)) {
     @include_once $dbFile;
-    if (isset($conn) && @mysqli_ping($conn)) {
-        $r = @mysqli_query($conn, "SHOW TABLES LIKE 'users'");
+    if (!empty($conn) && @mysqli_ping($conn)) {
+        $r = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
         if ($r && mysqli_num_rows($r) > 0) {
             header('Location: ../index.php');
             exit;

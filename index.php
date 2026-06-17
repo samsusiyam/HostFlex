@@ -1,7 +1,9 @@
 <?php
+// Check if installed; redirect to wizard if not
 if (!file_exists(__DIR__ . '/config/database.php')) { header('Location: config/install.php'); exit; }
 require_once 'config/database.php';
-$r = @mysqli_query($conn, "SHOW TABLES LIKE 'users'");
+if (!$conn || !mysqli_ping($conn)) { header('Location: config/install.php'); exit; }
+$r = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
 if (!$r || mysqli_num_rows($r) == 0) { header('Location: config/install.php'); exit; }
 require_once 'includes/functions.php'; checkMaintenance();
 
