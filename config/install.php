@@ -2,20 +2,23 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Redirect if already installed
-$dbFile = __DIR__ . '/database.php';
-if (file_exists($dbFile)) {
-    @include_once $dbFile;
-    if (!empty($conn) && @mysqli_ping($conn)) {
-        $r = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
-        if ($r && mysqli_num_rows($r) > 0) {
-            header('Location: ../index.php');
-            exit;
+// Redirect if already installed (skip during step 3 = installation in progress)
+$step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
+if ($step !== 3) {
+    $dbFile = __DIR__ . '/database.php';
+    if (file_exists($dbFile)) {
+        @include_once $dbFile;
+        if (!empty($conn) && @mysqli_ping($conn)) {
+            $r = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
+            if ($r && mysqli_num_rows($r) > 0) {
+                header('Location: ../index.php');
+                exit;
+            }
         }
     }
 }
 
-$step = isset($_GET['step']) ? max(1, min(3, (int)$_GET['step'])) : 1;
+$step = max(1, min(3, $step));
 $error = '';
 $success = '';
 
