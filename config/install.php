@@ -64,6 +64,14 @@ function writeDatabaseConfig($host, $user, $pass, $name) {
 }
 
 function getDbConn() {
+    // Try direct from session first (most reliable)
+    if (!empty($_SESSION['install_db_host'])) {
+        try {
+            $c = @mysqli_connect($_SESSION['install_db_host'], $_SESSION['install_db_user'], $_SESSION['install_db_pass'], $_SESSION['install_db_name']);
+            if ($c) { mysqli_set_charset($c, "utf8"); return $c; }
+        } catch (Throwable $e) {}
+    }
+    // Fallback: read config file
     include __DIR__ . '/database.php';
     global $conn;
     return $conn;
@@ -106,6 +114,11 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Cannot write config/database.php. Check directory permissions.';
             $step = 1;
         } else {
+            // Save credentials in session for step 3 to use directly
+            $_SESSION['install_db_host'] = $host;
+            $_SESSION['install_db_user'] = $user;
+            $_SESSION['install_db_pass'] = $pass;
+            $_SESSION['install_db_name'] = $name;
             // Verify the written config by making a fresh direct connection
             try { $v = @mysqli_connect($host, $user, $pass, $name); } catch (Throwable $e) { $v = false; }
             if (!$v || !@mysqli_ping($v)) {
@@ -134,18 +147,7 @@ if ($step === 3 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     else {
         $conn = getDbConn();
         if (!$conn || !@mysqli_ping($conn)) {
-            $eMsg = '';
-            if (file_exists(__DIR__ . '/database.php')) {
-                @include __DIR__ . '/database.php';
-                if (empty($conn)) {
-                    try { $t = @mysqli_connect($db_host, $db_user, $db_pass, $db_name); } catch (Throwable $e) { $eMsg = $e->getMessage(); }
-                    if (empty($t) && !$eMsg) $eMsg = @mysqli_connect_error() ?: 'Unknown error. Check host/user/pass/db_name.';
-                    if ($t) mysqli_close($t);
-                }
-            } else {
-                $eMsg = 'config/database.php not found.';
-            }
-            $error = 'Database connection failed: ' . $eMsg;
+            $error = 'Database connection failed. Please go back to Step 1 and verify credentials.';
         } else {
         $log = [];
         $sql_schema = file_get_contents(__DIR__ . '/../database.sql');
