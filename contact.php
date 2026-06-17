@@ -6,6 +6,12 @@ $recaptcha_enabled = getSetting('recaptcha_enabled') === '1';
 $recaptcha_site_key = getSetting('recaptcha_site_key');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Raw values for email templates (not double-escaped)
+    $raw_name = trim($_POST['name']);
+    $raw_email = trim($_POST['email']);
+    $raw_subject = trim($_POST['subject']);
+    $raw_message = $_POST['message'];
+    // Sanitized values for DB storage
     $name = sanitize($_POST['name']);
     $email = sanitize($_POST['email']);
     $subject = sanitize($_POST['subject']);
@@ -31,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($tpl_row = mysqli_fetch_assoc($tpl)) {
                 $body = str_replace(
                     ['{name}', '{email}', '{message}', '{site_name}', '{site_url}'],
-                    [htmlspecialchars($name), htmlspecialchars($email), nl2br(htmlspecialchars($message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
+                    [htmlspecialchars($raw_name), htmlspecialchars($raw_email), nl2br(htmlspecialchars($raw_message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
                     $tpl_row['body']
                 );
                 $subj = str_replace(['{site_name}', '{site_url}'], [$site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']], $tpl_row['subject']);
@@ -57,21 +63,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($forward_emails)) {
                 // Load forward email template
                 $fwd_tpl = mysqli_query($conn, "SELECT * FROM email_templates WHERE name = 'Contact Forward (Admin)' LIMIT 1");
-                $fwd_subj = "Contact: $subject";
+                $fwd_subj = "Contact: $raw_subject";
                 $fwd_body = "<h3>New Contact Message</h3>
-                    <p><strong>Name:</strong> " . htmlspecialchars($name) . "</p>
-                    <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
-                    <p><strong>Subject:</strong> " . htmlspecialchars($subject) . "</p>
-                    <p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message)) . "</p>";
+                    <p><strong>Name:</strong> " . htmlspecialchars($raw_name) . "</p>
+                    <p><strong>Email:</strong> " . htmlspecialchars($raw_email) . "</p>
+                    <p><strong>Subject:</strong> " . htmlspecialchars($raw_subject) . "</p>
+                    <p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($raw_message)) . "</p>";
                 if ($fwd_tpl_row = mysqli_fetch_assoc($fwd_tpl)) {
                     $fwd_subj = str_replace(
                         ['{name}', '{email}', '{subject}', '{message}', '{site_name}', '{site_url}'],
-                        [$name, $email, $subject, nl2br(htmlspecialchars($message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
+                        [$raw_name, $raw_email, $raw_subject, nl2br(htmlspecialchars($raw_message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
                         $fwd_tpl_row['subject']
                     );
                     $fwd_body = str_replace(
                         ['{name}', '{email}', '{subject}', '{message}', '{site_name}', '{site_url}'],
-                        [htmlspecialchars($name), htmlspecialchars($email), htmlspecialchars($subject), nl2br(htmlspecialchars($message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
+                        [htmlspecialchars($raw_name), htmlspecialchars($raw_email), htmlspecialchars($raw_subject), nl2br(htmlspecialchars($raw_message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
                         $fwd_tpl_row['body']
                     );
                 }
