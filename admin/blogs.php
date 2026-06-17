@@ -237,7 +237,7 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500"><?php echo date('d M Y', strtotime($post['created_at'])); ?></td>
                 <td class="px-4 py-3 text-right">
-                    <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 mr-2" title="View"><i class="fa fa-eye"></i></a>
+                    <a href="../blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 mr-2" title="View"><i class="fa fa-eye"></i></a>
                     <a href="?edit=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 mr-2" title="Edit"><i class="fa fa-edit"></i></a>
                     <a href="?delete=<?php echo $post['id']; ?>" onclick="return confirm('Delete this post?')" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa fa-trash"></i></a>
                 </td>

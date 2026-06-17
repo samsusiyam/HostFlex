@@ -48,19 +48,19 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <?php while ($post = mysqli_fetch_assoc($posts)): ?>
             <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
                 <?php if ($post['image']): ?>
-<a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>">
+<a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>">
                     <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($post['title']); ?>">
                 </a>
                 <?php endif; ?>
                 <div class="p-5">
                     <?php if ($post['category_name']): ?>
-                    <a href="/category/<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+                    <a href="category.php?slug=<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
                     <?php endif; ?>
-                    <h3 class="text-lg font-bold mt-1 mb-2"><a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($post['title']); ?></a></h3>
+                    <h3 class="text-lg font-bold mt-1 mb-2"><a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($post['title']); ?></a></h3>
                     <p class="text-sm text-gray-500 mb-3"><?php echo htmlspecialchars($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 150) . '...'); ?></p>
                     <div class="flex items-center justify-between text-xs text-gray-400">
                         <span><?php echo $post['author'] ? htmlspecialchars($post['author']) . ' • ' : ''; ?><?php echo date('d M Y', strtotime($post['created_at'])); ?></span>
-                        <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-blue-600 hover:underline">Read More</a>
+                        <a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="text-blue-600 hover:underline">Read More</a>
                     </div>
                 </div>
             </div>

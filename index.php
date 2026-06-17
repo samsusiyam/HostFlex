@@ -291,13 +291,11 @@ if (mysqli_num_rows($blog_posts) > 0):
     <?php while ($bpost = mysqli_fetch_assoc($blog_posts)): ?>
     <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
         <?php if ($bpost['image']): ?>
-        <a href="/blog/<?php echo htmlspecialchars($bpost['slug']); ?>">
-                    <img alt="<?php echo htmlspecialchars($bpost['title']); ?>" class="h-[200px] w-full object-cover" src="<?php echo htmlspecialchars($bpost['image']); ?>">
-                </a>
-                <?php endif; ?>
-                <div class="p-5">
-                    <p class="mb-2 text-xs font-semibold tracking-wide text-blue-600 uppercase"><?php echo htmlspecialchars($bpost['category_name'] ?: 'Blog'); ?></p>
-                    <h3 class="text-lg font-bold mt-1 mb-2"><a href="/blog/<?php echo htmlspecialchars($bpost['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($bpost['title']); ?></a></h3>
+        <a href="blog.php?slug=<?php echo htmlspecialchars($bpost['slug']); ?>">
+        <img src="<?php echo htmlspecialchars($bpost['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($bpost['title']); ?>"></a>
+        <div class="p-4">
+            <p class="text-xs text-gray-500"><?php echo date('F d, Y', strtotime($bpost['created_at'])); ?></p>
+            <h3 class="text-lg font-bold mt-1 mb-2"><a href="blog.php?slug=<?php echo htmlspecialchars($bpost['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($bpost['title']); ?></a></h3>
             <p class="text-sm text-gray-500 mb-3"><?php echo htmlspecialchars($bpost['excerpt'] ?: substr(strip_tags($bpost['content']), 0, 150) . '...'); ?></p>
             <div class="text-xs text-gray-400">
                 <span><?php echo date('d M Y', strtotime($bpost['created_at'])); ?></span>
