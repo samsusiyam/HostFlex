@@ -55,14 +55,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($fallback) $forward_emails[] = $fallback;
             }
             if (!empty($forward_emails)) {
-                $forward_body = "<h3>New Contact Message</h3>
+                // Load forward email template
+                $fwd_tpl = mysqli_query($conn, "SELECT * FROM email_templates WHERE name = 'Contact Forward (Admin)' LIMIT 1");
+                $fwd_subj = "Contact: $subject";
+                $fwd_body = "<h3>New Contact Message</h3>
                     <p><strong>Name:</strong> " . htmlspecialchars($name) . "</p>
                     <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
                     <p><strong>Subject:</strong> " . htmlspecialchars($subject) . "</p>
                     <p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message)) . "</p>";
+                if ($fwd_tpl_row = mysqli_fetch_assoc($fwd_tpl)) {
+                    $fwd_subj = str_replace(
+                        ['{name}', '{email}', '{subject}', '{message}', '{site_name}', '{site_url}'],
+                        [$name, $email, $subject, nl2br(htmlspecialchars($message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
+                        $fwd_tpl_row['subject']
+                    );
+                    $fwd_body = str_replace(
+                        ['{name}', '{email}', '{subject}', '{message}', '{site_name}', '{site_url}'],
+                        [htmlspecialchars($name), htmlspecialchars($email), htmlspecialchars($subject), nl2br(htmlspecialchars($message)), $site_name, $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']],
+                        $fwd_tpl_row['body']
+                    );
+                }
                 foreach ($forward_emails as $forward_to) {
                     $mail_err = '';
-                    $forward_sent = sendMail($forward_to, "Contact: $subject", $forward_body, $email, $mail_err);
+                    $forward_sent = sendMail($forward_to, $fwd_subj, $fwd_body, $email, $mail_err);
                     if (!$forward_sent) {
                         error_log("Contact forward failed to $forward_to: $mail_err");
                     }

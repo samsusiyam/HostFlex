@@ -22,6 +22,12 @@ if (mysqli_num_rows($check) == 0) {
             'Thank you for contacting {site_name}',
             "<p>Dear {name},</p>\n<p>Thank you for reaching out to us. We have received your message and will get back to you shortly.</p>\n<p><strong>Your message:</strong></p>\n<p>{message}</p>\n<p>Best regards,<br>{site_name} Team</p>",
             'name,email,message,site_name,site_url'
+        ],
+        [
+            'Contact Forward (Admin)',
+            'New Contact Message: {subject}',
+            "<h3>New Contact Message</h3>\n<p><strong>Name:</strong> {name}</p>\n<p><strong>Email:</strong> {email}</p>\n<p><strong>Subject:</strong> {subject}</p>\n<p><strong>Message:</strong><br>{message}</p>",
+            'name,email,subject,message,site_name,site_url'
         ]
     ];
 
@@ -31,6 +37,17 @@ if (mysqli_num_rows($check) == 0) {
         mysqli_stmt_execute($stmt);
     }
     mysqli_stmt_close($stmt);
+}
+
+// Auto-seed Contact Forward template for existing installations
+$check_fwd = mysqli_query($conn, "SELECT id FROM email_templates WHERE name = 'Contact Forward (Admin)'");
+if (mysqli_num_rows($check_fwd) == 0) {
+    mysqli_query($conn, "INSERT INTO email_templates (name, subject, body, variables) VALUES (
+        'Contact Forward (Admin)',
+        'New Contact Message: {subject}',
+        '<h3>New Contact Message</h3>\n<p><strong>Name:</strong> {name}</p>\n<p><strong>Email:</strong> {email}</p>\n<p><strong>Subject:</strong> {subject}</p>\n<p><strong>Message:</strong><br>{message}</p>',
+        'name,email,subject,message,site_name,site_url'
+    )");
 }
 
 // POST handling
