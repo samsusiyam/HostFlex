@@ -133,8 +133,20 @@ if ($step === 3 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (strlen($admin_pass) < 4) $error = 'Password must be at least 4 characters.';
     else {
         $conn = getDbConn();
-        if (!$conn || !@mysqli_ping($conn)) $error = 'Database connection failed. Please go back to Step 1 and verify credentials.';
-        else {
+        if (!$conn || !@mysqli_ping($conn)) {
+            $eMsg = '';
+            if (file_exists(__DIR__ . '/database.php')) {
+                @include __DIR__ . '/database.php';
+                if (empty($conn)) {
+                    try { $t = @mysqli_connect($db_host, $db_user, $db_pass, $db_name); } catch (Throwable $e) { $eMsg = $e->getMessage(); }
+                    if (empty($t) && !$eMsg) $eMsg = @mysqli_connect_error() ?: 'Unknown error. Check host/user/pass/db_name.';
+                    if ($t) mysqli_close($t);
+                }
+            } else {
+                $eMsg = 'config/database.php not found.';
+            }
+            $error = 'Database connection failed: ' . $eMsg;
+        } else {
         $log = [];
         $sql_schema = file_get_contents(__DIR__ . '/../database.sql');
         runQueries($conn, $sql_schema, $log);
