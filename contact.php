@@ -25,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query = "INSERT INTO contacts (name, email, subject, message) VALUES ('$name', '$email', '$subject', '$message')";
         if (mysqli_query($conn, $query)) {
             $site_name = getSetting('site_name') ?: 'HostFlex';
-            $admin_email = getSetting('site_email');
 
             // Send auto-reply to submitter using Contact Auto-Reply template
             $tpl = mysqli_query($conn, "SELECT * FROM email_templates WHERE name = 'Contact Auto-Reply' LIMIT 1");
@@ -40,13 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Forward to admin with reply-to set to submitter
+            $admin_email = getSetting('site_email') ?: getSetting('smtp_from_email');
             if ($admin_email) {
                 $forward_body = "<h3>New Contact Message</h3>
                     <p><strong>Name:</strong> " . htmlspecialchars($name) . "</p>
                     <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
                     <p><strong>Subject:</strong> " . htmlspecialchars($subject) . "</p>
                     <p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message)) . "</p>";
-                sendMail($admin_email, "Contact: $subject", $forward_body, $email);
+                $mail_err = '';
+                $forward_sent = sendMail($admin_email, "Contact: $subject", $forward_body, $email, $mail_err);
+                if (!$forward_sent) {
+                    error_log("Contact forward failed to $admin_email: $mail_err");
+                }
             }
 
             $success = 'Your message has been sent successfully.';
