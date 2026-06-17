@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail_error = '';
         $sent = sendMail($test_to, 'Test Email from ' . getSetting('site_name'), '<h2>Test Email</h2><p>This is a test email from your SMTP configuration.</p>', '', $mail_error);
         if ($sent) {
-            $success = 'Test email sent successfully to ' . htmlspecialchars($test_to) . '!';
+            $success = 'Test email sent successfully to ' . htmlspecialchars($test_to) . '! Check your inbox (and spam folder).';
         } else {
-            $error = 'Failed to send test email. Error: ' . htmlspecialchars($mail_error);
+            $error = 'Failed to send test email to ' . htmlspecialchars($test_to) . '. Error: ' . htmlspecialchars($mail_error);
         }
     } else {
         $keys = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'smtp_from_email', 'smtp_from_name', 'smtp_reply_to'];
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-if (isset($_GET['s'])) {
+if (isset($_GET['s']) && !$success && !$error) {
     $success = 'Settings updated successfully!';
 }
 
