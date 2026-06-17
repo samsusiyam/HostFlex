@@ -39,6 +39,11 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
         </div>
     </div>
     <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-envelope text-green-600"></i> Forward Email</h2>
+        <p class="text-sm text-gray-500 mb-4">Contact form submissions will be forwarded to these email addresses. Add one per line.</p>
+        <div><textarea name="contact_forward_emails" rows="4" class="w-full border rounded px-3 py-2 font-mono text-sm" placeholder="admin@example.com&#10;support@example.com"><?php echo htmlspecialchars($s['contact_forward_emails'] ?? ''); ?></textarea></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-shield-alt text-blue-600"></i> reCAPTCHA Settings</h2>
         <p class="text-sm text-gray-500 mb-4">Configure reCAPTCHA keys in <a href="settings-integrations.php" class="text-blue-600 underline">Integrations</a> page.</p>
         <div class="flex items-center gap-3">

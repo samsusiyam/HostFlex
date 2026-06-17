@@ -39,17 +39,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Forward to admin with reply-to set to submitter
-            $admin_email = getSetting('site_email') ?: getSetting('smtp_from_email');
-            if ($admin_email) {
+            $forward_emails_raw = getSetting('contact_forward_emails');
+            $forward_emails = [];
+            if ($forward_emails_raw) {
+                $lines = explode("\n", $forward_emails_raw);
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if ($line && filter_var($line, FILTER_VALIDATE_EMAIL)) {
+                        $forward_emails[] = $line;
+                    }
+                }
+            }
+            if (empty($forward_emails)) {
+                $fallback = getSetting('site_email') ?: getSetting('smtp_from_email');
+                if ($fallback) $forward_emails[] = $fallback;
+            }
+            if (!empty($forward_emails)) {
                 $forward_body = "<h3>New Contact Message</h3>
                     <p><strong>Name:</strong> " . htmlspecialchars($name) . "</p>
                     <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
                     <p><strong>Subject:</strong> " . htmlspecialchars($subject) . "</p>
                     <p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message)) . "</p>";
-                $mail_err = '';
-                $forward_sent = sendMail($admin_email, "Contact: $subject", $forward_body, $email, $mail_err);
-                if (!$forward_sent) {
-                    error_log("Contact forward failed to $admin_email: $mail_err");
+                foreach ($forward_emails as $forward_to) {
+                    $mail_err = '';
+                    $forward_sent = sendMail($forward_to, "Contact: $subject", $forward_body, $email, $mail_err);
+                    if (!$forward_sent) {
+                        error_log("Contact forward failed to $forward_to: $mail_err");
+                    }
                 }
             }
 
