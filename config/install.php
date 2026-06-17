@@ -28,7 +28,11 @@ $error = '';
 $success = '';
 
 function testDbConnection($host, $user, $pass, $name) {
-    $conn = @mysqli_connect($host, $user, $pass);
+    try {
+        $conn = @mysqli_connect($host, $user, $pass);
+    } catch (Throwable $e) {
+        return 'Could not connect to MySQL: ' . $e->getMessage();
+    }
     if (!$conn) return 'Could not connect to MySQL: ' . mysqli_connect_error();
     if (!@mysqli_select_db($conn, $name)) return 'Database "' . htmlspecialchars($name) . '" not found. Create it first and try again.';
     $r = @mysqli_query($conn, 'SELECT 1');
@@ -103,7 +107,7 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $step = 1;
         } else {
             // Verify the written config by making a fresh direct connection
-            $v = @mysqli_connect($host, $user, $pass, $name);
+            try { $v = @mysqli_connect($host, $user, $pass, $name); } catch (Throwable $e) { $v = false; }
             if (!$v || !@mysqli_ping($v)) {
                 $error = 'Database config written but connection failed. Check credentials and try again.';
                 $step = 1;
