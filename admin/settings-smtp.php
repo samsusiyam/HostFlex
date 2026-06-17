@@ -13,11 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin_id = (int)$_SESSION['admin_id'];
         $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT email FROM users WHERE id = $admin_id"));
         $test_to = $admin['email'] ?? getSetting('site_email');
-        $sent = sendMail($test_to, 'Test Email from ' . getSetting('site_name'), '<h2>Test Email</h2><p>This is a test email from your SMTP configuration.</p>');
+        $mail_error = '';
+        $sent = sendMail($test_to, 'Test Email from ' . getSetting('site_name'), '<h2>Test Email</h2><p>This is a test email from your SMTP configuration.</p>', '', $mail_error);
         if ($sent) {
             $success = 'Test email sent successfully to ' . htmlspecialchars($test_to) . '!';
         } else {
-            $error = 'Failed to send test email. Please check your SMTP settings.';
+            $error = 'Failed to send test email. Error: ' . htmlspecialchars($mail_error);
         }
     } else {
         $keys = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'smtp_from_email', 'smtp_from_name', 'smtp_reply_to'];

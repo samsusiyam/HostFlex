@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-function sendMail($to, $subject, $body, $replyTo = '') {
+function sendMail($to, $subject, $body, $replyTo = '', &$error = '') {
     $mail = new PHPMailer(true);
     try {
         $smtp_host = getSetting('smtp_host');
@@ -34,6 +34,7 @@ function sendMail($to, $subject, $body, $replyTo = '') {
         $mail->send();
         return true;
     } catch (Exception $e) {
+        $error = $e->getMessage();
         return false;
     }
 }
