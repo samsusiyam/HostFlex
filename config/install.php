@@ -34,11 +34,14 @@ function writeDatabaseConfig($host, $user, $pass, $name) {
     $content .= '$db_user = ' . var_export($user, true) . ";\n";
     $content .= '$db_pass = ' . var_export($pass, true) . ";\n";
     $content .= '$db_name = ' . var_export($name, true) . ";\n\n";
-    $content .= '$conn = mysqli_connect($db_host, $db_user, $db_pass, $db_name);' . "\n\n";
-    $content .= 'if (!$conn) {' . "\n";
-    $content .= '    die("Connection failed: " . mysqli_connect_error());' . "\n";
-    $content .= '}' . "\n\n";
-    $content .= 'mysqli_set_charset($conn, "utf8");' . "\n";
+    $content .= 'try {' . "\n";
+    $content .= '    $conn = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);' . "\n";
+    $content .= '    if ($conn) {' . "\n";
+    $content .= '        mysqli_set_charset($conn, "utf8");' . "\n";
+    $content .= '    }' . "\n";
+    $content .= '} catch (Throwable $e) {' . "\n";
+    $content .= '    $conn = null;' . "\n";
+    $content .= '}' . "\n";
     return file_put_contents(__DIR__ . '/database.php', $content);
 }
 
