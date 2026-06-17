@@ -69,8 +69,8 @@ function toggleFab() { var el = document.getElementById("fabOptions"); if (el) e
 <?php if ($wa): ?><a href="https://wa.me/<?php echo $wa; ?>" target="_blank" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;margin-right:8px;font-weight:600;display:inline-block;transition:all 0.3s ease;">💬 WhatsApp</a><?php endif; ?>
 <?php if ($tg): ?><a href="<?php echo $tg; ?>" target="_blank" style="background:linear-gradient(135deg,#0088cc,#005f99);color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;display:inline-block;transition:all 0.3s ease;">📨 Telegram</a><?php endif; ?>
 </div>
-<div style="margin-top:16px;font-size:12.5px;color:#555;"><label style="cursor:pointer;"><input type="checkbox" id="dontShow" style="margin-right:6px;"> আজকের জন্য আর দেখাবেন না</label></div>
-<button onclick="closePopup()" style="margin-top:18px;background:linear-gradient(135deg,#0d6efd,#6610f2);color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s ease;">❌ বন্ধ করুন</button>
+<div style="margin-top:16px;font-size:12.5px;color:#555;"><label style="cursor:pointer;"><input type="checkbox" id="dontShow" style="margin-right:6px;"> <?php echo getSetting('popup_hide_label') ?: 'আজকের জন্য আর দেখাবেন না'; ?></label></div>
+<button onclick="closePopup()" style="margin-top:18px;background:linear-gradient(135deg,#0d6efd,#6610f2);color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s ease;"><?php echo getSetting('popup_close_text') ?: '❌ বন্ধ করুন'; ?></button>
 </div>
 
 <style>
