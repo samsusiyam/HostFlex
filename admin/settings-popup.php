@@ -21,8 +21,8 @@ function saveSettingHelper2($key, $value) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($_POST as $key => $value) {
-        if (in_array($key, ['submit', 'save_social_buttons', 'add_social_button', 'deleted_btns'])) continue;
-        if ($key === 'social_buttons') continue;
+        if (in_array($key, ['submit', 'save_social_buttons', 'add_social_button', 'deleted_btns', 'deleted_links'])) continue;
+        if ($key === 'social_buttons' || $key === 'social_links') continue;
         $s_key = sanitize($key);
         $s_value = mysqli_real_escape_string($conn, $value);
         $check = mysqli_query($conn, "SELECT id FROM settings WHERE setting_key = '$s_key'");
@@ -64,6 +64,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
         }
         saveSettingHelper2('social_buttons', json_encode($buttons));
+    }
+
+    if (isset($_POST['social_links']) && is_array($_POST['social_links'])) {
+        $links = [];
+        $names = $_POST['social_links']['name'] ?? [];
+        $icons = $_POST['social_links']['icon'] ?? [];
+        $colors = $_POST['social_links']['color'] ?? [];
+        $urls = $_POST['social_links']['url'] ?? [];
+        $deleted_links = isset($_POST['deleted_links']) ? (array)$_POST['deleted_links'] : [];
+        foreach ($names as $i => $name) {
+            if (in_array($i, $deleted_links)) continue;
+            if (!trim($name) || !trim($urls[$i] ?? '')) continue;
+            $links[] = [
+                'name' => trim($name),
+                'icon' => trim($icons[$i] ?? 'fab fa-globe'),
+                'color' => trim($colors[$i] ?? '#1877f2'),
+                'url' => trim($urls[$i] ?? '')
+            ];
+        }
+        saveSettingHelper2('social_links', json_encode($links));
     }
 
     header('Location: settings-popup.php?s=1');
@@ -112,13 +132,36 @@ if ($social_buttons_raw) {
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-share-alt text-blue-500 mr-2"></i> Social Links (Footer)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1"><i class="fab fa-facebook text-blue-600 mr-1"></i> Facebook URL</label><input type="url" name="facebook_url" value="<?php echo htmlspecialchars($s['facebook_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1"><i class="fab fa-twitter text-sky-500 mr-1"></i> Twitter URL</label><input type="url" name="twitter_url" value="<?php echo htmlspecialchars($s['twitter_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1"><i class="fab fa-linkedin text-blue-700 mr-1"></i> LinkedIn URL</label><input type="url" name="linkedin_url" value="<?php echo htmlspecialchars($s['linkedin_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1"><i class="fab fa-youtube text-red-600 mr-1"></i> YouTube URL</label><input type="url" name="youtube_url" value="<?php echo htmlspecialchars($s['youtube_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold flex items-center"><i class="fa fa-share-alt text-blue-500 mr-2"></i> Social Links (Footer)</h2>
+            <button type="button" onclick="showAddSocialLink()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 transition shadow text-sm font-medium"><i class="fa fa-plus mr-1"></i> Add Link</button>
         </div>
+        <p class="text-sm text-gray-500 mb-4">These social icons appear in the footer.</p>
+        <div id="socialLinksContainer">
+            <?php
+            $social_links_raw = $s['social_links'] ?? '';
+            $social_links = [];
+            if ($social_links_raw) {
+                $decoded = json_decode($social_links_raw, true);
+                if (is_array($decoded)) $social_links = $decoded;
+            }
+            if (empty($social_links)): ?>
+            <div id="noSocialLinksMsg" class="text-center py-8 text-gray-400">
+                <i class="fa fa-share-alt text-4xl mb-2"></i>
+                <p>No social links configured yet.</p>
+            </div>
+            <?php endif; ?>
+            <?php foreach ($social_links as $i => $link): ?>
+            <div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200" data-idx="<?php echo $i; ?>">
+                <div class="flex-[3]"><input type="text" name="social_links[name][]" value="<?php echo htmlspecialchars($link['name'] ?? ''); ?>" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
+                <div class="w-36"><input type="text" name="social_links[icon][]" value="<?php echo htmlspecialchars($link['icon'] ?? 'fab fa-globe'); ?>" placeholder="FA class (fab fa-facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs"></div>
+                <div class="w-28"><input type="text" name="social_links[color][]" value="<?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left:4px solid <?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>"></div>
+                <div class="flex-[4]"><input type="url" name="social_links[url][]" value="<?php echo htmlspecialchars($link['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
+                <button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div id="deletedLinksContainer"></div>
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
@@ -139,13 +182,10 @@ if ($social_buttons_raw) {
             <div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200" data-idx="<?php echo $i; ?>">
                 <div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="<?php echo htmlspecialchars($btn['name'] ?? ''); ?>" placeholder="Name" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
                 <div class="flex flex-col items-center gap-1">
-                    <?php if ($is_img_icon): ?>
-                    <img src="../<?php echo htmlspecialchars($btn['icon']); ?>" class="w-7 h-7 object-contain" alt="icon">
-                    <?php else: ?>
-                    <span class="text-xl"><?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?></span>
-                    <?php endif; ?>
-                    <label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][<?php echo $i; ?>]" accept="image/*" class="hidden" onchange="this.closest('.social-btn-row').querySelector('.icon-preview').src=window.URL.createObjectURL(this.files[0]); this.closest('.social-btn-row').querySelector('.icon-preview').classList.remove('hidden')"></label>
-                    <input type="hidden" name="social_buttons[icon][]" value="<?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?>">
+                    <img src="<?php echo $is_img_icon ? '../' . htmlspecialchars($btn['icon']) : ''; ?>" class="w-7 h-7 object-contain icon-preview<?php echo $is_img_icon ? '' : ' hidden'; ?>" alt="icon">
+                    <span class="text-xl icon-emoji<?php echo $is_img_icon ? ' hidden' : ''; ?>"><?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?></span>
+                    <label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][<?php echo $i; ?>]" accept="image/*" class="hidden" onchange="var r=this.closest('.social-btn-row');r.querySelector('.icon-preview').src=window.URL.createObjectURL(this.files[0]);r.querySelector('.icon-preview').classList.remove('hidden');r.querySelector('.icon-preview').style.display='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-hidden').value=''"></label>
+                    <input type="hidden" name="social_buttons[icon][]" class="icon-hidden" value="<?php echo htmlspecialchars($btn['icon'] ?? '💬'); ?>">
                 </div>
                 <div class="w-24"><input type="text" name="social_buttons[color][]" value="<?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left: 4px solid <?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>"></div>
                 <div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="<?php echo htmlspecialchars($btn['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
@@ -197,6 +237,22 @@ if ($social_buttons_raw) {
     </div>
 </div>
 
+<div id="addSocialLinkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 mr-2"></i> Add Footer Social Link</h3>
+        <div class="grid grid-cols-1 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" id="newLinkName" placeholder="Facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Font Awesome Class</label><input type="text" id="newLinkIcon" value="fab fa-facebook" placeholder="fab fa-facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-sm"></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label><input type="text" id="newLinkColor" value="#1877f2" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">URL</label><input type="url" id="newLinkUrl" placeholder="https://facebook.com/yourpage" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+        </div>
+        <div class="mt-6 flex items-center gap-3">
+            <button type="button" onclick="addSocialLink()" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition shadow font-medium"><i class="fa fa-plus mr-1"></i> Add</button>
+            <button type="button" onclick="closeAddSocialLink()" class="text-gray-600 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+
 <script>
 function showAddSocialBtn() {
     document.getElementById('addSocialModal').classList.remove('hidden');
@@ -219,9 +275,9 @@ function addSocialBtn() {
     var html = '<div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
     html += '<div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="' + escHtml(name) + '" placeholder="Name" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
     html += '<div class="flex flex-col items-center gap-1">';
-    var previewStyle = hasFile ? '' : ' style="display:none"';
-    html += '<img src="' + (hasFile ? URL.createObjectURL(fileInput.files[0]) : '') + '" class="w-7 h-7 object-contain icon-preview"' + previewStyle + '>';
-    html += '<label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][' + rnd + ']" accept="image/*" class="hidden" onchange="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-preview\').src=window.URL.createObjectURL(this.files[0]);r.querySelector(\'.icon-preview\').style.display=\'\';r.querySelector(\'.icon-hidden\').value=\'\'"></label>';
+    html += '<img src="' + (hasFile ? URL.createObjectURL(fileInput.files[0]) : '') + '" class="w-7 h-7 object-contain icon-preview"' + (hasFile ? '' : ' style="display:none"') + '>';
+    html += '<span class="text-xl icon-emoji' + (hasFile ? ' hidden' : '') + '">' + escHtml(icon) + '</span>';
+    html += '<label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][' + rnd + ']" accept="image/*" class="hidden" onchange="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-preview\').src=window.URL.createObjectURL(this.files[0]);r.querySelector(\'.icon-preview\').style.display=\'\';r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-hidden\').value=\'\'"></label>';
     html += '<input type="hidden" name="social_buttons[icon][]" class="icon-hidden" value="' + (hasFile ? '' : escHtml(icon)) + '">';
     html += '</div>';
     html += '<div class="w-24"><input type="text" name="social_buttons[color][]" value="' + escHtml(color) + '" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left: 4px solid ' + escHtml(color) + '"></div>';
@@ -246,6 +302,48 @@ function deleteSocialBtn(btn) {
         input.name = 'deleted_btns[]';
         input.value = row.dataset.idx !== undefined ? row.dataset.idx : 'x';
         document.getElementById('deletedBtnsContainer').appendChild(input);
+        row.remove();
+    }
+}
+function showAddSocialLink() {
+    document.getElementById('addSocialLinkModal').classList.remove('hidden');
+}
+function closeAddSocialLink() {
+    document.getElementById('addSocialLinkModal').classList.add('hidden');
+}
+function addSocialLink() {
+    var name = document.getElementById('newLinkName').value.trim();
+    var icon = document.getElementById('newLinkIcon').value.trim() || 'fab fa-globe';
+    var color = document.getElementById('newLinkColor').value.trim() || '#1877f2';
+    var url = document.getElementById('newLinkUrl').value.trim();
+    if (!name || !url) { alert('Name and URL are required.'); return; }
+    var container = document.getElementById('socialLinksContainer');
+    var msg = document.getElementById('noSocialLinksMsg');
+    if (msg) msg.style.display = 'none';
+    var rnd = Date.now();
+    var html = '<div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
+    html += '<div class="flex-[3]"><input type="text" name="social_links[name][]" value="' + escHtml(name) + '" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
+    html += '<div class="w-36"><input type="text" name="social_links[icon][]" value="' + escHtml(icon) + '" placeholder="FA class" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs"></div>';
+    html += '<div class="w-28"><input type="text" name="social_links[color][]" value="' + escHtml(color) + '" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left:4px solid ' + escHtml(color) + '"></div>';
+    html += '<div class="flex-[4]"><input type="url" name="social_links[url][]" value="' + escHtml(url) + '" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
+    html += '<button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+    html += '</div>';
+    container.insertAdjacentHTML('beforeend', html);
+    document.getElementById('newLinkName').value = '';
+    document.getElementById('newLinkIcon').value = 'fab fa-globe';
+    document.getElementById('newLinkColor').value = '#1877f2';
+    document.getElementById('newLinkUrl').value = '';
+    closeAddSocialLink();
+}
+function deleteSocialLink(btn) {
+    if (!confirm('Delete this link?')) return;
+    var row = btn.closest('.social-link-row');
+    if (row) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'deleted_links[]';
+        input.value = row.dataset.idx !== undefined ? row.dataset.idx : 'x';
+        document.getElementById('deletedLinksContainer').appendChild(input);
         row.remove();
     }
 }

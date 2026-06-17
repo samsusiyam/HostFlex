@@ -37,6 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = 'footer_logo'");
         }
     }
+    if (isset($_FILES['favicon_file']) && $_FILES['favicon_file']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['favicon_file']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, ['ico','jpg','jpeg','png','gif','webp','svg'])) {
+            $fname = 'favicon_' . time() . '.' . $ext;
+            move_uploaded_file($_FILES['favicon_file']['tmp_name'], $upload_dir . $fname);
+            $path = 'uploads/branding/' . $fname;
+            mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = 'favicon'");
+        }
+    }
     header('Location: settings-branding.php?s=1');
     exit;
 }
@@ -86,6 +95,20 @@ include 'header.php'; ?>
                 <textarea name="footer_description" rows="3" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($s['footer_description'] ?? ''); ?></textarea>
                 <p class="text-xs text-gray-400 mt-1">Appears below the footer logo</p>
             </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Favicon</h2>
+        <div>
+            <?php $favicon = $s['favicon'] ?? ''; ?>
+            <?php if ($favicon): ?>
+            <div class="mb-2"><img src="../<?php echo htmlspecialchars($favicon); ?>" class="h-10 rounded border" id="faviconPreview"></div>
+            <?php else: ?>
+            <div class="mb-2"><img class="h-10 hidden rounded border" id="faviconPreview"></div>
+            <?php endif; ?>
+            <input type="file" name="favicon_file" accept="image/x-icon,image/png,image/gif,image/webp,image/svg+xml" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('faviconPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('faviconPreview').classList.remove('hidden')">
+            <input type="text" name="favicon" value="<?php echo htmlspecialchars($favicon); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2">
+            <p class="text-xs text-gray-400 mt-1">Upload .ico, .png, .svg or enter path manually</p>
         </div>
     </div>
     <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>
