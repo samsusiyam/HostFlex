@@ -72,8 +72,13 @@ $items = mysqli_query($conn, "SELECT * FROM partners ORDER BY sort_order ASC");
             <div class="space-y-3">
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Company Name</label><input type="text" name="name" id="fName" required class="w-full border rounded px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
-                    <input type="file" name="photo" accept="image/*" class="w-full border rounded px-3 py-2 text-sm">
-                    <div id="logoPreview" class="mt-1 hidden"><img class="max-h-12 rounded border"></div>
+                    <input type="file" name="photo" id="photoInput" accept="image/*" class="w-full border rounded px-3 py-2 text-sm">
+                    <div id="logoPreview" class="mt-2 hidden">
+                        <div class="relative inline-block">
+                            <img class="max-h-16 rounded border">
+                            <button type="button" onclick="removeLogo()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600" title="Remove logo">&times;</button>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"><i class="fa fa-plus mr-1"></i> Add</button>
                 <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 w-full hidden" id="cancelBtn"><i class="fa fa-times mr-1"></i> Cancel</button>
@@ -101,6 +106,20 @@ $items = mysqli_query($conn, "SELECT * FROM partners ORDER BY sort_order ASC");
     </div>
 </div>
 <script>
+document.getElementById('photoInput').addEventListener('change', function() {
+    var prev = document.getElementById('logoPreview');
+    var img = prev.querySelector('img');
+    if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) { img.src = e.target.result; prev.classList.remove('hidden'); };
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+function removeLogo() {
+    document.getElementById('photoInput').value = '';
+    document.getElementById('existingPhoto').value = '';
+    document.getElementById('logoPreview').classList.add('hidden');
+}
 function editItem(id, data) {
     document.getElementById('editId').value = id;
     document.getElementById('fName').value = data.name || '';
@@ -115,6 +134,7 @@ function editItem(id, data) {
 function resetForm() {
     document.getElementById('editId').value = 0;
     document.getElementById('fName').value = ''; document.getElementById('existingPhoto').value = '';
+    document.getElementById('photoInput').value = '';
     document.getElementById('formTitle').textContent = 'Add Partner';
     document.getElementById('submitBtn').innerHTML = '<i class="fa fa-plus mr-1"></i> Add';
     document.getElementById('cancelBtn').classList.add('hidden');

@@ -376,9 +376,9 @@ if (mysqli_num_rows($partners) > 0):
 <div class="mb-10 text-center"><h2 class="text-3xl font-bold"><?php echo htmlspecialchars($p_heading); ?></h2></div>
 <div class="flex flex-wrap items-center justify-center gap-8">
     <?php while ($p = mysqli_fetch_assoc($partners)): ?>
-    <div class="bg-white rounded-xl shadow p-4 flex items-center justify-center h-20 w-40">
+    <div class="bg-white rounded-xl shadow px-6 py-5 flex items-center justify-center h-28 w-52">
         <?php if ($p['photo']): ?>
-        <img src="<?php echo htmlspecialchars($p['photo']); ?>" class="max-h-12 max-w-full object-contain" alt="<?php echo htmlspecialchars($p['name']); ?>">
+        <img src="<?php echo htmlspecialchars($p['photo']); ?>" class="max-h-16 max-w-full object-contain" alt="<?php echo htmlspecialchars($p['name']); ?>">
         <?php else: ?>
         <span class="font-semibold text-gray-500"><?php echo htmlspecialchars($p['name']); ?></span>
         <?php endif; ?>
