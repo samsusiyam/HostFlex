@@ -17,6 +17,7 @@ if (isset($_GET['delete'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $category = sanitize($_POST['category']);
     $name = sanitize($_POST['name']);
     $subtitle = sanitize($_POST['subtitle']);
@@ -85,6 +86,7 @@ while ($plan = mysqli_fetch_assoc($plans)) {
         <?php echo $edit_plan ? 'Edit Plan' : 'Add New Plan'; ?>
     </h2>
     <form method="POST">
+        <?= csrfField() ?>
         <?php if ($edit_plan): ?><input type="hidden" name="id" value="<?php echo $edit_plan['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>

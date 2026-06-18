@@ -63,7 +63,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo getSetting('site_name'); ?></title>
+<title><?php echo escSetting('site_name'); ?></title>
 </head>
 <body>
 
@@ -91,7 +91,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="flex w-fit gap-x-2">
-<a href="<?php echo htmlspecialchars($c['button_url'] ?: getSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
+<a href="<?php echo htmlspecialchars($c['button_url'] ?: escSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
@@ -102,7 +102,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <!-- Domain Search -->
 <div class="content mt-32 mb-10">
 <div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
-<form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: getSetting('whmcs_domain_search_url')); ?>" class="flex w-auto">
+<form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: escSetting('whmcs_domain_search_url')); ?>" class="flex w-auto">
 <input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px]" type="search" />
 <div class="ml-2 w-fit">
 <button type="submit" size="custom" class="h-[53px] btn btn-blue">

@@ -8,6 +8,7 @@ $upload_dir = '../uploads/branding/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     foreach ($_POST as $key => $value) {
         if ($key === 'submit') continue;
         $s_key = sanitize($key);
@@ -20,27 +21,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     if (isset($_FILES['header_logo_file']) && $_FILES['header_logo_file']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['header_logo_file']['name'], PATHINFO_EXTENSION));
-        if (in_array($ext, ['jpg','jpeg','png','gif','webp','svg'])) {
-            $fname = 'header_logo_' . time() . '.' . $ext;
+        $v = validateImageUpload($_FILES['header_logo_file']);
+        if ($v === true) {
+            $fname = 'header_logo_' . time() . '.' . pathinfo($_FILES['header_logo_file']['name'], PATHINFO_EXTENSION);
             move_uploaded_file($_FILES['header_logo_file']['tmp_name'], $upload_dir . $fname);
             $path = 'uploads/branding/' . $fname;
             mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = 'header_logo'");
         }
     }
     if (isset($_FILES['footer_logo_file']) && $_FILES['footer_logo_file']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['footer_logo_file']['name'], PATHINFO_EXTENSION));
-        if (in_array($ext, ['jpg','jpeg','png','gif','webp','svg'])) {
-            $fname = 'footer_logo_' . time() . '.' . $ext;
+        $v = validateImageUpload($_FILES['footer_logo_file']);
+        if ($v === true) {
+            $fname = 'footer_logo_' . time() . '.' . pathinfo($_FILES['footer_logo_file']['name'], PATHINFO_EXTENSION);
             move_uploaded_file($_FILES['footer_logo_file']['tmp_name'], $upload_dir . $fname);
             $path = 'uploads/branding/' . $fname;
             mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = 'footer_logo'");
         }
     }
     if (isset($_FILES['favicon_file']) && $_FILES['favicon_file']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['favicon_file']['name'], PATHINFO_EXTENSION));
-        if (in_array($ext, ['ico','jpg','jpeg','png','gif','webp','svg'])) {
-            $fname = 'favicon_' . time() . '.' . $ext;
+        $v = validateImageUpload($_FILES['favicon_file'], ['ico','jpg','jpeg','png','gif','webp','svg']);
+        if ($v === true) {
+            $fname = 'favicon_' . time() . '.' . pathinfo($_FILES['favicon_file']['name'], PATHINFO_EXTENSION);
             move_uploaded_file($_FILES['favicon_file']['tmp_name'], $upload_dir . $fname);
             $path = 'uploads/branding/' . $fname;
             mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = 'favicon'");
@@ -64,6 +65,7 @@ include 'header.php'; ?>
 </div>
 <?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST" enctype="multipart/form-data">
+    <?= csrfField() ?>
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

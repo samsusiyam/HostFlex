@@ -52,6 +52,7 @@ if (mysqli_num_rows($check_fwd) == 0) {
 
 // POST handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $name = sanitize($_POST['name']);
     $subject = sanitize($_POST['subject']);
     $body = mysqli_real_escape_string($conn, $_POST['body']);
@@ -93,6 +94,7 @@ $templates = mysqli_query($conn, "SELECT * FROM email_templates ORDER BY name AS
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Template' : 'Add Template'; ?></h2>
     <form method="POST">
+        <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

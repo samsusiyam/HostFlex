@@ -21,7 +21,7 @@
 <?php endif; ?>
 <header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
 <div class="content flex items-center justify-between">
-<a href="index.php"><img class="h-[50px]" src="<?php echo getSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo getSetting('site_name'); ?>" /></a>
+<a href="index.php"><img class="h-[50px]" src="<?php echo getSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" /></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
 <?php
 $menu_items = getMenuItems('header');
@@ -44,7 +44,7 @@ foreach ($tree as $item):
 <?php else: ?>
 <a href="<?php echo $url; ?>" class="font-medium hover:text-blue-600"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
-<a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
+<a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
 <div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all transform origin-top" style="transform: scaleY(0);">
 <?php foreach ($tree as $item):
@@ -65,7 +65,7 @@ foreach ($tree as $item):
 <?php else: ?>
 <a href="<?php echo $url; ?>" class="font-medium hover:text-blue-600"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
-<div class="w-fit"><a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
+<div class="w-fit"><a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
 </div>
 <div class="xl:hidden w-fit ml-auto">
 <button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl"><i class="fa fa-bars"></i></button>

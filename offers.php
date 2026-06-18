@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Offers - <?php echo getSetting('site_name'); ?></title>
+<title>Offers - <?php echo escSetting('site_name'); ?></title>
 </head>
 <body>
 <?php include "header.php"; ?>

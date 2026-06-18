@@ -5,6 +5,7 @@ require_once '../includes/functions.php';
 checkAdminLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     foreach ($_POST as $key => $value) {
         if ($key === 'submit') continue;
         $s_key = sanitize($key);
@@ -38,6 +39,7 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
         <form method="POST">
+            <?= csrfField() ?>
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 class="text-lg font-semibold mb-4">Footer Content</h2>
                 <div class="space-y-4">

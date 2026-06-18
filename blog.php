@@ -15,7 +15,7 @@ $meta_kw = $post['meta_keywords'] ?? '';
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($post['title']); ?> - <?php echo getSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($post['title']); ?> - <?php echo escSetting('site_name'); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($meta_desc); ?>">
 <?php if ($meta_kw): ?><meta name="keywords" content="<?php echo htmlspecialchars($meta_kw); ?>"><?php endif; ?>
 <meta property="og:title" content="<?php echo htmlspecialchars($post['title']); ?>">

@@ -20,6 +20,7 @@ function saveSettingHelper2($key, $value) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     foreach ($_POST as $key => $value) {
         if (in_array($key, ['submit', 'save_social_buttons', 'add_social_button', 'deleted_btns', 'deleted_links'])) continue;
         if ($key === 'social_buttons' || $key === 'social_links') continue;
@@ -47,12 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!trim($urls[$i] ?? '')) continue;
             $icon = trim($icons[$i] ?? '');
             if (isset($_FILES['social_buttons']['tmp_name']['icon'][$i]) && !empty($_FILES['social_buttons']['tmp_name']['icon'][$i])) {
-                $file = $_FILES['social_buttons'];
-                $ext = strtolower(pathinfo($file['name']['icon'][$i], PATHINFO_EXTENSION));
-                $allowed = ['jpg','jpeg','png','gif','webp','svg'];
-                if (in_array($ext, $allowed)) {
+                $file_chunk = [
+                    'name' => $_FILES['social_buttons']['name']['icon'][$i],
+                    'tmp_name' => $_FILES['social_buttons']['tmp_name']['icon'][$i],
+                    'error' => $_FILES['social_buttons']['error']['icon'][$i],
+                    'size' => $_FILES['social_buttons']['size']['icon'][$i],
+                ];
+                $v = validateImageUpload($file_chunk);
+                if ($v === true) {
+                    $ext = strtolower(pathinfo($file_chunk['name'], PATHINFO_EXTENSION));
                     $fname = 'social_' . time() . '_' . $i . '.' . $ext;
-                    move_uploaded_file($file['tmp_name']['icon'][$i], $upload_dir . $fname);
+                    move_uploaded_file($file_chunk['tmp_name'], $upload_dir . $fname);
                     $icon = 'uploads/social/' . $fname;
                 }
             }
@@ -114,6 +120,7 @@ if ($social_buttons_raw) {
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
+    <?= csrfField() ?>
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-bell text-yellow-600 mr-2"></i> Popup Notice</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

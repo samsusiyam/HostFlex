@@ -46,6 +46,7 @@ if (isset($_GET['s'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     if (!isset($_FILES['backup_file']) || $_FILES['backup_file']['error'] !== UPLOAD_ERR_OK) {
         $error = 'Please select a valid SQL file to restore.';
     } else {
@@ -117,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
             <i class="fa fa-exclamation-triangle mr-1"></i> This will overwrite existing data. We recommend backing up first.
         </div>
         <form method="post" enctype="multipart/form-data" onsubmit="return confirm('Are you sure you want to restore this backup? Existing data will be overwritten.');">
+            <?= csrfField() ?>
             <div class="mb-4">
                 <input type="file" name="backup_file" accept=".sql" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
             </div>

@@ -20,6 +20,7 @@ function saveSettingHelper($key, $value) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_sections'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $deleted = isset($_POST['deleted']) ? (array)$_POST['deleted'] : [];
     $new_sections = [];
     if (isset($_POST['sections']) && is_array($_POST['sections'])) {
@@ -149,12 +150,13 @@ if (isset($_GET['s'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_section_img'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg','jpeg','png','gif','webp'];
-        if (in_array($ext, $allowed)) {
+        $v = validateImageUpload($_FILES['image'], ['jpg','jpeg','png','gif','webp']);
+        if ($v === true) {
             $upload_dir = '../uploads/homepage/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
             $fname = 'section_' . time() . '_' . rand(100,999) . '.' . $ext;
             move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $fname);
             header('Content-Type: application/json');
@@ -227,6 +229,7 @@ $type_icons = ['hero' => 'fa-film', 'domain_search' => 'fa-search', 'features' =
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST" id="sectionsForm" enctype="multipart/form-data">
+<?= csrfField() ?>
 <div id="sectionsContainer">
 <?php foreach ($sections as $idx => $section):
     $type = $section['type'];

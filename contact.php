@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Contact - <?php echo getSetting('site_name'); ?></title>
+<title>Contact - <?php echo escSetting('site_name'); ?></title>
 </head>
 <body>
 <?php include "header.php"; ?>
@@ -108,8 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <section class="section_gap flex items-center bg-gray-50 font-poppins dark:bg-gray-800">
 <div class="content">
 <div class="mb-20 text-center pb-7">
-<h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo getSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
-<p class="text-lg text-gray-500 sm:text-xl dark:text-gray-400"><?php echo getSetting('contact_page_subheading') ?: 'We would love to hear from you.'; ?></p>
+<h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo escSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
+<p class="text-lg text-gray-500 sm:text-xl dark:text-gray-400"><?php echo escSetting('contact_page_subheading') ?: 'We would love to hear from you.'; ?></p>
 </div>
 <?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto"><?php echo $success; ?></div><?php endif; ?>
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto"><?php echo $error; ?></div><?php endif; ?>

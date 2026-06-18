@@ -4,7 +4,7 @@ $page_title = 'Blog';
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Blog - <?php echo getSetting('site_name'); ?></title>
+<title>Blog - <?php echo escSetting('site_name'); ?></title>
 <meta name="description" content="Read our latest blog posts about web hosting, technology and more">
 </head>
 <body>

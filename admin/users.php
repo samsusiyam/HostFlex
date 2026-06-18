@@ -20,6 +20,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $username = sanitize($_POST['username']);
     $email = sanitize($_POST['email']);
     $password = $_POST['password'];
@@ -80,6 +81,7 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at DESC");
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $is_new ? 'New User' : 'Edit User'; ?></h2>
     <form method="POST">
+        <?= csrfField() ?>
         <input type="hidden" name="edit_id" value="<?php echo $eu['id']; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Username</label><input type="text" name="username" value="<?php echo htmlspecialchars($eu['username']); ?>" required class="w-full border rounded px-3 py-2"></div>

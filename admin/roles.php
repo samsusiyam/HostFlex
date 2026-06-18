@@ -10,6 +10,7 @@ $error = '';
 $perm_key = 'admin_permissions';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_perms'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $perm_data = [];
     $roles = ['admin', 'editor', 'manager'];
     $sections = ['dashboard', 'plans', 'offers', 'categories', 'pages', 'menus', 'contacts', 'subscribers', 'testimonials', 'faqs', 'partners', 'settings', 'blog', 'users', 'roles', 'logs', 'backup'];
@@ -51,6 +52,7 @@ $section_labels = ['dashboard' => 'Dashboard', 'plans' => 'Hosting Plans', 'offe
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST">
+<?= csrfField() ?>
 <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">

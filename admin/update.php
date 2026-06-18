@@ -32,6 +32,7 @@ $update_available = $latest && version_compare($latest['version'], APP_VERSION, 
 
 // Perform update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_update']) && $latest) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     ignore_user_abort(true);
     set_time_limit(300);
 
@@ -161,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_update']) && $late
                 <div class="mt-4 text-left bg-gray-50 rounded p-3 text-sm max-h-32 overflow-y-auto"><?php echo nl2br(htmlspecialchars($latest['notes'])); ?></div>
                 <?php endif; ?>
                 <form method="POST" class="mt-4" onsubmit="return confirm('Update to v<?php echo $latest['version']; ?>? This will overwrite system files. Your database and uploads will be preserved.')">
+                    <?= csrfField() ?>
                     <button type="submit" name="do_update" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 shadow"><i class="fa fa-download mr-2"></i> Update to v<?php echo $latest['version']; ?></button>
                 </form>
             </div>

@@ -5,6 +5,7 @@ require_once '../includes/functions.php';
 checkAdminLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     foreach ($_POST as $key => $value) {
         if ($key === 'submit') continue;
         $s_key = sanitize($key);
@@ -32,6 +33,7 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 </div>
 <?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST">
+    <?= csrfField() ?>
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Page Heading</label><input type="text" name="contact_page_heading" value="<?php echo htmlspecialchars($s['contact_page_heading'] ?? 'Contact Us'); ?>" class="w-full border rounded px-3 py-2"></div>

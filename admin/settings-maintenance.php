@@ -5,6 +5,7 @@ require_once '../includes/functions.php';
 checkAdminLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     foreach ($_POST as $key => $value) {
         if ($key === 'submit') continue;
         $s_key = sanitize($key);
@@ -40,6 +41,7 @@ $is_active = ($s['maintenance_mode'] ?? '0') === '1';
 <?php endif; ?>
 
 <form method="POST">
+    <?= csrfField() ?>
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="flex items-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
             <label class="relative inline-flex items-center cursor-pointer">

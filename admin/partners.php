@@ -25,14 +25,16 @@ if (isset($_GET['msg'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $name = sanitize($_POST['name'] ?? '');
     $edit_id = (int)($_POST['edit_id'] ?? 0);
     if (!$name) { $error = 'Name required!'; }
     else {
         $photo = isset($_POST['existing_photo']) ? sanitize($_POST['existing_photo']) : '';
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg','jpeg','png','gif','webp','svg'])) {
+            $v = validateImageUpload($_FILES['photo'], ['jpg','jpeg','png','gif','webp','svg']);
+            if ($v === true) {
+                $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
                 $fname = 'partner_' . time() . '_' . rand(100,999) . '.' . $ext;
                 move_uploaded_file($_FILES['photo']['tmp_name'], $upload_dir . $fname);
                 $photo = 'uploads/partners/' . $fname;
@@ -64,6 +66,7 @@ $items = mysqli_query($conn, "SELECT * FROM partners ORDER BY sort_order ASC");
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4" id="formTitle">Add Partner</h2>
         <form method="POST" enctype="multipart/form-data" id="itemForm">
+            <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <input type="hidden" name="existing_photo" id="existingPhoto" value="">
             <div class="space-y-3">

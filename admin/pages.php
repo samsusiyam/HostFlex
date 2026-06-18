@@ -12,6 +12,7 @@ if (isset($_GET['delete'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $title = sanitize($_POST['title']);
     $slug = sanitize($_POST['slug']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
@@ -47,6 +48,7 @@ $pages = mysqli_query($conn, "SELECT * FROM pages ORDER BY title ASC");
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Page' : 'Add Page'; ?></h2>
     <form method="POST">
+        <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Title</label><input type="text" name="title" value="<?php echo $edit ? htmlspecialchars($edit['title']) : ''; ?>" required class="w-full border rounded px-3 py-2"></div>

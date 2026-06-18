@@ -23,6 +23,7 @@ if (isset($_POST['reorder'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['reorder'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $name = sanitize($_POST['name']);
     $slug = sanitize($_POST['slug']);
     $description = sanitize($_POST['description']);
@@ -33,8 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['reorder'])) {
     $upload_dir = '../uploads/categories/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
     if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-        if (in_array($ext, ['jpg','jpeg','png','gif','webp','svg'])) {
+        $v = validateImageUpload($_FILES['image_file']);
+        if ($v === true) {
+            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
             $fname = 'cat_' . time() . '_' . rand(100,999) . '.' . $ext;
             move_uploaded_file($_FILES['image_file']['tmp_name'], $upload_dir . $fname);
             $image = 'uploads/categories/' . $fname;
@@ -69,6 +71,7 @@ $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY sort_order 
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Category' : 'Add Category'; ?></h2>
     <form method="POST" enctype="multipart/form-data">
+        <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" name="name" value="<?php echo $edit ? htmlspecialchars($edit['name']) : ''; ?>" required class="w-full border rounded px-3 py-2"></div>

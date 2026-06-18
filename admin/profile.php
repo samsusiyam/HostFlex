@@ -11,6 +11,7 @@ $error = '';
 $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = $admin_id"));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     if (isset($_POST['update_info'])) {
         $email = sanitize($_POST['email'] ?? '');
         $username = sanitize($_POST['username'] ?? '');
@@ -68,6 +69,7 @@ $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = 
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-user text-blue-600 mr-2"></i> Account Info</h2>
         <form method="POST">
+            <?= csrfField() ?>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -89,6 +91,7 @@ $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = 
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-lock text-green-600 mr-2"></i> Change Password</h2>
         <form method="POST">
+            <?= csrfField() ?>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>

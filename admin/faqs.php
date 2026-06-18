@@ -20,6 +20,7 @@ if (isset($_GET['msg'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $question = sanitize($_POST['question'] ?? '');
     $answer = $_POST['answer'] ?? '';
     $edit_id = (int)($_POST['edit_id'] ?? 0);
@@ -52,6 +53,7 @@ $items = mysqli_query($conn, "SELECT * FROM faqs ORDER BY sort_order ASC");
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4" id="formTitle">Add FAQ</h2>
         <form method="POST" id="itemForm">
+            <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <div class="space-y-3">
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Question</label><input type="text" name="question" id="fQuestion" required class="w-full border rounded px-3 py-2"></div>

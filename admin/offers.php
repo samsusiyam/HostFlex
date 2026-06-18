@@ -16,6 +16,7 @@ if (isset($_GET['delete'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $title = sanitize($_POST['title']);
     $description = sanitize($_POST['description']);
     $badge = sanitize($_POST['badge']);
@@ -61,6 +62,7 @@ $offers = mysqli_query($conn, "SELECT * FROM offers ORDER BY sort_order ASC");
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit_offer ? 'Edit Offer' : 'Add New Offer'; ?></h2>
     <form method="POST">
+        <?= csrfField() ?>
         <?php if ($edit_offer): ?><input type="hidden" name="id" value="<?php echo $edit_offer['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">

@@ -25,6 +25,7 @@ $upload_dir = '../uploads/testimonials/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $name = sanitize($_POST['name'] ?? '');
     $company = sanitize($_POST['company'] ?? '');
     $review = sanitize($_POST['review'] ?? '');
@@ -35,8 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     else {
         $photo = isset($_POST['existing_photo']) ? sanitize($_POST['existing_photo']) : '';
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg','jpeg','png','gif','webp'])) {
+            $v = validateImageUpload($_FILES['photo'], ['jpg','jpeg','png','gif','webp']);
+            if ($v === true) {
+                $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
                 $fname = 'testimonial_' . time() . '_' . rand(100,999) . '.' . $ext;
                 move_uploaded_file($_FILES['photo']['tmp_name'], $upload_dir . $fname);
                 $photo = 'uploads/testimonials/' . $fname;
@@ -68,6 +70,7 @@ $items = mysqli_query($conn, "SELECT * FROM testimonials ORDER BY sort_order ASC
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4" id="formTitle">Add Testimonial</h2>
         <form method="POST" enctype="multipart/form-data" id="itemForm">
+            <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <input type="hidden" name="existing_photo" id="existingPhoto" value="">
             <div class="space-y-3">

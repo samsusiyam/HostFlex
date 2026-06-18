@@ -12,7 +12,7 @@ if (!$page) {
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($page['title']); ?> - <?php echo getSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($page['title']); ?> - <?php echo escSetting('site_name'); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($page['meta_description']); ?>">
 <meta name="keywords" content="<?php echo htmlspecialchars($page['meta_keywords']); ?>">
 </head>

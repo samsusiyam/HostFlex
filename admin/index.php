@@ -19,23 +19,28 @@ function logLoginAttempt($username, $status) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = sanitize($_POST['username']);
-    $password = $_POST['password'];
-    
-    $query = "SELECT * FROM users WHERE username = '$username' AND status = 1 LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    
-    if ($user = mysqli_fetch_assoc($result)) {
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['admin_id'] = $user['id'];
-            $_SESSION['admin_username'] = $user['username'];
-            logLoginAttempt($username, 'success');
-            header('Location: dashboard.php');
-            exit;
+    if (isBannedIP()) {
+        $error = 'Too many failed attempts. Please try again after 15 minutes.';
+    } else {
+        $username = sanitize($_POST['username']);
+        $password = $_POST['password'];
+
+        $query = "SELECT * FROM users WHERE username = '$username' AND status = 1 LIMIT 1";
+        $result = mysqli_query($conn, $query);
+
+        if ($user = mysqli_fetch_assoc($result)) {
+            if (password_verify($password, $user['password'])) {
+                session_regenerate_id(true);
+                $_SESSION['admin_id'] = $user['id'];
+                $_SESSION['admin_username'] = $user['username'];
+                logLoginAttempt($username, 'success');
+                header('Location: dashboard.php');
+                exit;
+            }
         }
+        logLoginAttempt($username, 'failed');
+        $error = 'Invalid username or password!';
     }
-    logLoginAttempt($username, 'failed');
-    $error = 'Invalid username or password!';
 }
 ?>
 <!DOCTYPE html>

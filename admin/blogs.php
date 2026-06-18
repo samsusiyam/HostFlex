@@ -28,6 +28,7 @@ if (isset($_GET['msg'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inline_cat'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $action = $_POST['inline_cat'];
     if ($action === 'add' || $action === 'edit') {
         $name = sanitize($_POST['name'] ?? '');
@@ -55,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inline_cat'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $title = sanitize($_POST['title'] ?? '');
     $slug = sanitize($_POST['slug'] ?? '');
     $content = $_POST['content'] ?? '';
@@ -75,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
 
         $image = '';
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg','jpeg','png','gif','webp'];
-            if (in_array($ext, $allowed)) {
+            $v = validateImageUpload($_FILES['image'], ['jpg','jpeg','png','gif','webp']);
+            if ($v === true) {
                 $upload_dir = '../uploads/blog/';
                 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
                 $fname = 'blog_' . time() . '_' . rand(100,999) . '.' . $ext;
                 move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $fname);
                 $image = 'uploads/blog/' . $fname;
@@ -142,6 +144,7 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
 <div class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $is_new ? 'New Post' : 'Edit Post'; ?></h2>
     <form method="POST" enctype="multipart/form-data">
+        <?= csrfField() ?>
         <input type="hidden" name="edit_id" value="<?php echo $ep['id']; ?>">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2">

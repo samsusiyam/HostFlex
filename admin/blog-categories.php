@@ -21,6 +21,7 @@ if (isset($_GET['msg'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $name = sanitize($_POST['name'] ?? '');
     $slug = sanitize($_POST['slug'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
@@ -59,6 +60,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4">Add Category</h2>
         <form method="POST" id="categoryForm">
+            <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <div class="space-y-3">
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" name="name" id="catName" required class="w-full border rounded px-3 py-2"></div>

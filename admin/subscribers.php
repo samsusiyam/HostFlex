@@ -7,6 +7,7 @@ checkAdminLogin();
 
 $msg = '';
 if (isset($_POST['send_newsletter'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $subject = trim($_POST['subject'] ?? '');
     $message = trim($_POST['message'] ?? '');
     $selected = $_POST['selected_subs'] ?? [];
@@ -111,6 +112,7 @@ $result = mysqli_query($conn, "SELECT * FROM subscribers $where ORDER BY created
 <div id="newsletterModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
         <form method="POST" id="newsletterForm">
+            <?= csrfField() ?>
             <div class="flex items-center justify-between px-6 py-4 border-b">
                 <h3 class="text-lg font-semibold text-gray-800"><i class="fa fa-envelope mr-2 text-green-600"></i>Send Newsletter</h3>
                 <button type="button" onclick="document.getElementById('newsletterModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600"><i class="fa fa-times text-xl"></i></button>

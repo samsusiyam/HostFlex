@@ -2,8 +2,8 @@
 <div class="pt-12">
 <div class="content grid grid-cols-1 lg:grid-cols-11 lg:gap-10">
 <div class="col-span-3 space-y-6 py-3 row-span-2">
-<h3><img class="max-h-[40px] max-w-[200px] sm:max-w-[400px] rounded" src="<?php echo getSetting('footer_logo') ?: 'images/logo-white.png'; ?>" alt="<?php echo getSetting('site_name'); ?>"></h3>
-<p style="color: #ffffff" class="text-sm max-w-[350px]"><?php echo getSetting('footer_description'); ?></p>
+<h3><img class="max-h-[40px] max-w-[200px] sm:max-w-[400px] rounded" src="<?php echo getSetting('footer_logo') ?: 'images/logo-white.png'; ?>" alt="<?php echo escSetting('site_name'); ?>"></h3>
+<p style="color: #ffffff" class="text-sm max-w-[350px]"><?php echo escSetting('footer_description'); ?></p>
 <br>
 <a href="//www.dmca.com/Protection/Status.aspx?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" title="DMCA.com Protection Status" class="dmca-badge"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120m.png?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" alt="DMCA.com Protection Status"></a>
 <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
@@ -27,10 +27,10 @@
                     endforeach;
                 else:
                     // Fallback to old individual settings
-                    $fb = getSetting('facebook_url'); if ($fb): ?><a class="circle-btn w-10 h-10 bg-[#1877f2] text-white" href="<?php echo $fb; ?>"><i class="fab fa-facebook"></i></a><?php endif; ?>
-                    <?php $li = getSetting('linkedin_url'); if ($li): ?><a class="circle-btn w-10 h-10 bg-[#0a66c2] text-white" href="<?php echo $li; ?>"><i class="fab fa-linkedin"></i></a><?php endif; ?>
-                    <?php $yt = getSetting('youtube_url'); if ($yt): ?><a class="circle-btn w-10 h-10 bg-[#ff0000] text-white" href="<?php echo $yt; ?>"><i class="fab fa-youtube"></i></a><?php endif; ?>
-                    <?php $tw = getSetting('twitter_url'); if ($tw): ?><a class="circle-btn w-10 h-10 bg-[#1da1f2] text-white" href="<?php echo $tw; ?>"><i class="fab fa-twitter"></i></a><?php endif; ?>
+                    $fb = getSetting('facebook_url'); if ($fb): ?><a class="circle-btn w-10 h-10 bg-[#1877f2] text-white" href="<?php echo htmlspecialchars($fb); ?>"><i class="fab fa-facebook"></i></a><?php endif; ?>
+                    <?php $li = getSetting('linkedin_url'); if ($li): ?><a class="circle-btn w-10 h-10 bg-[#0a66c2] text-white" href="<?php echo htmlspecialchars($li); ?>"><i class="fab fa-linkedin"></i></a><?php endif; ?>
+                    <?php $yt = getSetting('youtube_url'); if ($yt): ?><a class="circle-btn w-10 h-10 bg-[#ff0000] text-white" href="<?php echo htmlspecialchars($yt); ?>"><i class="fab fa-youtube"></i></a><?php endif; ?>
+                    <?php $tw = getSetting('twitter_url'); if ($tw): ?><a class="circle-btn w-10 h-10 bg-[#1da1f2] text-white" href="<?php echo htmlspecialchars($tw); ?>"><i class="fab fa-twitter"></i></a><?php endif; ?>
                 <?php endif; ?>
 </div>
 <div class="mt-6">
@@ -67,7 +67,7 @@ foreach ($footer_tree as $parent):
 </div>
 <div class="border-t border-b border-gray-400 border-opacity-25">
 <div class="content py-4 flex justify-between flex-col items-center lg:flex-row gap-4">
-<p style="color: #ffffff" class="text-center py-6"><?php echo getSetting('footer_copyright'); ?></p>
+<p style="color: #ffffff" class="text-center py-6"><?php echo escSetting('footer_copyright'); ?></p>
 </div>
 </div>
 </div>

@@ -12,7 +12,7 @@ if (!$category) {
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($category['name']); ?> - <?php echo getSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($category['name']); ?> - <?php echo escSetting('site_name'); ?></title>
 </head>
 <body>
 <?php include "header.php"; ?>

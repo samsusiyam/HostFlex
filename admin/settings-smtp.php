@@ -9,6 +9,7 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     if (isset($_POST['test_email'])) {
         $admin_id = (int)$_SESSION['admin_id'];
         $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT email FROM users WHERE id = $admin_id"));
@@ -57,6 +58,7 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST">
+    <?= csrfField() ?>
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-server text-purple-600 mr-2"></i> SMTP Configuration</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -22,6 +22,7 @@ if (isset($_POST['reorder'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['reorder'])) {
+    validateCSRFToken($_POST['csrf_token'] ?? '');
     $label = sanitize($_POST['label']);
     $url = sanitize($_POST['url']);
     $parent_id = (int)$_POST['parent_id'];
@@ -99,6 +100,7 @@ function renderMenuTable($location_label) {
 <div class="bg-white rounded-lg shadow p-6 mb-6 border-t-4 border-blue-500">
     <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-<?php echo $edit ? 'edit' : 'plus-circle'; ?> text-blue-600 mr-2"></i> <?php echo $edit ? 'Edit Menu Item' : 'Add New Menu Item'; ?></h2>
     <form method="POST">
+        <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Label <span class="text-red-500">*</span></label><input type="text" name="label" value="<?php echo $edit ? htmlspecialchars($edit['label']) : ''; ?>" required class="w-full border rounded px-3 py-2"></div>
