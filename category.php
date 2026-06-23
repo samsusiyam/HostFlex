@@ -57,9 +57,9 @@ if (!$category) {
 <h3 class="text-xl xl:text-2xl font-extrabold"><?php echo $sym; ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $default_price; ?></span></h3>
 <span class="priceFor text-sm font-semibold mt-1"><?php echo $default_label; ?></span>
 <?php if ($both): ?>
-<div class="mt-2 inline-flex rounded-full border border-blue-300 overflow-hidden text-xs font-medium">
-    <button type="button" class="billingToggle px-3 py-1 bg-blue-600 text-white" data-period="monthly" onclick="setBilling(this, 'monthly')">Monthly</button>
-    <button type="button" class="billingToggle px-3 py-1 text-blue-600 hover:bg-blue-50" data-period="yearly" onclick="setBilling(this, 'yearly')">Yearly</button>
+<div class="mt-2 flex items-center justify-center gap-0 bg-gray-100 rounded-lg p-0.5 border border-gray-200">
+    <button type="button" class="billingToggle px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 bg-blue-600 text-white shadow-sm" data-period="monthly" onclick="setBilling(this, 'monthly')">Monthly</button>
+    <button type="button" class="billingToggle px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 text-gray-500 hover:text-gray-800" data-period="yearly" onclick="setBilling(this, 'yearly')">Yearly</button>
 </div>
 <?php endif; ?>
 </div>

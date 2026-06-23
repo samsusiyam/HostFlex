@@ -197,7 +197,7 @@ while ($plan = mysqli_fetch_assoc($plans)) {
                     <?php endif; ?>
                 </div>
 
-                <?php $sym = getSetting('currency_symbol') ?: 'TK.'; ?>
+                <?php $sym = escSetting('currency_symbol') ?: 'TK.'; ?>
                 <div class="space-y-2">
                     <?php if ($plan['monthly_price'] > 0): ?>
                     <div class="flex items-baseline gap-1">

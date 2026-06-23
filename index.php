@@ -57,7 +57,7 @@ usort($homepage_sections, function($a, $b) {
     return ($a['sort_order'] ?? 0) - ($b['sort_order'] ?? 0);
 });
 
-$currency_symbol = getSetting('currency_symbol') ?: 'TK.';
+$currency_symbol = escSetting('currency_symbol') ?: 'TK.';
 $pricing_url = getSetting('whmcs_domain_pricing_url');
 ?>
 <html lang="en">

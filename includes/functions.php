@@ -134,7 +134,7 @@ function validateImageUpload($file, $allowed_exts = ['jpg','jpeg','png','gif','w
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime = finfo_file($finfo, $file['tmp_name']);
     finfo_close($finfo);
-    $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp','image/svg+xml'];
+    $allowed_mime = ['image/jpeg','image/png','image/gif','image/webp','image/svg+xml','image/x-icon','image/vnd.microsoft.icon'];
     if (!in_array($mime, $allowed_mime)) return 'Invalid file content (MIME type mismatch)';
     return true;
 }
