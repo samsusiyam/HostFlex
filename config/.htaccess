@@ -3,3 +3,7 @@ Require all denied
 <Files "install.php">
   Require all granted
 </Files>
+
+<Files "migrate.php">
+  Require all granted
+</Files>
