@@ -57,9 +57,11 @@ if (!$category) {
 <h3 class="text-xl xl:text-2xl font-extrabold"><?php echo $sym; ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $default_price; ?></span></h3>
 <span class="priceFor text-sm font-semibold mt-1"><?php echo $default_label; ?></span>
 <?php if ($both): ?>
-<div class="mt-3 inline-flex rounded-full border-2 border-blue-600 overflow-hidden">
-    <button type="button" class="billingToggle px-5 py-1.5 text-sm font-bold transition-all duration-150 bg-blue-600 text-white" data-period="monthly" onclick="setBilling(this,'monthly')">Monthly</button>
-    <button type="button" class="billingToggle px-5 py-1.5 text-sm font-bold transition-all duration-150 text-blue-600" data-period="yearly" onclick="setBilling(this,'yearly')">Annually</button>
+<div class="mt-3 btn-group shadow-sm" role="group" aria-label="Billing period">
+    <input type="radio" class="btn-check" name="billing_<?php echo $plan['id']; ?>" id="monthly_<?php echo $plan['id']; ?>" value="monthly" checked>
+    <label class="btn btn-outline-primary rounded-start-pill px-4 py-2 fw-bold" for="monthly_<?php echo $plan['id']; ?>" onclick="setBilling(this,'monthly')">Monthly</label>
+    <input type="radio" class="btn-check" name="billing_<?php echo $plan['id']; ?>" id="yearly_<?php echo $plan['id']; ?>" value="yearly">
+    <label class="btn btn-outline-primary rounded-end-pill px-4 py-2 fw-bold" for="yearly_<?php echo $plan['id']; ?>" onclick="setBilling(this,'yearly')">Annually</label>
 </div>
 <?php endif; ?>
 </div>
@@ -82,16 +84,10 @@ if (!$category) {
 <?php endif; ?>
 </div>
 <script>
-function setBilling(btn, period) {
-    var card = btn.closest('.overflow-hidden');
+function setBilling(label, period) {
+    var card = label.closest('.overflow-hidden');
     var priceSpan = card.querySelector('.priceValue');
     var labelSpan = card.querySelector('.priceFor');
-    card.querySelectorAll('.billingToggle').forEach(function(t) {
-        t.classList.remove('bg-blue-600', 'text-white');
-        t.classList.add('text-blue-600');
-    });
-    btn.classList.remove('text-blue-600');
-    btn.classList.add('bg-blue-600', 'text-white');
     priceSpan.textContent = priceSpan.getAttribute('data-' + period);
     labelSpan.textContent = period === 'monthly' ? '/month' : '/year';
 }
@@ -115,6 +111,7 @@ function setBilling(btn, period) {
 <script src="js/scroll.js"></script>
 <script src="js/ns.js"></script>
 <script src="js/ns-jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
 
