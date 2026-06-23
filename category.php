@@ -60,18 +60,18 @@ if (!$category) {
 <style>
 .billing-toggle{position:relative;display:inline-flex;align-items:center;cursor:pointer}
 .billing-toggle input{position:absolute;opacity:0;width:0;height:0}
-.billing-toggle .slider{position:relative;width:48px;height:24px;background:#d1d5db;border-radius:9999px;transition:background .3s}
+.billing-toggle .slider{position:relative;width:48px;height:24px;background:#d1d5db;border-radius:9999px;transition:background .3s;flex-shrink:0}
 .billing-toggle .slider::before{content:"";position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
 .billing-toggle input:checked + .slider{background:#2563eb}
 .billing-toggle input:checked + .slider::before{transform:translateX(24px)}
 </style>
-<div class="mt-3 flex items-center justify-center gap-3">
-    <span class="billingLabel text-sm font-bold text-blue-700 cursor-pointer" data-period="monthly" onclick="toggleBilling(this, 'monthly')">Monthly Plan</span>
-    <label class="billing-toggle">
+<div class="mt-3 flex items-center justify-center gap-2">
+    <span class="billingLabel text-sm font-bold text-blue-700 cursor-pointer leading-none" data-period="monthly" onclick="toggleBilling(this, 'monthly')">Monthly</span>
+    <label class="billing-toggle leading-none">
         <input type="checkbox" class="billingCheck" onchange="toggleBilling(this)">
         <span class="slider"></span>
     </label>
-    <span class="billingLabel text-sm font-bold text-gray-400 cursor-pointer" data-period="yearly" onclick="toggleBilling(this, 'yearly')">Yearly Plan</span>
+    <span class="billingLabel text-sm font-bold text-gray-400 cursor-pointer leading-none" data-period="yearly" onclick="toggleBilling(this, 'yearly')">Yearly</span>
 </div>
 <?php endif; ?>
 </div>
