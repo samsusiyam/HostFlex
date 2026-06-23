@@ -104,7 +104,11 @@ $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY sort_order 
                 <td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($cat['name']); ?></td>
                 <td class="px-6 py-4 text-sm text-gray-500"><?php echo $cat['slug']; ?></td>
                 <td class="px-6 py-4 text-sm"><?php echo $cat['status'] ? '<span class="text-green-600">Active</span>' : '<span class="text-red-600">Inactive</span>'; ?></td>
-                <td class="px-6 py-4 text-sm space-x-2"><a href="?edit=<?php echo $cat['id']; ?>" class="text-blue-600 hover:text-blue-800"><i class="fa fa-edit"></i></a> <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a></td>
+                <td class="px-6 py-4 text-sm space-x-2">
+                    <a href="/category.php?slug=<?php echo $cat['slug']; ?>" target="_blank" title="View on site" class="text-green-600 hover:text-green-800"><i class="fa fa-eye"></i></a>
+                    <a href="?edit=<?php echo $cat['id']; ?>" class="text-blue-600 hover:text-blue-800"><i class="fa fa-edit"></i></a>
+                    <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a>
+                </td>
             </tr>
             <?php endwhile; ?>
         </tbody>

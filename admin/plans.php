@@ -159,7 +159,10 @@ while ($plan = mysqli_fetch_assoc($plans)) {
 <?php $plan_count = count($cat_plans); ?>
 <div class="mb-8">
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-3 rounded-lg mb-4 flex justify-between items-center">
-        <h2 class="text-lg font-semibold"><i class="fa fa-folder mr-2"></i> <?php echo htmlspecialchars($cat_name); ?></h2>
+        <div class="flex items-center gap-2">
+            <h2 class="text-lg font-semibold"><i class="fa fa-folder mr-2"></i> <?php echo htmlspecialchars($cat_name); ?></h2>
+            <a href="/category.php?slug=<?php echo $cat_slug; ?>" target="_blank" title="View on site" class="text-white/70 hover:text-white text-sm transition-colors"><i class="fa fa-external-link-alt"></i></a>
+        </div>
         <span class="bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full"><?php echo $plan_count; ?> plan<?php echo $plan_count > 1 ? 's' : ''; ?></span>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
