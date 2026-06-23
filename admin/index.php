@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - HostFlex</title>
+    <title>Admin Login - <?php echo escSetting('site_name'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="w-full max-w-md">
     <div class="bg-white rounded-2xl shadow-2xl p-8">
         <div class="text-center mb-8">
-            <img src="../images/bg.png" class="h-12 mx-auto mb-4" alt="HostFlex">
+            <img src="../images/bg.png" class="h-12 mx-auto mb-4" alt="<?php echo escSetting('site_name'); ?>">
             <h2 class="text-2xl font-bold text-gray-800">Admin Login</h2>
-            <p class="text-gray-500">HostFlex Management Panel</p>
+            <p class="text-gray-500"><?php echo escSetting('site_name'); ?> Management Panel</p>
             </div>
             
             <?php if ($error): ?>

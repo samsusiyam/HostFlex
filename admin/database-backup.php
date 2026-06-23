@@ -14,7 +14,7 @@ if (isset($_GET['download'])) {
         $tables[] = $row[0];
     }
 
-    $output = "-- HostFlex Database Backup\n";
+    $output = "-- " . getSetting('site_name') . " Database Backup\n";
     $output .= "-- Generated: " . date('Y-m-d H:i:s') . "\n\n";
 
     foreach ($tables as $table) {
