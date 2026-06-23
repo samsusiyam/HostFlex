@@ -57,9 +57,9 @@ if (!$category) {
 <h3 class="text-xl xl:text-2xl font-extrabold"><?php echo $sym; ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $default_price; ?></span></h3>
 <span class="priceFor text-sm font-semibold mt-1"><?php echo $default_label; ?></span>
 <?php if ($both): ?>
-<div class="mt-2 flex items-center justify-center gap-0 bg-blue-50 rounded-xl p-0.5 border border-blue-200 shadow-inner">
-    <button type="button" class="billingToggle px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ease-in-out bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md" data-period="monthly" onclick="setBilling(this, 'monthly')">Monthly</button>
-    <button type="button" class="billingToggle px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ease-in-out text-gray-500 hover:text-blue-700" data-period="yearly" onclick="setBilling(this, 'yearly')">Yearly</button>
+<div class="mt-2 inline-flex rounded-full border-2 border-blue-600 overflow-hidden text-xs font-bold leading-none">
+    <button type="button" class="billingToggle px-3 py-1.5 bg-blue-600 text-white" data-period="monthly" onclick="setBilling(this,'monthly')">Monthly</button>
+    <button type="button" class="billingToggle px-3 py-1.5 text-blue-600" data-period="yearly" onclick="setBilling(this,'yearly')">Yearly</button>
 </div>
 <?php endif; ?>
 </div>
@@ -86,13 +86,12 @@ function setBilling(btn, period) {
     var card = btn.closest('.overflow-hidden');
     var priceSpan = card.querySelector('.priceValue');
     var labelSpan = card.querySelector('.priceFor');
-    var toggles = card.querySelectorAll('.billingToggle');
-    toggles.forEach(function(t) {
-        t.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-md');
-        t.classList.add('text-gray-500', 'hover:text-blue-700');
+    card.querySelectorAll('.billingToggle').forEach(function(t) {
+        t.classList.remove('bg-blue-600', 'text-white');
+        t.classList.add('text-blue-600');
     });
-    btn.classList.remove('text-gray-500', 'hover:text-blue-700');
-    btn.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-blue-700', 'text-white', 'shadow-md');
+    btn.classList.remove('text-blue-600');
+    btn.classList.add('bg-blue-600', 'text-white');
     priceSpan.textContent = priceSpan.getAttribute('data-' + period);
     labelSpan.textContent = period === 'monthly' ? '/month' : '/year';
 }
