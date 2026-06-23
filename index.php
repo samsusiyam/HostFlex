@@ -102,7 +102,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <!-- Domain Search -->
 <div class="content mt-32 mb-10">
 <div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
-<form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: escSetting('whmcs_domain_search_url')); ?>" class="flex w-auto">
+<form method="get" action="<?php echo htmlspecialchars($c['search_url'] ?: escSetting('whmcs_domain_search_url')); ?>" class="flex w-auto">
 <input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px]" type="search" />
 <div class="ml-2 w-fit">
 <button type="submit" size="custom" class="h-[53px] btn btn-blue">
