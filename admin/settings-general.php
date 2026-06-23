@@ -32,7 +32,7 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
     <p class="text-gray-500">Site name, tagline, contact info, currency</p>
 </div>
 <?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
-<form method="POST">
+<form method="POST" accept-charset="UTF-8">
     <?= csrfField() ?>
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

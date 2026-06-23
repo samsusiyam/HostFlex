@@ -79,7 +79,7 @@ $offers = mysqli_query($conn, "SELECT * FROM offers ORDER BY sort_order ASC");
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Price Label</label>
-                <input type="text" name="price_label" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['price_label']) : ''; ?>" class="w-full border rounded px-3 py-2" placeholder="৳50/mo">
+                <input type="text" name="price_label" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['price_label']) : ''; ?>" class="w-full border rounded px-3 py-2" placeholder="<?php echo getSetting('currency_symbol') ?: 'TK.'; ?>50/mo">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Link URL</label>

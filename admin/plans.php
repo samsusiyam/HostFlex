@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $badge = sanitize($_POST['badge']);
     $monthly_price = (float)$_POST['monthly_price'];
     $yearly_price = (float)$_POST['yearly_price'];
+    if (!isset($_POST['enable_monthly'])) $monthly_price = 0;
+    if (!isset($_POST['enable_yearly'])) $yearly_price = 0;
     $features = json_encode(array_filter(array_map('trim', explode("\n", $_POST['features']))));
     $order_url = sanitize($_POST['order_url']);
     $is_popular = isset($_POST['is_popular']) ? 1 : 0;
@@ -111,11 +113,13 @@ while ($plan = mysqli_fetch_assoc($plans)) {
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-money text-gray-400 mr-1"></i> Monthly Price</label>
-                <input type="number" step="0.01" name="monthly_price" value="<?php echo $edit_plan ? $edit_plan['monthly_price'] : ''; ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" value="<?php echo $edit_plan ? $edit_plan['monthly_price'] : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_monthly" value="1" <?php echo (!$edit_plan || $edit_plan['monthly_price'] > 0) ? 'checked' : ''; ?> onchange="if(!this.checked) document.getElementById('monthlyPrice').value='0'"> <span class="ml-1">Enable monthly billing</span></label>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-calendar text-gray-400 mr-1"></i> Yearly Price</label>
-                <input type="number" step="0.01" name="yearly_price" value="<?php echo $edit_plan ? $edit_plan['yearly_price'] : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="number" step="0.01" name="yearly_price" id="yearlyPrice" value="<?php echo $edit_plan ? $edit_plan['yearly_price'] : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_yearly" value="1" <?php echo (!$edit_plan || $edit_plan['yearly_price'] > 0) ? 'checked' : ''; ?> onchange="if(!this.checked) document.getElementById('yearlyPrice').value='0'"> <span class="ml-1">Enable yearly billing</span></label>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-link text-gray-400 mr-1"></i> Order URL</label>
@@ -193,14 +197,17 @@ while ($plan = mysqli_fetch_assoc($plans)) {
                     <?php endif; ?>
                 </div>
 
+                <?php $sym = getSetting('currency_symbol') ?: 'TK.'; ?>
                 <div class="space-y-2">
+                    <?php if ($plan['monthly_price'] > 0): ?>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl font-bold text-gray-900">৳<?php echo number_format($plan['monthly_price'], 0); ?></span>
+                        <span class="text-2xl font-bold text-gray-900"><?php echo $sym; ?><?php echo number_format($plan['monthly_price'], 0); ?></span>
                         <span class="text-sm text-gray-500">/month</span>
                     </div>
+                    <?php endif; ?>
                     <?php if ($plan['yearly_price'] > 0): ?>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-lg font-semibold text-gray-700">৳<?php echo number_format($plan['yearly_price'], 0); ?></span>
+                        <span class="text-lg font-semibold text-gray-700"><?php echo $sym; ?><?php echo number_format($plan['yearly_price'], 0); ?></span>
                         <span class="text-sm text-gray-500">/year</span>
                     </div>
                     <?php endif; ?>

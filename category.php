@@ -38,17 +38,30 @@ if (!$category) {
 <p>Honest and affordable pricing model to help you get started easily.</p>
 </div>
 
+<?php $sym = htmlspecialchars(getSetting('currency_symbol') ?: 'TK.', ENT_QUOTES, 'UTF-8'); ?>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
 <?php $plans = getPlans($category['slug']); ?>
 <?php if (mysqli_num_rows($plans) > 0): ?>
-<?php while ($plan = mysqli_fetch_assoc($plans)): ?>
-<?php $features = json_decode($plan['features'], true); ?>
+<?php while ($plan = mysqli_fetch_assoc($plans)):
+    $features = json_decode($plan['features'], true);
+    $has_monthly = $plan['monthly_price'] > 0;
+    $has_yearly = $plan['yearly_price'] > 0;
+    $both = $has_monthly && $has_yearly;
+    $default_price = $has_monthly ? $plan['monthly_price'] : $plan['yearly_price'];
+    $default_label = $has_monthly ? '/month' : '/year';
+?>
 <div class="rounded-lg shadow-xl flex flex-col overflow-hidden" style="background-image: url('images/hosting-bg.html'); background-size: contain; background-repeat: no-repeat; background-position: top;">
 <div class="p-5 text-center rounded-t-lg border-b border-white bg-opacity-95 overflow-hidden bg-blue-100">
 <span class="inline-block text-sm uppercase tracking-wider font-semibold px-3 py-1 bg-gray-500 bg-opacity-50 text-white rounded-full mb-4"><?php echo htmlspecialchars($plan['badge'] ?: $plan['name']); ?></span>
-<div class="flex gap-1 mb-1 justify-center items-center">
-<h3 class="text-xl xl:text-2xl font-extrabold"><?php echo getSetting('currency_symbol'); ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $plan['monthly_price']; ?></span></h3>
-<span class="priceFor text-sm font-semibold mt-1"> /Month</span>
+<div class="flex flex-col gap-1 mb-1 justify-center items-center">
+<h3 class="text-xl xl:text-2xl font-extrabold"><?php echo $sym; ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $default_price; ?></span></h3>
+<span class="priceFor text-sm font-semibold mt-1"><?php echo $default_label; ?></span>
+<?php if ($both): ?>
+<div class="mt-2 inline-flex rounded-full border border-blue-300 overflow-hidden text-xs font-medium">
+    <button type="button" class="billingToggle px-3 py-1 bg-blue-600 text-white" data-period="monthly" onclick="setBilling(this, 'monthly')">Monthly</button>
+    <button type="button" class="billingToggle px-3 py-1 text-blue-600 hover:bg-blue-50" data-period="yearly" onclick="setBilling(this, 'yearly')">Yearly</button>
+</div>
+<?php endif; ?>
 </div>
 <p class="text-gray-700 text-sm font-medium"><?php echo htmlspecialchars($plan['subtitle']); ?></p>
 </div>
@@ -68,6 +81,18 @@ if (!$category) {
 <div class="col-span-full text-center py-12"><p class="text-gray-400 text-lg">No plans available in this category yet.</p></div>
 <?php endif; ?>
 </div>
+<script>
+function setBilling(btn, period) {
+    var card = btn.closest('.rounded-lg');
+    var priceSpan = card.querySelector('.priceValue');
+    var labelSpan = card.querySelector('.priceFor');
+    var toggles = card.querySelectorAll('.billingToggle');
+    toggles.forEach(function(t) { t.classList.remove('bg-blue-600', 'text-white'); t.classList.add('text-blue-600'); });
+    btn.classList.add('bg-blue-600', 'text-white'); btn.classList.remove('text-blue-600');
+    priceSpan.textContent = priceSpan.getAttribute('data-' + period);
+    labelSpan.textContent = period === 'monthly' ? '/month' : '/year';
+}
+</script>
 </div>
 </section>
 <?php include "footer.php"; ?>
