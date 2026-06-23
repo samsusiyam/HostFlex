@@ -57,13 +57,21 @@ if (!$category) {
 <h3 class="text-xl xl:text-2xl font-extrabold"><?php echo $sym; ?> <span data-monthly="<?php echo $plan['monthly_price']; ?>" data-yearly="<?php echo $plan['yearly_price']; ?>" class="priceValue"><?php echo $default_price; ?></span></h3>
 <span class="priceFor text-sm font-semibold mt-1"><?php echo $default_label; ?></span>
 <?php if ($both): ?>
+<style>
+.billing-toggle{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+.billing-toggle input{position:absolute;opacity:0;width:0;height:0}
+.billing-toggle .slider{position:relative;width:48px;height:24px;background:#d1d5db;border-radius:9999px;transition:background .3s}
+.billing-toggle .slider::before{content:"";position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.billing-toggle input:checked + .slider{background:#2563eb}
+.billing-toggle input:checked + .slider::before{transform:translateX(24px)}
+</style>
 <div class="mt-3 flex items-center justify-center gap-3">
-    <span class="billingLabel text-sm font-bold text-blue-700 cursor-pointer" onclick="toggleBilling(this, 'monthly')">Monthly Plan</span>
-    <label class="toggleSwitch relative inline-block w-12 h-6 cursor-pointer">
-        <input type="checkbox" class="toggleInput sr-only" onchange="toggleBilling(this)">
-        <span class="toggleSlider absolute inset-0 bg-gray-300 rounded-full transition-colors duration-300"></span>
+    <span class="billingLabel text-sm font-bold text-blue-700 cursor-pointer" data-period="monthly" onclick="toggleBilling(this, 'monthly')">Monthly Plan</span>
+    <label class="billing-toggle">
+        <input type="checkbox" class="billingCheck" onchange="toggleBilling(this)">
+        <span class="slider"></span>
     </label>
-    <span class="billingLabel text-sm font-bold text-gray-400 cursor-pointer" onclick="toggleBilling(this, 'yearly')">Yearly Plan</span>
+    <span class="billingLabel text-sm font-bold text-gray-400 cursor-pointer" data-period="yearly" onclick="toggleBilling(this, 'yearly')">Yearly Plan</span>
 </div>
 <?php endif; ?>
 </div>
@@ -87,38 +95,31 @@ if (!$category) {
 </div>
 <script>
 function toggleBilling(el, period) {
-    var card = el.closest('.overflow-hidden') || el.closest('.rounded-lg');
+    var card = el.closest('.overflow-hidden');
     var priceSpan = card.querySelector('.priceValue');
     var labelSpan = card.querySelector('.priceFor');
     var labels = card.querySelectorAll('.billingLabel');
-    var slider = card.querySelector('.toggleSlider');
-    var input = card.querySelector('.toggleInput');
-    
-    if (el.classList.contains('billingLabel')) {
-        period = el.getAttribute('onclick').includes('monthly') ? 'monthly' : 'yearly';
-    } else {
+    var input = card.querySelector('.billingCheck');
+
+    if (!period) {
         period = input.checked ? 'yearly' : 'monthly';
     }
-    
+
     labels.forEach(function(l) {
         l.classList.remove('text-blue-700', 'text-gray-400');
-        if (l.getAttribute('onclick').includes(period)) {
+        if (l.getAttribute('data-period') === period) {
             l.classList.add('text-blue-700');
         } else {
             l.classList.add('text-gray-400');
         }
     });
-    
+
     if (period === 'yearly') {
-        slider.classList.add('bg-blue-600');
-        slider.classList.remove('bg-gray-300');
-        if (input) input.checked = true;
+        input.checked = true;
     } else {
-        slider.classList.remove('bg-blue-600');
-        slider.classList.add('bg-gray-300');
-        if (input) input.checked = false;
+        input.checked = false;
     }
-    
+
     priceSpan.textContent = priceSpan.getAttribute('data-' + period);
     labelSpan.textContent = period === 'monthly' ? '/month' : '/year';
 }
