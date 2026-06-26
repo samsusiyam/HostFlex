@@ -5,8 +5,8 @@
 <h3><picture><source srcset="images/logo-white.webp" type="image/webp"><img class="max-h-[40px] max-w-[200px] sm:max-w-[400px] rounded" src="<?php echo getSetting('footer_logo') ?: 'images/logo-white.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" loading="lazy"></picture></h3>
 <p style="color: #ffffff" class="text-sm max-w-[350px]"><?php echo escSetting('footer_description'); ?></p>
 <br>
-<a href="//www.dmca.com/Protection/Status.aspx?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" title="DMCA.com Protection Status" class="dmca-badge"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120m.png?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" alt="DMCA.com Protection Status" width="120" height="30"></a>
-<script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
+<a href="//www.dmca.com/Protection/Status.aspx?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" title="DMCA.com Protection Status" class="dmca-badge"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120m.png?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" alt="DMCA.com Protection Status" width="120" height="30" style="aspect-ratio:4/1;width:120px;height:auto"></a>
+<script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js" defer></script>
 <div class="flex flex-wrap gap-2">
                 <?php
                 $social_links_raw = getSetting('social_links');

@@ -139,6 +139,38 @@ function validateImageUpload($file, $allowed_exts = ['jpg','jpeg','png','gif','w
     return true;
 }
 
+function resizeImage($src, $dst, $max_w, $max_h) {
+    list($w, $h, $type) = @getimagesize($src);
+    if (!$w || !$h) return false;
+    if ($w <= $max_w && $h <= $max_h) return copy($src, $dst);
+    $ratio = min($max_w / $w, $max_h / $h);
+    $nw = round($w * $ratio);
+    $nh = round($h * $ratio);
+    $src_img = null;
+    switch ($type) {
+        case IMAGETYPE_JPEG: $src_img = @imagecreatefromjpeg($src); break;
+        case IMAGETYPE_PNG:  $src_img = @imagecreatefrompng($src);  break;
+        case IMAGETYPE_WEBP: $src_img = @imagecreatefromwebp($src); break;
+        case IMAGETYPE_GIF:  $src_img = @imagecreatefromgif($src);  break;
+        default: return false;
+    }
+    if (!$src_img) return false;
+    $dst_img = imagecreatetruecolor($nw, $nh);
+    imagealphablending($dst_img, false);
+    imagesavealpha($dst_img, true);
+    imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $nw, $nh, $w, $h);
+    $ext = strtolower(pathinfo($dst, PATHINFO_EXTENSION));
+    $ok = false;
+    if ($ext === 'webp') $ok = imagewebp($dst_img, $dst, 80);
+    elseif ($ext === 'png') $ok = imagepng($dst_img, $dst, 8);
+    elseif ($ext === 'jpg' || $ext === 'jpeg') $ok = imagejpeg($dst_img, $dst, 85);
+    elseif ($ext === 'gif') $ok = imagegif($dst_img, $dst);
+    else $ok = imagepng($dst_img, $dst, 8);
+    imagedestroy($src_img);
+    imagedestroy($dst_img);
+    return $ok;
+}
+
 function isBannedIP() {
     global $conn;
     if (!tableExists('login_logs')) return false;

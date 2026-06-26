@@ -37,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
                 $fname = 'partner_' . time() . '_' . rand(100,999) . '.' . $ext;
                 move_uploaded_file($_FILES['photo']['tmp_name'], $upload_dir . $fname);
+                $uploaded = $upload_dir . $fname;
+                resizeImage($uploaded, $uploaded, 400, 128);
                 $photo = 'uploads/partners/' . $fname;
                 if ($edit_id) { $old = mysqli_fetch_assoc(mysqli_query($conn, "SELECT photo FROM partners WHERE id = $edit_id")); if ($old['photo'] && file_exists('../' . $old['photo'])) unlink('../' . $old['photo']); }
             }
