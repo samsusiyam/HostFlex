@@ -98,7 +98,10 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" fetchpriority="high"></div>
+<div class="hidden px-6 lg:block">
+<?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
+<picture><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" fetchpriority="high"></picture>
+</div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
@@ -140,7 +143,8 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 ?>
 <div class="bg-white border border-blue-600 overflow-hidden rounded-xl shadow-xl">
 <div class="flex flex-col items-center justify-center">
-<div class="px-14 py-8"><img src="<?php echo htmlspecialchars($cat['image'] ?: 'images/s.png'); ?>" class="h-24 sm:h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" width="96" height="96" loading="lazy" /></div>
+<div class="px-14 py-8"><?php $cat_img = $cat['image'] ?: 'images/s.png'; $cat_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $cat_img); ?>
+<picture><source srcset="<?php echo htmlspecialchars($cat_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($cat_img); ?>" class="h-24 sm:h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" width="96" height="96" loading="lazy"></picture></div>
 <h1 class="mb-4 px-8 text-xl font-bold text-black"><?php echo htmlspecialchars($cat['name']); ?></h1>
 <p class="text-md px-8 text-center font-normal text-gray-900"><?php echo htmlspecialchars($cat['description']); ?></p>
 <?php if ($min_price && $min_price['min_price']): ?>
@@ -259,7 +263,10 @@ if (empty($cards)) {
 </div>
 </div>
 </div>
-<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" alt="Hosting illustration" class="h-full mt-12 sm:mt-0" width="500" height="400" loading="lazy"></div>
+<div class="flex md:w-5/12 justify-end items-center max-lg:hidden">
+<?php $cta_img = $c['image'] ?? 'images/tp.png'; $cta_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $cta_img); ?>
+<picture><source srcset="<?php echo htmlspecialchars($cta_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($cta_img); ?>" alt="Hosting illustration" class="h-full mt-12 sm:mt-0" width="500" height="400" loading="lazy"></picture>
+</div>
 </div>
 </div>
 </div>
@@ -270,7 +277,8 @@ if (empty($cards)) {
 <div class="content">
 <div class="w-fit mx-auto">
 <div class="mb-12 flex flex-col gap-2">
-<img src="<?php echo htmlspecialchars($c['image'] ?? 'images/refund.png'); ?>" alt="Refund Guarantee" width="350" height="350" loading="lazy">
+<?php $ref_img = $c['image'] ?? 'images/refund.png'; $ref_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $ref_img); ?>
+<picture><source srcset="<?php echo htmlspecialchars($ref_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="350" height="350" loading="lazy"></picture>
 <h2 class="text-black text-2xl font-bold"><?php echo htmlspecialchars($c['heading'] ?? ''); ?></h2>
 <p><?php echo htmlspecialchars($c['text'] ?? ''); ?></p>
 </div>
