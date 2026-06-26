@@ -92,8 +92,9 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </div>
 </div>
 <?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
-<div class="hidden self-center lg:block w-full px-6"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
+<div class="hidden lg:block px-6"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
 </div>
+
 
 <?php elseif ($type === 'domain_search'): ?>
 <!-- Domain Search -->
