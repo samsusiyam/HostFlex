@@ -2,7 +2,7 @@
 <div class="pt-12">
 <div class="content grid grid-cols-1 lg:grid-cols-11 lg:gap-10">
 <div class="col-span-3 space-y-6 py-3 row-span-2">
-<h3><img class="max-h-[40px] max-w-[200px] sm:max-w-[400px] rounded" src="<?php echo getSetting('footer_logo') ?: 'images/logo-white.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" loading="lazy"></h3>
+<h3><picture><source srcset="images/logo-white.webp" type="image/webp"><img class="max-h-[40px] max-w-[200px] sm:max-w-[400px] rounded" src="<?php echo getSetting('footer_logo') ?: 'images/logo-white.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" loading="lazy"></picture></h3>
 <p style="color: #ffffff" class="text-sm max-w-[350px]"><?php echo escSetting('footer_description'); ?></p>
 <br>
 <a href="//www.dmca.com/Protection/Status.aspx?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" title="DMCA.com Protection Status" class="dmca-badge"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120m.png?ID=65bbde93-ced3-47fc-b61c-569d89434dd2" alt="DMCA.com Protection Status" width="120" height="30"></a>

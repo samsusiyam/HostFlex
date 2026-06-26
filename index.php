@@ -73,13 +73,6 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 
 <main>
 
-<style>
-.btn-blue {
-    background-color: #0718c4;
-    color: #000503;
-}
-</style>
-
 <?php foreach ($homepage_sections as $section):
     if (($section['enabled'] ?? '1') !== '1') continue;
     $c = $section['content'] ?? [];
