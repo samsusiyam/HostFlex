@@ -296,7 +296,7 @@ if (mysqli_num_rows($blog_posts) > 0):
     <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
         <?php if ($bpost['image']): ?>
         <a href="blog.php?slug=<?php echo htmlspecialchars($bpost['slug']); ?>">
-        <img src="<?php echo htmlspecialchars($bpost['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($bpost['title']); ?>"></a>
+        <img src="<?php echo htmlspecialchars($bpost['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($bpost['title']); ?>" width="400" height="192"></a>
         <?php endif; ?>
         <div class="p-4">
             <p class="text-xs text-gray-500"><?php echo date('F d, Y', strtotime($bpost['created_at'])); ?></p>
@@ -330,7 +330,7 @@ if (mysqli_num_rows($testimonials) > 0):
     <?php while ($t = mysqli_fetch_assoc($testimonials)): ?>
     <div class="bg-white rounded-xl shadow p-6 border">
         <div class="flex items-center gap-3 mb-3">
-            <?php if ($t['photo']): ?><img src="<?php echo htmlspecialchars($t['photo']); ?>" class="w-12 h-12 rounded-full object-cover"><?php endif; ?>
+            <?php if ($t['photo']): ?><img src="<?php echo htmlspecialchars($t['photo']); ?>" class="w-12 h-12 rounded-full object-cover" width="48" height="48"><?php endif; ?>
             <div>
                 <p class="font-semibold"><?php echo htmlspecialchars($t['name']); ?></p>
                 <?php if ($t['company']): ?><p class="text-sm text-gray-500"><?php echo htmlspecialchars($t['company']); ?></p><?php endif; ?>
