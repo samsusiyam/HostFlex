@@ -21,7 +21,7 @@
 <?php endif; ?>
 <header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
 <div class="content flex items-center justify-between">
-<a href="index.php"><img class="h-[50px]" src="<?php echo getSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" /></a>
+<a href="index.php"><img class="h-[50px]" src="<?php echo getSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" /></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
 <?php
 $menu_items = getMenuItems('header');

@@ -98,7 +98,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt></div>
+<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt width="800" height="600" loading="lazy"></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
@@ -140,7 +140,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 ?>
 <div class="bg-white border border-blue-600 overflow-hidden rounded-xl shadow-xl">
 <div class="flex flex-col items-center justify-center">
-<div class="px-14 py-8"><img src="<?php echo htmlspecialchars($cat['image'] ?: 'images/s.png'); ?>" class="h-24 sm:h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" /></div>
+<div class="px-14 py-8"><img src="<?php echo htmlspecialchars($cat['image'] ?: 'images/s.png'); ?>" class="h-24 sm:h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" width="96" height="96" loading="lazy" /></div>
 <h1 class="mb-4 px-8 text-xl font-bold text-black"><?php echo htmlspecialchars($cat['name']); ?></h1>
 <p class="text-md px-8 text-center font-normal text-gray-900"><?php echo htmlspecialchars($cat['description']); ?></p>
 <?php if ($min_price && $min_price['min_price']): ?>
@@ -196,7 +196,7 @@ if (empty($cards)) {
 <div class="grid grid-cols-1 gap-4 xsm:grid-cols-2 md:gap-8 lg:grid-cols-4">
 <?php foreach ($cards as $feature): ?>
 <div class="flex flex-col gap-3 rounded border p-6 shadow">
-<img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($feature['icon'] ?? $feature['icon']); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" />
+<img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($feature['icon'] ?? $feature['icon']); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" width="65" height="65" loading="lazy" />
 <h3><?php echo htmlspecialchars($feature['title']); ?></h3>
 <p><?php echo htmlspecialchars($feature['desc'] ?? $feature['description'] ?? ''); ?></p>
 </div>
@@ -246,20 +246,20 @@ if (empty($cards)) {
 <p class="mt-10 text-lg pr-0 sm:pr-8 dark:text-gray-400"><?php echo $c['description'] ?? ''; ?></p>
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-6 py-10">
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
 <a href="javascript:void(Tawk_API.toggle())"><h1 class="text-md text-gray-100 text-center bg-blue-600 py-3 px-4 font-semibold">Live Chat</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/EmailSupport.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/EmailSupport.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-purple-600 py-3 px-4 font-semibold">Email Support</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/Helpdesk.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/Helpdesk.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-indigo-600 py-3 px-4 font-semibold">24x7 Helpdesk</h1></a>
 </div>
 </div>
 </div>
-<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" class="h-full mt-12 sm:mt-0"></div>
+<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" class="h-full mt-12 sm:mt-0" width="500" height="400" loading="lazy"></div>
 </div>
 </div>
 </div>
@@ -270,7 +270,7 @@ if (empty($cards)) {
 <div class="content">
 <div class="w-fit mx-auto">
 <div class="mb-12 flex flex-col gap-2">
-<img src="<?php echo htmlspecialchars($c['image'] ?? 'images/refund.png'); ?>" alt="Refund Guarantee" width="200" height="150">
+<img src="<?php echo htmlspecialchars($c['image'] ?? 'images/refund.png'); ?>" alt="Refund Guarantee" width="350" height="350" loading="lazy">
 <h2 class="text-black text-2xl font-bold"><?php echo htmlspecialchars($c['heading'] ?? ''); ?></h2>
 <p><?php echo htmlspecialchars($c['text'] ?? ''); ?></p>
 </div>
@@ -381,7 +381,7 @@ if (mysqli_num_rows($partners) > 0):
     <?php while ($p = mysqli_fetch_assoc($partners)): ?>
     <div class="bg-white rounded-xl shadow px-6 py-5 flex items-center justify-center h-28 w-52">
         <?php if ($p['photo']): ?>
-        <img src="<?php echo htmlspecialchars($p['photo']); ?>" style="max-height:64px;max-width:100%;object-fit:contain;" alt="<?php echo htmlspecialchars($p['name']); ?>">
+        <img src="<?php echo htmlspecialchars($p['photo']); ?>" style="max-height:64px;max-width:100%;object-fit:contain;" alt="<?php echo htmlspecialchars($p['name']); ?>" width="200" height="64" loading="lazy">
         <?php else: ?>
         <span class="font-semibold text-gray-500"><?php echo htmlspecialchars($p['name']); ?></span>
         <?php endif; ?>
