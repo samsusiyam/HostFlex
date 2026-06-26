@@ -101,7 +101,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <div class="content mt-32 mb-10">
 <div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
 <form method="get" action="<?php echo htmlspecialchars(getSetting('whmcs_domain_search_url') ?: 'https://my.hostnibo.com/domainchecker.php'); ?>" class="flex w-auto">
-<input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px]" type="search" />
+<input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px] h-[53px]" type="search" />
 <div class="ml-2 w-fit">
 <button type="submit" size="custom" class="h-[53px] btn btn-blue" aria-label="Search domain">
 <i class="fa fa-search"></i> <span class="hidden sm:block">Search</span>
@@ -110,11 +110,11 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </form>
 <div class="flex justify-between gap-4 md:gap-8">
 <?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): ?>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
 <?php endforeach; else: ?>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1"><?php echo $currency_symbol; ?>999</span></span></a>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1"><?php echo $currency_symbol; ?>455</span></span></a>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1"><?php echo $currency_symbol; ?>250</span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1"><?php echo $currency_symbol; ?>999</span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1"><?php echo $currency_symbol; ?>455</span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1"><?php echo $currency_symbol; ?>250</span></span></a>
 <?php endif; ?>
 </div>
 </div>
@@ -193,7 +193,7 @@ if (empty($cards)) {
 <?php foreach ($cards as $feature): ?>
 <div class="flex flex-col gap-3 rounded border p-6 shadow">
 <?php $ficon = $feature['icon'] ?? 'images/icon/speedometer.png'; $fwebp = preg_replace('/\.png$/i', '.webp', $ficon); ?>
-<picture><source srcset="<?php echo htmlspecialchars($fwebp); ?>" type="image/webp"><img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($ficon); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" width="65" height="65" loading="lazy"></picture>
+<picture><source srcset="<?php echo htmlspecialchars($fwebp); ?>" type="image/webp"><img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($ficon); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" width="65" height="65" loading="lazy" style="aspect-ratio:1"></picture>
 <h3><?php echo htmlspecialchars($feature['title']); ?></h3>
 <p><?php echo htmlspecialchars($feature['desc'] ?? $feature['description'] ?? ''); ?></p>
 </div>
