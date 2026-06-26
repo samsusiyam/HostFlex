@@ -68,7 +68,7 @@ foreach ($tree as $item):
 <div class="w-fit"><a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
 </div>
 <div class="xl:hidden w-fit ml-auto">
-<button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl"><i class="fa fa-bars"></i></button>
+<button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl" aria-label="Toggle navigation menu"><i class="fa fa-bars"></i></button>
 </div>
 </div>
 </header>

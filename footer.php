@@ -35,11 +35,11 @@
 </div>
 <div class="mt-6">
     <h3 class="text-lg font-semibold mb-3">Newsletter</h3>
-    <p class="text-sm text-gray-300 mb-3">Subscribe to get latest updates</p>
+    <p class="text-sm text-gray-200 mb-3">Subscribe to get latest updates</p>
     <form id="newsletterForm" class="flex flex-col gap-2" onsubmit="return subscribeNewsletter(event)">
         <div class="flex gap-2">
             <input type="email" id="newsletterEmail" placeholder="Your email" required class="flex-1 px-3 py-2 rounded text-sm text-gray-900">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 whitespace-nowrap"><i class="fa fa-paper-plane"></i></button>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 whitespace-nowrap" aria-label="Subscribe to newsletter"><i class="fa fa-paper-plane"></i></button>
         </div>
         <div id="newsletterMsg" class="text-xs mt-1"></div>
     </form>

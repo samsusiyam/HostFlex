@@ -9,6 +9,7 @@ if (!$page) {
     exit;
 }
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
@@ -30,22 +31,7 @@ if (!$page) {
 </div>
 </section>
 <?php include "footer.php"; ?>
-<script src="../cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="../cdn.jsdelivr.net/npm/%40accessible360/accessible-slick%401.0.1/slick/slick.min.js"></script>
-<script src="../cdn.jsdelivr.net/npm/%40fancyapps/fancybox%403.5.6/dist/jquery.fancybox.min.js"></script>
-<script src="../unpkg.com/alpinejs%403.14.9/dist/cdn.min.js"></script>
-<script src="../cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-<script src="../unpkg.com/%40material-tailwind/html%403.0.0-beta.7/scripts/ripple.js"></script>
-<script src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/collapse.js"></script>
-<script src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/dialog.js"></script>
-<script src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/dismissible.js"></script>
-<script type="module" src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/popover.js"></script>
-<script src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/tabs.js"></script>
-<script type="module" src="../unpkg.com/%40material-tailwind/html%402.0.0/scripts/tooltip.js"></script>
-<script src="../unpkg.com/tailwindcss%402.2.19/dist/tailwind.min.js"></script>
-<script src="js/scroll.js"></script>
-<script src="js/ns.js"></script>
-<script src="js/ns-jquery.js"></script>
+<?php include "scripts.php"; ?>
 </body>
 </html>
 
