@@ -128,7 +128,6 @@ function toggleBilling(el, period) {
 </div>
 </section>
 <?php include "footer.php"; ?>
-<?php include "scripts.php"; ?>
 </body>
 </html>
 

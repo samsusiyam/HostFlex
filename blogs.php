@@ -101,8 +101,6 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
 </section>
 
 <?php include "footer.php"; ?>
-<?php include "scripts.php"; ?>
-<script src="js/ns-jquery.js"></script>
 </body>
 </html>
 

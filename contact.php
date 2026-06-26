@@ -156,8 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 </section>
 <?php include "footer.php"; ?>
-<?php include "scripts.php"; ?>
-<script src="js/ns-jquery.js"></script>
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <?php endif; ?>

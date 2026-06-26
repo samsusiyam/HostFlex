@@ -64,8 +64,6 @@ $meta_kw = $post['meta_keywords'] ?? '';
 </style>
 
 <?php include "footer.php"; ?>
-<?php include "scripts.php"; ?>
-<script src="js/ns-jquery.js"></script>
 </body>
 </html>
 

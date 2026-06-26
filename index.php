@@ -200,7 +200,8 @@ if (empty($cards)) {
 <div class="grid grid-cols-1 gap-4 xsm:grid-cols-2 md:gap-8 lg:grid-cols-4">
 <?php foreach ($cards as $feature): ?>
 <div class="flex flex-col gap-3 rounded border p-6 shadow">
-<img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($feature['icon'] ?? $feature['icon']); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" width="65" height="65" loading="lazy" />
+<?php $ficon = $feature['icon'] ?? 'images/icon/speedometer.png'; $fwebp = preg_replace('/\.png$/i', '.webp', $ficon); ?>
+<picture><source srcset="<?php echo htmlspecialchars($fwebp); ?>" type="image/webp"><img class="h-[65px] w-[65px]" src="<?php echo htmlspecialchars($ficon); ?>" alt="<?php echo htmlspecialchars($feature['title']); ?>" width="65" height="65" loading="lazy"></picture>
 <h3><?php echo htmlspecialchars($feature['title']); ?></h3>
 <p><?php echo htmlspecialchars($feature['desc'] ?? $feature['description'] ?? ''); ?></p>
 </div>
@@ -409,8 +410,6 @@ if (mysqli_num_rows($partners) > 0):
 </main>
 
 <?php include "footer.php"; ?>
-
-<?php include "scripts.php"; ?>
 
 </body>
 </html>
