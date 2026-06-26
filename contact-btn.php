@@ -87,9 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var btn = document.getElementById('fabBtn');
     if (btn) {
         btn.addEventListener('click', function(e) {
+            var rect = btn.getBoundingClientRect();
             var ripple = document.createElement('span');
             ripple.className = 'ripple';
-            var rect = btn.getBoundingClientRect();
             var size = Math.max(rect.width, rect.height);
             ripple.style.width = ripple.style.height = size + 'px';
             ripple.style.left = (e.clientX - rect.left - size/2) + 'px';

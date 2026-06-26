@@ -82,7 +82,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($type === 'hero'): ?>
 <!-- Hero Section -->
 <section class="py-16 bg-white">
-<div class="content grid-cols-2 lg:grid">
+<div class="content grid grid-cols-1 lg:grid-cols-2">
 <div class="flex flex-col justify-center gap-6 md:gap-12">
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
