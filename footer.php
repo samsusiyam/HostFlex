@@ -47,15 +47,18 @@
 </div>
 <?php
 $footer_items = getMenuItems('footer');
-$footer_tree = buildMenuTree($footer_items);
-foreach ($footer_tree as $parent):
-    $has_children = isset($parent['children']) && !empty($parent['children']);
+$footer_parents = array_filter($footer_items, function($item) { return $item['parent_id'] == 0; });
+usort($footer_parents, function($a, $b) { return $a['sort_order'] - $b['sort_order']; });
+foreach ($footer_parents as $parent):
+    $children = array_filter($footer_items, function($item) use ($parent) { return $item['parent_id'] == $parent['id']; });
+    usort($children, function($a, $b) { return $a['sort_order'] - $b['sort_order']; });
+    $has_children = !empty($children);
 ?>
 <div class="col-span-2 space-y-6 py-3">
 <div>
 <h3 class="mb-8"><?php echo htmlspecialchars($parent['label']); ?></h3>
 <div class="space-y-3">
-<?php if ($has_children): foreach ($parent['children'] as $child): ?>
+<?php if ($has_children): foreach ($children as $child): ?>
 <a style="color: #ffffff" class="flex items-center gap-1 text-sm group" href="<?php echo htmlspecialchars($child['url']); ?>"><span class="circle-btn bg-opacity-25 w-4 h-4 text-xs text-white"><i class="fa fa-play fa-2xs group-hover:hidden"></i><i class="fa fa-pause fa-2xs hidden group-hover:block"></i></span><span><?php echo htmlspecialchars($child['label']); ?></span></a>
 <?php endforeach; else: ?>
 <a style="color: #ffffff" class="flex items-center gap-1 text-sm group" href="<?php echo htmlspecialchars($parent['url']); ?>"><span class="circle-btn bg-opacity-25 w-4 h-4 text-xs text-white"><i class="fa fa-play fa-2xs group-hover:hidden"></i><i class="fa fa-pause fa-2xs hidden group-hover:block"></i></span><span><?php echo htmlspecialchars($parent['label']); ?></span></a>

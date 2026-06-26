@@ -37,20 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query = "UPDATE hosting_plans SET category='$category', name='$name', subtitle='$subtitle', badge='$badge', monthly_price=$monthly_price, yearly_price=$yearly_price, features='$features', order_url='$order_url', is_popular=$is_popular, sort_order=$sort_order, status=$status WHERE id=$id";
         mysqli_query($conn, $query);
         logActivity('Updated Plan', $name . ' (ID: ' . $id . ')');
-        $success = 'Plan updated successfully!';
+        header('Location: plans.php?msg=updated');
+        exit;
     } else {
         $query = "INSERT INTO hosting_plans (category, name, subtitle, badge, monthly_price, yearly_price, features, order_url, is_popular, sort_order, status) VALUES ('$category', '$name', '$subtitle', '$badge', $monthly_price, $yearly_price, '$features', '$order_url', $is_popular, $sort_order, $status)";
         mysqli_query($conn, $query);
         logActivity('Created Plan', $name);
-        $success = 'Plan added successfully!';
+        header('Location: plans.php?msg=added');
+        exit;
     }
-}
-
-$edit_plan = null;
-if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    $result = mysqli_query($conn, "SELECT * FROM hosting_plans WHERE id = $id");
-    $edit_plan = mysqli_fetch_assoc($result);
 }
 
 $plans = mysqli_query($conn, "SELECT * FROM hosting_plans ORDER BY category, sort_order ASC");
@@ -75,83 +70,89 @@ while ($plan = mysqli_fetch_assoc($plans)) {
         <h1 class="text-2xl font-bold text-gray-800">Hosting Plans</h1>
         <p class="text-gray-500">Manage your hosting plans and pricing</p>
     </div>
-    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa fa-plus mr-1"></i> Add Plan</a>
+    <button onclick="openAddModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa fa-plus mr-1"></i> Add Plan</button>
 </div>
 
-<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><?php echo $success; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
-
-<?php if (isset($_GET['action']) && $_GET['action'] === 'add' || $edit_plan): ?>
-<div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
-    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-        <i class="fa <?php echo $edit_plan ? 'fa-pencil' : 'fa-plus-circle'; ?> text-blue-600"></i>
-        <?php echo $edit_plan ? 'Edit Plan' : 'Add New Plan'; ?>
-    </h2>
-    <form method="POST">
-        <?= csrfField() ?>
-        <?php if ($edit_plan): ?><input type="hidden" name="id" value="<?php echo $edit_plan['id']; ?>"><?php endif; ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-folder text-gray-400 mr-1"></i> Category</label>
-                <select name="category" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <?php if ($categories): mysqli_data_seek($categories, 0); while ($cat = mysqli_fetch_assoc($categories)): ?>
-                    <option value="<?php echo $cat['slug']; ?>" <?php echo ($edit_plan && $edit_plan['category'] == $cat['slug']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['name']); ?></option>
-                    <?php endwhile; endif; ?>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-tag text-gray-400 mr-1"></i> Plan Name</label>
-                <input type="text" name="name" value="<?php echo $edit_plan ? htmlspecialchars($edit_plan['name']) : ''; ?>" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-subscript text-gray-400 mr-1"></i> Subtitle</label>
-                <input type="text" name="subtitle" value="<?php echo $edit_plan ? htmlspecialchars($edit_plan['subtitle']) : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-certificate text-gray-400 mr-1"></i> Badge Text</label>
-                <input type="text" name="badge" value="<?php echo $edit_plan ? htmlspecialchars($edit_plan['badge']) : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-money text-gray-400 mr-1"></i> Monthly Price</label>
-                <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" value="<?php echo $edit_plan ? $edit_plan['monthly_price'] : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_monthly" value="1" <?php echo (!$edit_plan || $edit_plan['monthly_price'] > 0) ? 'checked' : ''; ?> onchange="if(!this.checked) document.getElementById('monthlyPrice').value='0'"> <span class="ml-1">Enable monthly billing</span></label>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-calendar text-gray-400 mr-1"></i> Yearly Price</label>
-                <input type="number" step="0.01" name="yearly_price" id="yearlyPrice" value="<?php echo $edit_plan ? $edit_plan['yearly_price'] : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_yearly" value="1" <?php echo (!$edit_plan || $edit_plan['yearly_price'] > 0) ? 'checked' : ''; ?> onchange="if(!this.checked) document.getElementById('yearlyPrice').value='0'"> <span class="ml-1">Enable yearly billing</span></label>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-link text-gray-400 mr-1"></i> Order URL</label>
-                <input type="url" name="order_url" value="<?php echo $edit_plan ? htmlspecialchars($edit_plan['order_url']) : ''; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-sort-numeric-asc text-gray-400 mr-1"></i> Sort Order</label>
-                <input type="number" name="sort_order" value="<?php echo $edit_plan ? $edit_plan['sort_order'] : '0'; ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-        </div>
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-list text-gray-400 mr-1"></i> Features</label>
-            <textarea name="features" rows="8" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><?php if ($edit_plan) { $feats = json_decode($edit_plan['features'], true); if ($feats) echo implode("\n", $feats); } ?></textarea>
-            <p class="text-xs text-gray-400 mt-1"><i class="fa fa-info-circle"></i> One feature per line</p>
-        </div>
-        <div class="mt-4 flex flex-wrap items-center gap-6">
-            <label class="flex items-center cursor-pointer select-none">
-                <input type="checkbox" name="is_popular" value="1" <?php echo ($edit_plan && $edit_plan['is_popular']) ? 'checked' : ''; ?> class="mr-2 rounded">
-                <span class="text-sm font-medium text-gray-700"><i class="fa fa-star text-yellow-500 mr-1"></i> Popular / Featured</span>
-            </label>
-            <label class="flex items-center cursor-pointer select-none">
-                <input type="checkbox" name="status" value="1" <?php echo (!$edit_plan || $edit_plan['status']) ? 'checked' : ''; ?> class="mr-2 rounded">
-                <span class="text-sm font-medium text-gray-700"><i class="fa fa-check-circle text-green-500 mr-1"></i> Active</span>
-            </label>
-        </div>
-        <div class="mt-6 flex items-center gap-3">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa <?php echo $edit_plan ? 'fa-save' : 'fa-plus-circle'; ?> mr-1"></i> <?php echo $edit_plan ? 'Update Plan' : 'Add Plan'; ?></button>
-            <a href="plans.php" class="text-gray-600 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"><i class="fa fa-times mr-1"></i> Cancel</a>
-        </div>
-    </form>
+<?php if (isset($_GET['msg'])): ?>
+<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
+    <i class="fa fa-check-circle mr-1"></i>
+    <?php echo $_GET['msg'] === 'updated' ? 'Plan updated successfully!' : 'Plan added successfully!'; ?>
 </div>
 <?php endif; ?>
+
+<div id="planModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+            <h3 id="planModalTitle" class="text-lg font-semibold flex items-center gap-2">
+                <i class="fa fa-plus-circle text-blue-600"></i> Add New Plan
+            </h3>
+            <button onclick="closePlanModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fa fa-times text-xl"></i></button>
+        </div>
+        <form method="POST" id="planForm">
+            <?= csrfField() ?>
+            <input type="hidden" name="id" id="planFormId" value="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-folder text-gray-400 mr-1"></i> Category</label>
+                    <select name="category" id="planFormCategory" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <?php if ($categories): mysqli_data_seek($categories, 0); while ($cat = mysqli_fetch_assoc($categories)): ?>
+                        <option value="<?php echo $cat['slug']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                        <?php endwhile; endif; ?>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-tag text-gray-400 mr-1"></i> Plan Name</label>
+                    <input type="text" name="name" id="planFormName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-subscript text-gray-400 mr-1"></i> Subtitle</label>
+                    <input type="text" name="subtitle" id="planFormSubtitle" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-certificate text-gray-400 mr-1"></i> Badge Text</label>
+                    <input type="text" name="badge" id="planFormBadge" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-money text-gray-400 mr-1"></i> Monthly Price</label>
+                    <input type="number" step="0.01" name="monthly_price" id="planFormMonthlyPrice" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_monthly" id="planFormEnableMonthly" value="1" checked onchange="if(!this.checked) document.getElementById('planFormMonthlyPrice').value='0'"> <span class="ml-1">Enable monthly billing</span></label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-calendar text-gray-400 mr-1"></i> Yearly Price</label>
+                    <input type="number" step="0.01" name="yearly_price" id="planFormYearlyPrice" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label class="mt-1 flex items-center text-xs text-gray-500"><input type="checkbox" name="enable_yearly" id="planFormEnableYearly" value="1" checked onchange="if(!this.checked) document.getElementById('planFormYearlyPrice').value='0'"> <span class="ml-1">Enable yearly billing</span></label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-link text-gray-400 mr-1"></i> Order URL</label>
+                    <input type="url" name="order_url" id="planFormOrderUrl" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-sort-numeric-asc text-gray-400 mr-1"></i> Sort Order</label>
+                    <input type="number" name="sort_order" id="planFormSortOrder" value="0" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa fa-list text-gray-400 mr-1"></i> Features</label>
+                <textarea name="features" id="planFormFeatures" rows="6" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <p class="text-xs text-gray-400 mt-1"><i class="fa fa-info-circle"></i> One feature per line</p>
+            </div>
+            <div class="mt-4 flex flex-wrap items-center gap-6">
+                <label class="flex items-center cursor-pointer select-none">
+                    <input type="checkbox" name="is_popular" id="planFormPopular" value="1" class="mr-2 rounded">
+                    <span class="text-sm font-medium text-gray-700"><i class="fa fa-star text-yellow-500 mr-1"></i> Popular / Featured</span>
+                </label>
+                <label class="flex items-center cursor-pointer select-none">
+                    <input type="checkbox" name="status" id="planFormStatus" value="1" class="mr-2 rounded">
+                    <span class="text-sm font-medium text-gray-700"><i class="fa fa-check-circle text-green-500 mr-1"></i> Active</span>
+                </label>
+            </div>
+            <div class="mt-6 flex items-center gap-3">
+                <button type="submit" id="planFormSubmitBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa fa-plus-circle mr-1"></i> Add Plan</button>
+                <button type="button" onclick="closePlanModal()" class="text-gray-600 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <?php if ($total_plans > 0): ?>
 <?php foreach ($plans_by_cat as $cat_slug => $cat_plans): ?>
@@ -220,7 +221,7 @@ while ($plan = mysqli_fetch_assoc($plans)) {
             <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl flex items-center justify-between">
                 <span class="text-xs text-gray-400"><i class="fa fa-database mr-1"></i> #<?php echo $plan['id']; ?></span>
                 <div class="flex items-center gap-3">
-                    <a href="?edit=<?php echo $plan['id']; ?>" class="text-blue-600 hover:text-blue-800 hover:scale-110 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></a>
+                    <a href="javascript:void(0)" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($plan)); ?>)" class="text-blue-600 hover:text-blue-800 hover:scale-110 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></a>
                     <a href="?delete=<?php echo $plan['id']; ?>" onclick="return confirm('Delete this plan?')" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform" title="Delete"><i class="fa fa-trash-alt"></i></a>
                 </div>
             </div>
@@ -236,7 +237,49 @@ while ($plan = mysqli_fetch_assoc($plans)) {
     <i class="fa fa-server text-5xl text-gray-300 mb-4"></i>
     <h3 class="text-xl font-semibold text-gray-500 mb-2">No Plans Yet</h3>
     <p class="text-gray-400 mb-4">Get started by adding your first hosting plan.</p>
-    <a href="?action=add" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa fa-plus mr-1"></i> Add First Plan</a>
+    <button onclick="openAddModal()" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow"><i class="fa fa-plus mr-1"></i> Add First Plan</button>
 </div>
 <?php endif; ?>
+<script>
+function openAddModal() {
+    document.getElementById('planModalTitle').innerHTML = '<i class="fa fa-plus-circle text-blue-600"></i> Add New Plan';
+    document.getElementById('planForm').reset();
+    document.getElementById('planFormId').value = '';
+    document.getElementById('planFormSubmitBtn').innerHTML = '<i class="fa fa-plus-circle mr-1"></i> Add Plan';
+    document.getElementById('planFormEnableMonthly').checked = true;
+    document.getElementById('planFormEnableYearly').checked = true;
+    document.getElementById('planFormStatus').checked = true;
+    document.getElementById('planModal').classList.remove('hidden');
+}
+
+function openEditModal(plan) {
+    document.getElementById('planModalTitle').innerHTML = '<i class="fa fa-pencil text-blue-600"></i> Edit Plan';
+    document.getElementById('planFormId').value = plan.id;
+    document.getElementById('planFormCategory').value = plan.category;
+    document.getElementById('planFormName').value = plan.name;
+    document.getElementById('planFormSubtitle').value = plan.subtitle || '';
+    document.getElementById('planFormBadge').value = plan.badge || '';
+    document.getElementById('planFormMonthlyPrice').value = plan.monthly_price;
+    document.getElementById('planFormYearlyPrice').value = plan.yearly_price;
+    document.getElementById('planFormOrderUrl').value = plan.order_url || '';
+    document.getElementById('planFormSortOrder').value = plan.sort_order;
+    document.getElementById('planFormPopular').checked = plan.is_popular == 1;
+    document.getElementById('planFormStatus').checked = plan.status == 1;
+    document.getElementById('planFormEnableMonthly').checked = plan.monthly_price > 0;
+    document.getElementById('planFormEnableYearly').checked = plan.yearly_price > 0;
+    var feats = [];
+    try { feats = JSON.parse(plan.features); } catch(e) {}
+    document.getElementById('planFormFeatures').value = feats.join('\n');
+    document.getElementById('planFormSubmitBtn').innerHTML = '<i class="fa fa-save mr-1"></i> Update Plan';
+    document.getElementById('planModal').classList.remove('hidden');
+}
+
+function closePlanModal() {
+    document.getElementById('planModal').classList.add('hidden');
+}
+
+document.getElementById('planModal').addEventListener('click', function(e) {
+    if (e.target === this) closePlanModal();
+});
+</script>
 <?php include 'footer.php'; ?>
