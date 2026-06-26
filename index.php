@@ -88,12 +88,11 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="flex w-fit gap-x-2">
 <a href="<?php echo htmlspecialchars($c['button_url'] ?: escSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
-<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
+<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle());'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block">
 <?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
-<picture><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" fetchpriority="high"></picture>
+<div class="hidden lg:block px-6"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
 </div>
 </div>
 
