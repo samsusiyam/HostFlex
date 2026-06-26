@@ -10,6 +10,7 @@ $error = '';
 $perm_key = 'admin_permissions';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_perms'])) {
+    checkPermission('roles', 'edit');
     validateCSRFToken($_POST['csrf_token'] ?? '');
     $perm_data = [];
     $roles = ['admin', 'editor', 'manager'];

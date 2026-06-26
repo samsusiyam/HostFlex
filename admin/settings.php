@@ -3,6 +3,7 @@ $page_title = 'Settings';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">

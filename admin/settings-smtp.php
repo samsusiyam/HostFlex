@@ -3,6 +3,7 @@ $page_title = 'SMTP Settings';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 require_once '../includes/mail.php';
 
 $error = '';

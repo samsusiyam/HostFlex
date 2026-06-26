@@ -3,6 +3,7 @@ $page_title = 'Activity Logs';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('logs', 'view');
 
 $search = trim($_GET['search'] ?? '');
 $where = '';
@@ -26,6 +27,7 @@ if (!$no_table) {
 }
 
 if (isset($_GET['clear']) && $_GET['clear'] == '1') {
+    checkPermission('logs', 'delete');
     if (!$no_table) mysqli_query($conn, "TRUNCATE TABLE activity_logs");
     header('Location: activity-logs.php');
     exit;

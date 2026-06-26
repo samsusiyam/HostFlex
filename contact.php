@@ -136,20 +136,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 <div class="px-6">
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
-<div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
+<div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($recaptcha_site_key, ENT_QUOTES, 'UTF-8'); ?>"></div></div>
 <?php endif; ?>
 <button class="px-4 py-2 font-medium text-gray-100 bg-blue-600 rounded shadow hover:bg-blue-700 dark:bg-blue-500">Send Message</button>
 </div>
 </form>
 </div>
 <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-<?php $c_email = getSetting('site_email'); if ($c_email): ?>
+<?php $c_email = escSetting('site_email'); if ($c_email): ?>
 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center"><div class="text-blue-600 text-3xl mb-3"><i class="fa fa-envelope"></i></div><h3 class="font-semibold mb-2">Email</h3><p class="text-gray-600 dark:text-gray-400"><?php echo $c_email; ?></p></div>
 <?php endif; ?>
-<?php $c_phone = getSetting('site_phone'); if ($c_phone): ?>
+<?php $c_phone = escSetting('site_phone'); if ($c_phone): ?>
 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center"><div class="text-blue-600 text-3xl mb-3"><i class="fa fa-phone"></i></div><h3 class="font-semibold mb-2">Phone</h3><p class="text-gray-600 dark:text-gray-400"><?php echo $c_phone; ?></p></div>
 <?php endif; ?>
-<?php $c_addr = getSetting('site_address'); if ($c_addr): ?>
+<?php $c_addr = escSetting('site_address'); if ($c_addr): ?>
 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center"><div class="text-blue-600 text-3xl mb-3"><i class="fa fa-map-marker"></i></div><h3 class="font-semibold mb-2">Address</h3><p class="text-gray-600 dark:text-gray-400"><?php echo $c_addr; ?></p></div>
 <?php endif; ?>
 </div>

@@ -3,11 +3,13 @@ $page_title = 'Database Backup';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('backup', 'view');
 
 $msg = '';
 $error = '';
 
 if (isset($_GET['download'])) {
+    checkPermission('backup', 'create');
     $tables = [];
     $result = mysqli_query($conn, "SHOW TABLES");
     while ($row = mysqli_fetch_array($result)) {
@@ -46,6 +48,7 @@ if (isset($_GET['s'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
+    checkPermission('backup', 'create');
     validateCSRFToken($_POST['csrf_token'] ?? '');
     if (!isset($_FILES['backup_file']) || $_FILES['backup_file']['error'] !== UPLOAD_ERR_OK) {
         $error = 'Please select a valid SQL file to restore.';

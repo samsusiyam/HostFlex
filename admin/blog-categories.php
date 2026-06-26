@@ -3,11 +3,13 @@ $page_title = 'Blog Categories';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('blog', 'view');
 
 $msg = '';
 $error = '';
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('blog', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "UPDATE blog_posts SET category_id = NULL WHERE category_id = $id");
     mysqli_query($conn, "DELETE FROM blog_categories WHERE id = $id");
@@ -35,10 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($check) > 0) {
             $error = 'Slug already exists!';
         } elseif ($edit_id) {
+            checkPermission('blog', 'edit');
             mysqli_query($conn, "UPDATE blog_categories SET name='$name', slug='$slug', description='$description' WHERE id=$edit_id");
             header('Location: blog-categories.php?msg=updated');
             exit;
         } else {
+            checkPermission('blog', 'create');
             mysqli_query($conn, "INSERT INTO blog_categories (name, slug, description) VALUES ('$name', '$slug', '$description')");
             header('Location: blog-categories.php?msg=added');
             exit;

@@ -3,6 +3,7 @@ $page_title = 'Blog Posts';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('blog', 'view');
 
 $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT username FROM users WHERE id = " . (int)$_SESSION['admin_id']));
 $admin_username = $admin['username'] ?? 'Admin';
@@ -11,6 +12,7 @@ $msg = '';
 $error = '';
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('blog', 'delete');
     $id = (int)$_GET['delete'];
     $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image, title FROM blog_posts WHERE id = $id"));
     if ($post && $post['image'] && file_exists('../' . $post['image'])) {
@@ -89,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
         }
 
         if ($edit_id) {
+            checkPermission('blog', 'edit');
             if (!$image) {
                 $old = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image FROM blog_posts WHERE id = $edit_id"));
                 $image = $old['image'];
@@ -98,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
             header('Location: blogs.php?msg=updated');
             exit;
         } else {
+            checkPermission('blog', 'create');
             mysqli_query($conn, "INSERT INTO blog_posts (title, slug, content, excerpt, image, category_id, author, status, meta_description, meta_keywords) VALUES ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, '$meta_description', '$meta_keywords')");
             logActivity('Created Post', $title);
             header('Location: blogs.php?msg=added');

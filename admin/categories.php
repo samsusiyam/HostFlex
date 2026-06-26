@@ -3,8 +3,10 @@ $page_title = 'Categories';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('categories', 'view');
 
 if (isset($_GET['delete'])) {
+    checkPermission('categories', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM categories WHERE id = $id");
     header('Location: categories.php');
@@ -44,9 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['reorder'])) {
     }
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
+        checkPermission('categories', 'edit');
         $id = (int)$_POST['id'];
         mysqli_query($conn, "UPDATE categories SET name='$name', slug='$slug', description='$description', image='$image', sort_order=$sort_order, status=$status WHERE id=$id");
     } else {
+        checkPermission('categories', 'create');
         mysqli_query($conn, "INSERT INTO categories (name, slug, description, image, sort_order, status) VALUES ('$name', '$slug', '$description', '$image', $sort_order, $status)");
     }
     header('Location: categories.php');

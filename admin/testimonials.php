@@ -3,11 +3,13 @@ $page_title = 'Testimonials';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('testimonials', 'view');
 
 $msg = '';
 $error = '';
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('testimonials', 'delete');
     $id = (int)$_GET['delete'];
     $t = mysqli_fetch_assoc(mysqli_query($conn, "SELECT photo FROM testimonials WHERE id = $id"));
     if ($t && $t['photo'] && file_exists('../' . $t['photo'])) unlink('../' . $t['photo']);
@@ -46,10 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         if ($edit_id) {
+            checkPermission('testimonials', 'edit');
             mysqli_query($conn, "UPDATE testimonials SET name='$name', company='$company', photo='$photo', rating=$rating, review='$review' WHERE id=$edit_id");
             header('Location: testimonials.php?msg=updated');
             exit;
         } else {
+            checkPermission('testimonials', 'create');
             $max = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MAX(sort_order) as m FROM testimonials"));
             $sort = ($max['m'] ?? 0) + 1;
             mysqli_query($conn, "INSERT INTO testimonials (name, company, photo, rating, review, sort_order) VALUES ('$name', '$company', '$photo', $rating, '$review', $sort)");

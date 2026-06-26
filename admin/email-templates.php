@@ -3,6 +3,7 @@ $page_title = 'Email Templates';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 
 // Ensure table exists and seed defaults
 $check = mysqli_query($conn, "SHOW TABLES LIKE 'email_templates'");

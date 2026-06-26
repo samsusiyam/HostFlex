@@ -3,8 +3,10 @@ $page_title = 'Menus';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('menus', 'view');
 
 if (isset($_GET['delete'])) {
+    checkPermission('menus', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM menu_items WHERE id = $id OR parent_id = $id");
     header('Location: menus.php');
@@ -31,9 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['reorder'])) {
     $status = isset($_POST['status']) ? 1 : 0;
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
+        checkPermission('menus', 'edit');
         $id = (int)$_POST['id'];
         mysqli_query($conn, "UPDATE menu_items SET label='$label', url='$url', parent_id=$parent_id, location='$location', sort_order=$sort_order, status=$status WHERE id=$id");
     } else {
+        checkPermission('menus', 'create');
         mysqli_query($conn, "INSERT INTO menu_items (label, url, parent_id, location, sort_order, status) VALUES ('$label', '$url', $parent_id, '$location', $sort_order, $status)");
     }
     header('Location: menus.php');

@@ -3,6 +3,7 @@ $page_title = 'Logo & Branding';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 
 $upload_dir = '../uploads/branding/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);

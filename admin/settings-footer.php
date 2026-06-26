@@ -3,6 +3,7 @@ $page_title = 'Footer Settings';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCSRFToken($_POST['csrf_token'] ?? '');

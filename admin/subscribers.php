@@ -4,9 +4,11 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/mail.php';
 checkAdminLogin();
+checkPermission('subscribers', 'view');
 
 $msg = '';
 if (isset($_POST['send_newsletter'])) {
+    checkPermission('subscribers', 'create');
     validateCSRFToken($_POST['csrf_token'] ?? '');
     $subject = trim($_POST['subject'] ?? '');
     $message = trim($_POST['message'] ?? '');
@@ -31,6 +33,7 @@ if (isset($_POST['send_newsletter'])) {
     }
 }
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('subscribers', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM subscribers WHERE id = $id");
     $msg = 'Subscriber deleted!';

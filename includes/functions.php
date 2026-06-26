@@ -12,6 +12,7 @@ function checkAdminLogin() {
 
 function getSetting($key) {
     global $conn;
+    $key = mysqli_real_escape_string($conn, $key);
     $query = "SELECT setting_value FROM settings WHERE setting_key = '$key'";
     $result = mysqli_query($conn, $query);
     if ($row = mysqli_fetch_assoc($result)) {
@@ -24,7 +25,8 @@ function getPlans($category = null) {
     global $conn;
     $where = "WHERE status = 1";
     if ($category) {
-        $where .= " AND category = '$category'";
+        $cat = mysqli_real_escape_string($conn, $category);
+        $where .= " AND category = '$cat'";
     }
     $query = "SELECT * FROM hosting_plans $where ORDER BY sort_order ASC";
     return mysqli_query($conn, $query);
@@ -69,6 +71,7 @@ function getCategories($status = true) {
 
 function getCategoryBySlug($slug) {
     global $conn;
+    $slug = mysqli_real_escape_string($conn, $slug);
     $query = "SELECT * FROM categories WHERE slug = '$slug' AND status = 1 LIMIT 1";
     $result = mysqli_query($conn, $query);
     return mysqli_fetch_assoc($result);
@@ -76,6 +79,7 @@ function getCategoryBySlug($slug) {
 
 function getPageBySlug($slug) {
     global $conn;
+    $slug = mysqli_real_escape_string($conn, $slug);
     $query = "SELECT * FROM pages WHERE slug = '$slug' AND status = 1 LIMIT 1";
     $result = mysqli_query($conn, $query);
     return mysqli_fetch_assoc($result);
@@ -83,6 +87,7 @@ function getPageBySlug($slug) {
 
 function getMenuItems($location = 'header') {
     global $conn;
+    $location = mysqli_real_escape_string($conn, $location);
     $query = "SELECT * FROM menu_items WHERE status = 1 AND (location = '$location' OR location = 'both') ORDER BY sort_order ASC";
     $result = mysqli_query($conn, $query);
     $items = [];
@@ -129,6 +134,7 @@ function escSetting($key) {
 
 function validateImageUpload($file, $allowed_exts = ['jpg','jpeg','png','gif','webp','svg']) {
     if ($file['error'] !== UPLOAD_ERR_OK) return 'Upload error';
+    if ($file['size'] > MAX_UPLOAD_SIZE) return 'File too large. Maximum ' . (MAX_UPLOAD_SIZE / 1024 / 1024) . 'MB allowed.';
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowed_exts)) return 'Invalid file extension';
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -174,7 +180,7 @@ function resizeImage($src, $dst, $max_w, $max_h) {
 function isBannedIP() {
     global $conn;
     if (!tableExists('login_logs')) return false;
-    $ip = getClientIP();
+    $ip = mysqli_real_escape_string($conn, getClientIP());
     $window = date('Y-m-d H:i:s', strtotime('-15 minutes'));
     $q = mysqli_query($conn, "SELECT COUNT(*) as cnt FROM login_logs WHERE ip_address = '$ip' AND status = 'failed' AND created_at >= '$window'");
     $r = mysqli_fetch_assoc($q);
@@ -194,8 +200,38 @@ function getClientIP() {
 
 function tableExists($table) {
     global $conn;
+    $table = mysqli_real_escape_string($conn, $table);
     $r = mysqli_query($conn, "SHOW TABLES LIKE '$table'");
     return mysqli_num_rows($r) > 0;
+}
+
+define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024);
+
+function sanitizeSimple($data) {
+    global $conn;
+    return mysqli_real_escape_string($conn, trim($data));
+}
+
+function getUserRole($user_id) {
+    global $conn;
+    $uid = (int)$user_id;
+    $r = mysqli_query($conn, "SELECT role FROM users WHERE id = $uid");
+    $row = mysqli_fetch_assoc($r);
+    return $row['role'] ?? 'editor';
+}
+
+function hasPermission($section, $action = 'view') {
+    $role = getUserRole($_SESSION['admin_id'] ?? 0);
+    if ($role === 'admin') return true;
+    $raw = getSetting('admin_permissions');
+    $perms = $raw ? json_decode($raw, true) : [];
+    return isset($perms[$role][$section][$action]) && $perms[$role][$section][$action] == 1;
+}
+
+function checkPermission($section, $action = 'view') {
+    if (!hasPermission($section, $action)) {
+        die('Access denied: you do not have permission for this action.');
+    }
 }
 
 function logActivity($action, $details = '') {

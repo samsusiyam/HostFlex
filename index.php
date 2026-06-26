@@ -131,7 +131,8 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($cat_heading): ?><div class="mb-10 text-center"><h2 class="text-3xl font-bold"><?php echo htmlspecialchars($cat_heading); ?></h2></div><?php endif; ?>
 <div class="grid grid-cols-1 gap-8 xsm:grid-cols-2 lg:grid-cols-<?php echo min(4, $cat_count); ?>">
 <?php while ($cat = mysqli_fetch_assoc($categories)):
-    $min_price = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MIN(monthly_price) as min_price FROM hosting_plans WHERE category = '{$cat['slug']}' AND status = 1"));
+    $cat_slug_esc = mysqli_real_escape_string($conn, $cat['slug']);
+    $min_price = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MIN(monthly_price) as min_price FROM hosting_plans WHERE category = '{$cat_slug_esc}' AND status = 1"));
 ?>
 <div class="bg-white border border-blue-600 overflow-hidden rounded-xl shadow-xl">
 <div class="flex flex-col items-center justify-center">
@@ -240,7 +241,7 @@ if (empty($cards)) {
 <div class="sm:flex items-center rounded-xl py-2 sm:pt-16 sm:pb-20 sm:mt-8">
 <div class="sm:flex-1 md:w-7/12">
 <h2 class="text-3xl md:text-4xl font-extrabold dark:text-gray-100"><?php echo $c['heading'] ?? ''; ?></h2>
-<p class="mt-10 text-lg pr-0 sm:pr-8 dark:text-gray-400"><?php echo $c['description'] ?? ''; ?></p>
+<p class="mt-10 text-lg pr-0 sm:pr-8 dark:text-gray-400"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-6 py-10">
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>

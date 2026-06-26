@@ -3,8 +3,10 @@ $page_title = 'Pages';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('pages', 'view');
 
 if (isset($_GET['delete'])) {
+    checkPermission('pages', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM pages WHERE id = $id");
     header('Location: pages.php');
@@ -21,9 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = isset($_POST['status']) ? 1 : 0;
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
+        checkPermission('pages', 'edit');
         $id = (int)$_POST['id'];
         mysqli_query($conn, "UPDATE pages SET title='$title', slug='$slug', content='$content', meta_description='$meta_description', meta_keywords='$meta_keywords', status=$status WHERE id=$id");
     } else {
+        checkPermission('pages', 'create');
         mysqli_query($conn, "INSERT INTO pages (title, slug, content, meta_description, meta_keywords, status) VALUES ('$title', '$slug', '$content', '$meta_description', '$meta_keywords', $status)");
     }
     header('Location: pages.php');

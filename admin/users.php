@@ -3,11 +3,13 @@ $page_title = 'Admin Users';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('users', 'view');
 
 $msg = '';
 $error = '';
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('users', 'delete');
     $id = (int)$_GET['delete'];
     if ($id == $_SESSION['admin_id']) {
         $error = 'You cannot delete your own account!';
@@ -36,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
             $error = 'Username already exists!';
         } else {
             if ($edit_id) {
+                checkPermission('users', 'edit');
                 $sql = "UPDATE users SET username='$username', email='$email', role='$role', status=$status WHERE id=$edit_id";
                 if ($password) {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -45,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
                 logActivity('Updated User', $username . ' (ID: ' . $edit_id . ')');
                 $msg = 'User updated!';
             } else {
+                checkPermission('users', 'create');
                 if (!$password) {
                     $error = 'Password is required for new users!';
                 } else {

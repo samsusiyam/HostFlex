@@ -3,6 +3,7 @@ $page_title = 'Contact Messages';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('contacts', 'view');
 
 if (isset($_GET['read'])) {
     $id = (int)$_GET['read'];
@@ -12,6 +13,7 @@ if (isset($_GET['read'])) {
 }
 
 if (isset($_GET['delete'])) {
+    checkPermission('contacts', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM contacts WHERE id = $id");
     header('Location: contacts.php');
@@ -54,11 +56,11 @@ $contacts = mysqli_query($conn, "SELECT * FROM contacts ORDER BY created_at DESC
     </div>
     <?php if ($view_message['file']): ?>
     <div class="mt-4">
-        <strong>Attachment:</strong> <a href="../<?php echo $view_message['file']; ?>" target="_blank" class="text-blue-600"><?php echo basename($view_message['file']); ?></a>
+        <strong>Attachment:</strong> <a href="../<?php echo htmlspecialchars($view_message['file'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" class="text-blue-600"><?php echo htmlspecialchars(basename($view_message['file']), ENT_QUOTES, 'UTF-8'); ?></a>
     </div>
     <?php endif; ?>
     <div class="mt-4 space-x-2">
-        <a href="mailto:<?php echo $view_message['email']; ?>" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-reply"></i> Reply</a>
+        <a href="mailto:<?php echo htmlspecialchars($view_message['email'], ENT_QUOTES, 'UTF-8'); ?>" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-reply"></i> Reply</a>
         <a href="?delete=<?php echo $view_message['id']; ?>" onclick="return confirm('Delete this message?')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"><i class="fa fa-trash"></i> Delete</a>
     </div>
 </div>

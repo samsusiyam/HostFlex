@@ -3,6 +3,7 @@ $page_title = 'Dashboard';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('dashboard', 'view');
 
 $total_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans"))['c'];
 $active_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans WHERE status=1"))['c'];
@@ -18,7 +19,7 @@ $total_pages = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM
 <?php include 'header.php'; ?>
 <div class="mb-8">
     <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
-    <p class="text-gray-500">Welcome back, <?php echo $_SESSION['admin_username']; ?>!</p>
+    <p class="text-gray-500">Welcome back, <?php echo htmlspecialchars($_SESSION['admin_username'], ENT_QUOTES, 'UTF-8'); ?>!</p>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">

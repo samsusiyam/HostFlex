@@ -3,11 +3,13 @@ $page_title = 'FAQs';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('faqs', 'view');
 
 $msg = '';
 $error = '';
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('faqs', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM faqs WHERE id = $id");
     header('Location: faqs.php?msg=deleted');
@@ -29,10 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     else {
         $answer_esc = mysqli_real_escape_string($conn, $answer);
         if ($edit_id) {
+            checkPermission('faqs', 'edit');
             mysqli_query($conn, "UPDATE faqs SET question='$question', answer='$answer_esc' WHERE id=$edit_id");
             header('Location: faqs.php?msg=updated');
             exit;
         } else {
+            checkPermission('faqs', 'create');
             $max = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MAX(sort_order) as m FROM faqs"));
             $sort = ($max['m'] ?? 0) + 1;
             mysqli_query($conn, "INSERT INTO faqs (question, answer, sort_order) VALUES ('$question', '$answer_esc', $sort)");

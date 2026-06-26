@@ -3,11 +3,13 @@ $page_title = 'Manage Plans';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('plans', 'view');
 
 $error = '';
 $success = '';
 
 if (isset($_GET['delete'])) {
+    checkPermission('plans', 'delete');
     $id = (int)$_GET['delete'];
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name FROM hosting_plans WHERE id = $id"));
     mysqli_query($conn, "DELETE FROM hosting_plans WHERE id = $id");
@@ -33,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = isset($_POST['status']) ? 1 : 0;
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
+        checkPermission('plans', 'edit');
         $id = (int)$_POST['id'];
         $query = "UPDATE hosting_plans SET category='$category', name='$name', subtitle='$subtitle', badge='$badge', monthly_price=$monthly_price, yearly_price=$yearly_price, features='$features', order_url='$order_url', is_popular=$is_popular, sort_order=$sort_order, status=$status WHERE id=$id";
         mysqli_query($conn, $query);
@@ -40,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: plans.php?msg=updated');
         exit;
     } else {
+        checkPermission('plans', 'create');
         $query = "INSERT INTO hosting_plans (category, name, subtitle, badge, monthly_price, yearly_price, features, order_url, is_popular, sort_order, status) VALUES ('$category', '$name', '$subtitle', '$badge', $monthly_price, $yearly_price, '$features', '$order_url', $is_popular, $sort_order, $status)";
         mysqli_query($conn, $query);
         logActivity('Created Plan', $name);

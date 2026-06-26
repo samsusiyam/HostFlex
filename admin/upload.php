@@ -26,6 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
         echo json_encode(['error' => 'File content does not match allowed types']);
         exit;
     }
+    if ($file['size'] > MAX_UPLOAD_SIZE) {
+        http_response_code(400);
+        echo json_encode(['error' => 'File too large. Max 5MB allowed.']);
+        exit;
+    }
     $upload_dir = '../uploads/content/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
     $fname = 'img_' . time() . '_' . rand(100,999) . '.' . $ext;

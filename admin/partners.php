@@ -3,6 +3,7 @@ $page_title = 'Partners';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('partners', 'view');
 
 $msg = '';
 $error = '';
@@ -11,9 +12,10 @@ $upload_dir = '../uploads/partners/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    checkPermission('partners', 'delete');
     $id = (int)$_GET['delete'];
     $p = mysqli_fetch_assoc(mysqli_query($conn, "SELECT photo FROM partners WHERE id = $id"));
-    if ($p && $p['photo'] && file_exists('../' . $p['photo'])) unlink('../' . $p['photo']);
+    if ($p && $p['photo']) { $p_path = realpath(__DIR__ . '/../' . $p['photo']); $p_dir = realpath(__DIR__ . '/../uploads/partners/'); if ($p_path && $p_dir && strpos($p_path, $p_dir) === 0 && file_exists($p_path)) unlink($p_path); }
     mysqli_query($conn, "DELETE FROM partners WHERE id = $id");
     header('Location: partners.php?msg=deleted');
     exit;
@@ -40,14 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $uploaded = $upload_dir . $fname;
                 resizeImage($uploaded, $uploaded, 400, 128);
                 $photo = 'uploads/partners/' . $fname;
-                if ($edit_id) { $old = mysqli_fetch_assoc(mysqli_query($conn, "SELECT photo FROM partners WHERE id = $edit_id")); if ($old['photo'] && file_exists('../' . $old['photo'])) unlink('../' . $old['photo']); }
+                if ($edit_id) { $old = mysqli_fetch_assoc(mysqli_query($conn, "SELECT photo FROM partners WHERE id = $edit_id")); if ($old && $old['photo']) { $old_path = realpath(__DIR__ . '/../' . $old['photo']); $safe_dir = realpath(__DIR__ . '/../uploads/partners/'); if ($old_path && $safe_dir && strpos($old_path, $safe_dir) === 0 && file_exists($old_path)) unlink($old_path); } }
             }
         }
         if ($edit_id) {
+            checkPermission('partners', 'edit');
             mysqli_query($conn, "UPDATE partners SET name='$name', photo='$photo' WHERE id=$edit_id");
             header('Location: partners.php?msg=updated');
             exit;
         } else {
+            checkPermission('partners', 'create');
             $max = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MAX(sort_order) as m FROM partners"));
             $sort = ($max['m'] ?? 0) + 1;
             mysqli_query($conn, "INSERT INTO partners (name, photo, sort_order) VALUES ('$name', '$photo', $sort)");

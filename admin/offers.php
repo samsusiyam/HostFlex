@@ -3,11 +3,13 @@ $page_title = 'Manage Offers';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('offers', 'view');
 
 $error = '';
 $success = '';
 
 if (isset($_GET['delete'])) {
+    checkPermission('offers', 'delete');
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM offers WHERE id = $id");
     $success = 'Offer deleted successfully!';
@@ -27,11 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = isset($_POST['status']) ? 1 : 0;
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
+        checkPermission('offers', 'edit');
         $id = (int)$_POST['id'];
         $query = "UPDATE offers SET title='$title', description='$description', badge='$badge', price_label='$price_label', link_url='$link_url', link_text='$link_text', sort_order=$sort_order, status=$status WHERE id=$id";
         mysqli_query($conn, $query);
         $success = 'Offer updated successfully!';
     } else {
+        checkPermission('offers', 'create');
         $query = "INSERT INTO offers (title, description, badge, price_label, link_url, link_text, sort_order, status) VALUES ('$title', '$description', '$badge', '$price_label', '$link_url', '$link_text', $sort_order, $status)";
         mysqli_query($conn, $query);
         $success = 'Offer added successfully!';

@@ -5,13 +5,13 @@
 <?php $header_code = getSetting('header_code'); ?>
 <?php if ($onesignal_id): ?>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>window.OneSignalDeferred = window.OneSignalDeferred || [];OneSignalDeferred.push(function(OneSignal){OneSignal.init({appId:"<?php echo $onesignal_id; ?>"});});</script>
+<script>window.OneSignalDeferred = window.OneSignalDeferred || [];OneSignalDeferred.push(function(OneSignal){OneSignal.init({appId:<?php echo json_encode($onesignal_id); ?>});});</script>
 <?php endif; ?>
-<?php if ($tawkto_id): ?>
-<script>var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();(function(){var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];s1.async=true;s1.src='https://embed.tawk.to/<?php echo $tawkto_id; ?>/default';s1.charset='UTF-8';s1.setAttribute('crossorigin','*');s0.parentNode.insertBefore(s1,s0);})();</script>
+<?php if ($tawkto_id): $tawkto_id_esc = htmlspecialchars($tawkto_id, ENT_QUOTES, 'UTF-8'); ?>
+<script>var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();(function(){var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];s1.async=true;s1.src='https://embed.tawk.to/<?php echo $tawkto_id_esc; ?>/default';s1.charset='UTF-8';s1.setAttribute('crossorigin','*');s0.parentNode.insertBefore(s1,s0);})();</script>
 <?php endif; ?>
 <?php if ($crisp_id): ?>
-<script>window.$crisp=[];window.CRISP_WEBSITE_ID="<?php echo $crisp_id; ?>";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+<script>window.$crisp=[];window.CRISP_WEBSITE_ID=<?php echo json_encode($crisp_id); ?>;(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 <?php endif; ?>
 <?php if ($header_code): echo $header_code; endif; ?>
 <?php if (isMaintenanceMode() && isset($_SESSION['admin_id'])): ?>
@@ -21,7 +21,7 @@
 <?php endif; ?>
 <header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
 <div class="content flex items-center justify-between">
-<a href="index.php"><picture><source srcset="images/bg.webp" type="image/webp"><img class="h-[50px]" src="<?php echo getSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" style="object-fit:contain" /></picture></a>
+<a href="index.php"><picture><source srcset="images/bg.webp" type="image/webp"><img class="h-[50px]" src="<?php echo escSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" style="object-fit:contain" /></picture></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
 <?php
 $menu_items = getMenuItems('header');

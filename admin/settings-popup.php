@@ -3,6 +3,7 @@ $page_title = 'Popup Notice & Social';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
+checkPermission('settings', 'edit');
 
 $error = '';
 $success = '';
