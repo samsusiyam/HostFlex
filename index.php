@@ -92,7 +92,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </div>
 </div>
 <?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
-<div class="hidden self-center lg:block w-full max-w-[600px]"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:cover" fetchpriority="high"></picture></div>
+<div class="hidden self-center lg:block w-full px-6"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
@@ -271,7 +271,7 @@ if (empty($cards)) {
 <div class="w-fit mx-auto">
 <div class="mb-12 flex flex-col gap-2">
 <?php $ref_img = $c['image'] ?? 'images/refund.png'; $ref_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $ref_img); ?>
-<picture><source srcset="<?php echo htmlspecialchars($ref_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="500" height="500" loading="lazy"></picture>
+<picture><source srcset="<?php echo htmlspecialchars($ref_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="350" height="350" loading="lazy"></picture>
 <h2 class="text-black text-2xl font-bold"><?php echo htmlspecialchars($c['heading'] ?? ''); ?></h2>
 <p><?php echo htmlspecialchars($c['text'] ?? ''); ?></p>
 </div>
