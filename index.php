@@ -83,7 +83,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <!-- Hero Section -->
 <section class="py-16 bg-white">
 <div class="content grid grid-cols-1 lg:grid-cols-2">
-<div class="flex flex-col justify-center gap-6 md:gap-12">
+<div class="flex flex-col justify-center gap-6 md:gap-12 self-center">
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="flex w-fit gap-x-2">
@@ -92,7 +92,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </div>
 </div>
 <?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
-<div class="hidden lg:block px-6"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
+<div class="hidden lg:block px-6 self-center"><picture style="display:block;aspect-ratio:4/3"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
 </div>
 
 
