@@ -98,7 +98,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt width="800" height="600" loading="lazy"></div>
+<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="800" height="600" fetchpriority="high"></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
@@ -259,7 +259,7 @@ if (empty($cards)) {
 </div>
 </div>
 </div>
-<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" class="h-full mt-12 sm:mt-0" width="500" height="400" loading="lazy"></div>
+<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" alt="Hosting illustration" class="h-full mt-12 sm:mt-0" width="500" height="400" loading="lazy"></div>
 </div>
 </div>
 </div>

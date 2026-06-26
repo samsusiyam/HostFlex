@@ -9,10 +9,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" as="style" onload="this.rel='stylesheet'">
+
+<style>
+*{font-family:inter,sans-serif}.content{width:100%;margin-left:auto;margin-right:auto;padding-left:1rem;padding-right:1rem}@media (min-width:640px){.content{max-width:640px}}@media (min-width:768px){.content{max-width:768px}}@media (min-width:1024px){.content{max-width:1024px}}@media (min-width:1280px){.content{max-width:1280px}}@media (min-width:1536px){.content{max-width:1536px}}
+</style>
 
 <link rel="stylesheet" href="styles/styles.css" type="text/css" />
-<link rel="stylesheet" href="styles/custom.css" type="text/css" />
+<link rel="stylesheet" href="styles/custom.css" type="text/css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="styles/custom.css" type="text/css" /></noscript>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" media="print" onload="this.media='all'" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@accessible360/accessible-slick@1.0.1/slick/slick.min.css" media="print" onload="this.media='all'" />
