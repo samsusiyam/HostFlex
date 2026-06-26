@@ -4,3 +4,4 @@ uploads/
 .DS_Store
 Thumbs.db
 config/database.php
+.htaccess
