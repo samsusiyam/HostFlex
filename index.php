@@ -270,8 +270,8 @@ if (empty($cards)) {
 <div class="content">
 <div class="w-fit mx-auto">
 <div class="mb-12 flex flex-col gap-2">
-<?php $ref_img = $c['image'] ?? 'images/refund.png'; $ref_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $ref_img); ?>
-<picture><source srcset="<?php echo htmlspecialchars($ref_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="350" height="350" loading="lazy"></picture>
+<?php $ref_img = $c['image'] ?? 'images/refund.png'; ?>
+<img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="200" height="150" loading="lazy">
 <h2 class="text-black text-2xl font-bold"><?php echo htmlspecialchars($c['heading'] ?? ''); ?></h2>
 <p><?php echo htmlspecialchars($c['text'] ?? ''); ?></p>
 </div>
