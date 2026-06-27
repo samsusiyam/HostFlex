@@ -82,17 +82,16 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($type === 'hero'): ?>
 <!-- Hero Section -->
 <section class="py-16 bg-white">
-<div class="content grid grid-cols-1 lg:grid-cols-2">
-<div class="flex flex-col justify-center gap-6 md:gap-12 self-center">
-<h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
+<div class="content grid grid-cols-2 lg:grid">
+<div class="flex self-center flex-col justify-center gap-6 md:gap-12">
+<h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></h1>
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="flex w-fit gap-x-2">
 <a href="<?php echo htmlspecialchars($c['button_url'] ?: escSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle());'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<?php $hero_img = $c['image'] ?? 'images/cloud.jpg'; $hero_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $hero_img); ?>
-<div class="hidden lg:block px-6 self-center"><picture style="display:block;aspect-ratio:4/3;max-width:400px"><source srcset="<?php echo htmlspecialchars($hero_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($hero_img); ?>" alt="<?php echo escSetting('site_name'); ?> Hero" width="400" height="300" style="width:100%;height:100%;object-fit:contain" fetchpriority="high"></picture></div>
+<div class="hidden self-center lg:block w-full px-6"><img src="images/cloud.jpg" alt="Host Nibo Hero" width="800" height="600" style="width:100%;height:auto;max-height:500px;object-fit:contain"></div>
 </div>
 
 
