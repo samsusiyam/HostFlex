@@ -2,7 +2,64 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="<?php echo htmlspecialchars(escSetting('site_description') ?: 'Premium web hosting solutions with exceptional performance, reliability, and 24/7 support.'); ?>">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="shortcut icon" href="<?php echo escSetting('favicon') ?: 'images/favicon.ico'; ?>" type="image/x-icon" />
+<?php
+$og_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$og_title = escSetting('site_name') ?: 'HostNibo';
+$og_description = escSetting('site_description') ?: 'Premium web hosting solutions with exceptional performance, reliability, and 24/7 support.';
+$og_image = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . (escSetting('og_image') ?: 'images/bg.png');
+?>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="<?php echo $og_title; ?>">
+<meta property="og:title" content="<?php echo $og_title; ?>">
+<meta property="og:description" content="<?php echo $og_description; ?>">
+<meta property="og:url" content="<?php echo $og_url; ?>">
+<meta property="og:image" content="<?php echo $og_image; ?>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?php echo $og_title; ?>">
+<meta name="twitter:description" content="<?php echo $og_description; ?>">
+<meta name="twitter:image" content="<?php echo $og_image; ?>">
+<link rel="canonical" href="<?php echo $og_url; ?>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "<?php echo addslashes(escSetting('site_name') ?: 'HostNibo'); ?>",
+  "url": "<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>",
+  "logo": "<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . (escSetting('header_logo') ?: 'images/bg.png'); ?>",
+  "description": "<?php echo addslashes($og_description); ?>",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "email": "<?php echo addslashes(escSetting('site_email') ?: ''); ?>",
+    "telephone": "<?php echo addslashes(escSetting('site_phone') ?: ''); ?>"
+  },
+  "sameAs": <?php
+    $social = json_decode(getSetting('social_links') ?: '[]', true);
+    $same_as = [];
+    if (is_array($social)) {
+      foreach ($social as $s) {
+        if (!empty($s['url'])) $same_as[] = $s['url'];
+      }
+    }
+    echo json_encode($same_as);
+  ?>
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "<?php echo addslashes(escSetting('site_name') ?: 'HostNibo'); ?>",
+  "url": "<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>/index.php?domain={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>

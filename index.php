@@ -64,7 +64,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo escSetting('site_name'); ?></title>
+<title><?php echo escSetting('site_name') ?: 'HostNibo'; ?> - Premium Web Hosting in Bangladesh</title>
 </head>
 <body>
 
