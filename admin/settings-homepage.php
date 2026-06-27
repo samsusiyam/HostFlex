@@ -424,6 +424,8 @@ function uploadSectionImg(input, inputId, previewId) {
     var fd = new FormData();
     fd.append('image', file);
     fd.append('upload_section_img', '1');
+    var csrfEl = document.querySelector('input[name="csrf_token"]');
+    if (csrfEl) fd.append('csrf_token', csrfEl.value);
     fetch('', { method: 'POST', body: fd })
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -431,8 +433,11 @@ function uploadSectionImg(input, inputId, previewId) {
             document.getElementById(inputId).value = data.path;
             var prev = document.getElementById(previewId);
             if (prev) { prev.src = '../' + data.path; prev.style.display = ''; }
+        } else {
+            alert('Upload failed. Please try again.');
         }
-    });
+    })
+    .catch(function(e) { alert('Upload error: ' + e.message); });
 }
 
 function addFeatureCard(idx) {
