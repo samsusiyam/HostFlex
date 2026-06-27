@@ -14,15 +14,16 @@
 <script>window.$crisp=[];window.CRISP_WEBSITE_ID=<?php echo json_encode($crisp_id); ?>;(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 <?php endif; ?>
 <?php if ($header_code): echo $header_code; endif; ?>
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[999999] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 <?php if (isMaintenanceMode() && isset($_SESSION['admin_id'])): ?>
 <div class="bg-yellow-500 text-white text-center py-2 px-4 text-sm font-medium sticky top-0 z-[999999]">
     <i class="fa fa-tools mr-1"></i> Maintenance Mode is ACTIVE. Visitors see a maintenance page.
 </div>
 <?php endif; ?>
-<header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
+<header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]" role="banner">
 <div class="content flex items-center justify-between">
-<a href="index.php"><picture><source srcset="images/bg.webp" type="image/webp"><img class="h-[50px]" src="<?php echo escSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name'); ?>" width="200" height="50" style="object-fit:contain" /></picture></a>
-<div class="hidden xl:flex items-center gap-6 font-normal">
+<a href="index.php"><picture><source srcset="images/bg.webp" type="image/webp"><img class="h-[50px]" src="<?php echo escSetting('header_logo') ?: 'images/bg.png'; ?>" alt="<?php echo escSetting('site_name') ?: 'HostNibo'; ?>" width="200" height="50" style="object-fit:contain" /></picture></a>
+<nav class="hidden xl:flex items-center gap-6 font-normal" aria-label="Main navigation">
 <?php
 $menu_items = getMenuItems('header');
 $tree = buildMenuTree($menu_items);
@@ -45,8 +46,8 @@ foreach ($tree as $item):
 <a href="<?php echo $url; ?>" class="font-medium hover:text-blue-600"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
 <a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-700 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
-</div>
-<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all transform origin-top" style="transform: scaleY(0);">
+</nav>
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all transform origin-top" role="navigation" aria-label="Mobile navigation" style="transform: scaleY(0);">
 <?php foreach ($tree as $item):
     $has_children = isset($item['children']) && !empty($item['children']);
     $url = htmlspecialchars($item['url']);
@@ -68,7 +69,7 @@ foreach ($tree as $item):
 <div class="w-fit"><a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-700 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
 </div>
 <div class="xl:hidden w-fit ml-auto">
-<button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl" aria-label="Toggle navigation menu"><i class="fa fa-bars"></i></button>
+<button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-nav"><i class="fa fa-bars"></i></button>
 </div>
 </div>
 </header>

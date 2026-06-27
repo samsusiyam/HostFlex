@@ -68,7 +68,7 @@ $popup_enabled = getSetting('popup_notice_enabled');
 </div>
 <?php $fi++; endforeach; ?>
 </div>
-<button class="fab-button" id="fabBtn" onclick="toggleFab()"><?php echo $fab_icon; ?></button>
+<button class="fab-button" id="fabBtn" onclick="toggleFab()" aria-label="Contact options" aria-expanded="false" aria-controls="fabOptions"><?php echo $fab_icon; ?></button>
 </div>
 
 <script>

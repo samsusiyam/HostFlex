@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
-<section class="section_gap flex items-center bg-gray-50 font-poppins dark:bg-gray-800">
+<section class="section_gap flex items-center bg-gray-50 font-poppins dark:bg-gray-800" id="main-content">
 <div class="content">
 <div class="mb-20 text-center pb-7">
 <h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo escSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
@@ -115,30 +115,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto"><?php echo $success; ?></div><?php endif; ?>
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto"><?php echo $error; ?></div><?php endif; ?>
 <div class="px-3 py-6">
-<form method="POST" class="rounded shadow dark:bg-gray-900 bg-gray-50 p-12 max-w-4xl mx-auto">
+<form method="POST" toolname="send_contact_message" tooldescription="Sends a contact message to HostNibo support team with name, email, subject, and message" class="rounded shadow dark:bg-gray-900 bg-gray-50 p-12 max-w-4xl mx-auto" aria-label="Contact form">
 <div class="flex flex-wrap">
 <div class="w-full md:w-1/2 px-3 md:mb-4">
 <label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Name</label>
-<input name="name" type="text" placeholder="Your Name" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded lg:mb-0 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
+<input name="name" type="text" placeholder="Your Name" required toolparamdescription="The sender's full name" aria-label="Your name" class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded lg:mb-0 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
 <div class="w-full px-3 md:w-1/2 md:mb-0">
 <label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Email</label>
-<input name="email" type="email" placeholder="Your Email" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
+<input name="email" type="email" placeholder="Your Email" required toolparamdescription="The sender's email address" aria-label="Your email address" class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
 </div>
 <div class="px-3 mb-6">
 <label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Subject</label>
-<input name="subject" type="text" placeholder="Your Subject" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
+<input name="subject" type="text" placeholder="Your Subject" required toolparamdescription="The subject of the message" aria-label="Message subject" class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
 <div class="px-3 mb-6">
 <label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Message</label>
-<textarea name="message" placeholder="Write your message here..." required class="block w-full px-4 py-10 leading-tight text-gray-700 bg-gray-100 rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800"></textarea>
+<textarea name="message" placeholder="Write your message here..." required toolparamdescription="The message content to send" aria-label="Your message" class="block w-full px-4 py-10 leading-tight text-gray-700 bg-gray-100 rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800"></textarea>
 </div>
 <div class="px-6">
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
 <div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($recaptcha_site_key, ENT_QUOTES, 'UTF-8'); ?>"></div></div>
 <?php endif; ?>
-<button class="px-4 py-2 font-medium text-gray-100 bg-blue-600 rounded shadow hover:bg-blue-700 dark:bg-blue-500">Send Message</button>
+<button class="px-4 py-2 font-medium text-gray-100 bg-blue-600 rounded shadow hover:bg-blue-700 dark:bg-blue-500" aria-label="Send contact message">Send Message</button>
 </div>
 </form>
 </div>

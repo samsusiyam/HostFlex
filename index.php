@@ -71,7 +71,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
 
-<main>
+<main id="main-content">
 
 <?php foreach ($homepage_sections as $section):
     if (($section['enabled'] ?? '1') !== '1') continue;
@@ -99,8 +99,8 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <!-- Domain Search -->
 <div class="content mt-32 mb-10">
 <div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
-<form method="get" action="<?php echo htmlspecialchars(getSetting('whmcs_domain_search_url') ?: 'https://my.hostnibo.com/domainchecker.php'); ?>" class="flex w-auto">
-<input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px] h-[53px]" type="search" />
+<form method="get" action="<?php echo htmlspecialchars(getSetting('whmcs_domain_search_url') ?: 'https://my.hostnibo.com/domainchecker.php'); ?>" toolname="search_domain" tooldescription="Searches for domain name availability and pricing" class="flex w-auto" aria-label="Domain search">
+<input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px] h-[53px]" type="search" toolparamdescription="The domain name to search for availability" aria-label="Search for a domain name" />
 <div class="ml-2 w-fit">
 <button type="submit" size="custom" class="h-[53px] btn btn-blue" aria-label="Search domain">
 <i class="fa fa-search"></i> <span class="hidden sm:block">Search</span>

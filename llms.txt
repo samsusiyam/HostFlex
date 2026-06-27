@@ -1,0 +1,35 @@
+# HostNibo
+
+> HostNibo provides premium web hosting solutions with exceptional performance, reliability, and 24/7 support.
+
+## About
+
+HostNibo is a web hosting company offering shared hosting, VPS, dedicated servers, domain registration, and SSL certificates. We serve customers with BDIX-powered servers for top-notch performance in Bangladesh.
+
+## Key Pages
+
+- [Home](/index.php) - Main landing page with hosting plans and features
+- [Hosting Plans](/category/) - Browse all hosting categories and plans
+- [Special Offers](/offers.php) - Current deals and promotions
+- [Blog](/blogs.php) - Hosting tips, tutorials, and news
+- [Contact Us](/contact.php) - Get in touch with our support team
+
+## Services
+
+- Shared Hosting with cPanel
+- VPS Hosting
+- Dedicated Servers
+- Domain Registration (.com, .online, .xyz, and more)
+- Free SSL Certificates
+- 24/7 Professional Support
+
+## API
+
+- Domain Search: Use the domain search form on the homepage to check domain availability
+- Newsletter Subscribe: Subscribe to our newsletter for updates
+- Contact Form: Send us a message through the contact page
+
+## Links
+
+- Client Area: https://my.hostnibo.com
+- Knowledge Base: https://my.hostnibo.com/knowledgebase
