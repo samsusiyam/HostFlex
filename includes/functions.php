@@ -1,4 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-XSS-Protection: 1; mode=block');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://embed.tawk.to https://client.crisp.chat https://cdn.onesignal.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google.com https://onesignal.com wss://*.tawk.to https://client.crisp.chat; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.youtube.com; frame-ancestors 'self'");
+}
+
 function isAdminLoggedIn() {
     return isset($_SESSION['admin_id']);
 }
