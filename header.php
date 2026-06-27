@@ -47,7 +47,7 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 <a href="<?php echo escSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-700 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </nav>
-<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all transform origin-top" role="navigation" aria-label="Mobile navigation" style="transform: scaleY(0);">
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all" role="navigation" aria-label="Mobile navigation" style="display:none;">
 <?php foreach ($tree as $item):
     $has_children = isset($item['children']) && !empty($item['children']);
     $url = htmlspecialchars($item['url']);
