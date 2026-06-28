@@ -24,7 +24,7 @@ if ($r) { while ($row = $r->fetch_assoc()) {
 }}
 $r = @$conn->query("SELECT slug, name FROM blog_categories WHERE status = 1");
 if ($r) { while ($row = $r->fetch_assoc()) {
-    $pages_to_check[] = ['name' => 'Category: ' . $row['name'], 'url' => '/category/' . $row['slug']];
+    $pages_to_check[] = ['name' => 'Category: ' . $row['name'], 'url' => '/category.php?slug=' . $row['slug']];
 }}
 
 $results = [];

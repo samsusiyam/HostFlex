@@ -33,7 +33,7 @@ $meta_kw = $post['meta_keywords'] ?? '';
     <?php $breadcrumbs = [['label' => 'Blog', 'url' => '/blogs.php'], ['label' => $post['title']]]; include __DIR__ . '/breadcrumb.php'; ?>
     <div class="mb-6">
         <?php if ($post['category_name']): ?>
-        <a href="/category/<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+        <a href="/category.php?slug=<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
         <?php endif; ?>
         <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-3"><?php echo htmlspecialchars($post['title']); ?></h1>
         <div class="text-sm text-gray-500 flex items-center gap-3">

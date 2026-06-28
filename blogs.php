@@ -90,7 +90,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
                 <?php while ($cat = mysqli_fetch_assoc($categories)):
                     $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE category_id = {$cat['id']} AND status = 1"));
                 ?>
-                <a href="/category/<?php echo htmlspecialchars($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
+                <a href="/category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
                     <?php echo htmlspecialchars($cat['name']); ?> (<?php echo $count['c']; ?>)
                 </a>
                 <?php endwhile; ?>

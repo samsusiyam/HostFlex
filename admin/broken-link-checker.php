@@ -59,7 +59,7 @@ foreach ($pages_to_check as $page) {
             $check_url = $base_url . $href;
         } else {
             $dir = dirname(parse_url($full_url, PHP_URL_PATH) ?: '/');
-            $check_url = $base_url . $dir . '/' . $href;
+            $check_url = $base_url . $dir . $href;
         }
 
         $all_links[] = $check_url;

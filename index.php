@@ -145,7 +145,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </span>
 <?php endif; ?>
 </div>
-<div class="p-4"><a data-ripple-dark="true" href="/category/<?php echo $cat['slug']; ?>" class="btn btn-blue">Get started</a></div>
+<div class="p-4"><a data-ripple-dark="true" href="/category.php?slug=<?php echo $cat['slug']; ?>" class="btn btn-blue">Get started</a></div>
 </div>
 <?php endwhile; ?>
 </div>
