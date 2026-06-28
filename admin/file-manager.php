@@ -193,37 +193,37 @@ $file_json = json_encode($file_data);
 <?php include 'header.php'; ?>
 <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">File Manager</h1>
-        <p class="text-gray-500">Upload, browse, and manage images. Unused files are highlighted for cleanup.</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">File Manager</h1>
+        <p class="text-gray-500 dark:text-gray-400">Upload, browse, and manage images. Unused files are highlighted for cleanup.</p>
     </div>
     <button onclick="openUploadModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"><i class="fa fa-upload mr-1"></i> Upload Images</button>
 </div>
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($msg): ?><div class="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <div class="grid grid-cols-3 gap-4 mb-6">
-    <div class="bg-white rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'all' ? 'border-blue-500' : 'border-transparent'; ?> hover:border-blue-300 transition" onclick="setFilter('all')">
-        <div class="text-2xl font-bold text-gray-700" id="countAll">0</div>
-        <div class="text-sm text-gray-500">Total Files</div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'all' ? 'border-blue-500' : 'border-transparent dark:border-transparent'; ?> hover:border-blue-300 transition" onclick="setFilter('all')">
+        <div class="text-2xl font-bold text-gray-700 dark:text-gray-200" id="countAll">0</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Total Files</div>
     </div>
-    <div class="bg-white rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'used' ? 'border-green-500' : 'border-transparent'; ?> hover:border-green-300 transition" onclick="setFilter('used')">
-        <div class="text-2xl font-bold text-green-600" id="countUsed">0</div>
-        <div class="text-sm text-gray-500">In Use</div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'used' ? 'border-green-500' : 'border-transparent dark:border-transparent'; ?> hover:border-green-300 transition" onclick="setFilter('used')">
+        <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="countUsed">0</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">In Use</div>
     </div>
-    <div class="bg-white rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'unused' ? 'border-red-500' : 'border-transparent'; ?> hover:border-red-300 transition" onclick="setFilter('unused')">
-        <div class="text-2xl font-bold text-red-600" id="countUnused">0</div>
-        <div class="text-sm text-gray-500">Unused</div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center cursor-pointer border-2 <?php echo $sort_default === 'unused' ? 'border-red-500' : 'border-transparent dark:border-transparent'; ?> hover:border-red-300 transition" onclick="setFilter('unused')">
+        <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="countUnused">0</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Unused</div>
     </div>
 </div>
 
-<div class="bg-white rounded-lg shadow p-4 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
     <div class="flex flex-col md:flex-row gap-4 items-start md:items-center md:justify-between">
         <div class="flex items-center gap-2 flex-1 max-w-md">
-            <i class="fa fa-search text-gray-400"></i>
+            <i class="fa fa-search text-gray-400 dark:text-gray-500"></i>
             <input type="text" id="searchInput" placeholder="Search filename..." oninput="renderTable()" class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
         <div class="flex items-center gap-4 flex-wrap">
-            <label class="text-sm text-gray-500">Sort:</label>
+            <label class="text-sm text-gray-500 dark:text-gray-400">Sort:</label>
             <select id="sortSelect" onchange="renderTable()" class="border rounded px-3 py-2 text-sm">
                 <option value="size-desc">Size (largest)</option>
                 <option value="size-asc">Size (smallest)</option>
@@ -232,7 +232,7 @@ $file_json = json_encode($file_data);
                 <option value="date-desc">Date (newest)</option>
                 <option value="date-asc">Date (oldest)</option>
             </select>
-            <label class="text-sm text-gray-500">Show:</label>
+            <label class="text-sm text-gray-500 dark:text-gray-400">Show:</label>
             <select id="perPageSelect" onchange="renderTable()" class="border rounded px-3 py-2 text-sm">
                 <option value="25">25</option>
                 <option value="50" selected>50</option>
@@ -245,10 +245,10 @@ $file_json = json_encode($file_data);
 
 <form method="post" id="fileForm">
 <?= csrfField() ?>
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="w-full text-sm">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <table class="w-full text-sm dark:text-gray-200">
         <thead>
-            <tr class="bg-gray-50 border-b text-left">
+            <tr class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-700 text-left">
                 <th class="px-4 py-3 w-10"><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
                 <th class="px-4 py-3 w-16">Preview</th>
                 <th class="px-4 py-3">File</th>
@@ -258,11 +258,11 @@ $file_json = json_encode($file_data);
                 <th class="px-4 py-3">Status</th>
             </tr>
         </thead>
-        <tbody class="divide-y" id="fileTableBody"></tbody>
+        <tbody class="divide-y dark:divide-gray-700" id="fileTableBody"></tbody>
     </table>
     <div id="emptyState" class="hidden p-12 text-center">
-        <i class="fa fa-search text-5xl text-gray-300 mb-4"></i>
-        <p class="text-gray-500 text-lg">No files match your filter.</p>
+        <i class="fa fa-search text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+        <p class="text-gray-500 dark:text-gray-400 text-lg">No files match your filter.</p>
     </div>
 </div>
 
@@ -271,64 +271,64 @@ $file_json = json_encode($file_data);
         <button type="submit" name="delete_files" id="deleteBtn" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm" onclick="return confirm('Delete the selected files? This cannot be undone.')" disabled>
             <i class="fa fa-trash mr-1"></i> Delete Selected
         </button>
-        <span class="text-sm text-gray-500" id="selectedCount">0 selected</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400" id="selectedCount">0 selected</span>
     </div>
-    <div class="flex items-center gap-1 text-sm" id="pagination"></div>
+    <div class="flex items-center gap-1 text-sm dark:text-gray-300" id="pagination"></div>
 </div>
 </form>
 
 <div id="uploadModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center" onclick="if(event.target===this)closeUploadModal()">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4 p-6">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Upload Images</h3>
-            <button onclick="closeUploadModal()" type="button" class="text-gray-400 hover:text-gray-600"><i class="fa fa-times text-xl"></i></button>
+            <h3 class="text-lg font-semibold dark:text-gray-200">Upload Images</h3>
+            <button onclick="closeUploadModal()" type="button" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"><i class="fa fa-times text-xl"></i></button>
         </div>
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition cursor-pointer" id="dropZone" onclick="document.getElementById('fileInput').click()">
-            <i class="fa fa-cloud-upload-alt text-5xl text-gray-300 mb-4"></i>
-            <p class="text-gray-500 mb-2">Drop images here or click to browse</p>
-            <p class="text-xs text-gray-400">JPG, PNG, GIF, WebP, SVG &mdash; Max 5MB each</p>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-400 transition cursor-pointer" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <i class="fa fa-cloud-upload-alt text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+            <p class="text-gray-500 dark:text-gray-300 mb-2">Drop images here or click to browse</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">JPG, PNG, GIF, WebP, SVG &mdash; Max 5MB each</p>
             <input type="file" id="fileInput" accept="image/*" multiple class="hidden" onchange="handleFiles(this.files)">
         </div>
         <div id="previewGrid" class="mt-4 grid grid-cols-4 gap-2"></div>
         <div id="uploadProgress" class="mt-4 hidden">
-            <div class="bg-gray-200 rounded-full h-2"><div id="progressBar" class="bg-blue-600 h-2 rounded-full w-0 transition-all"></div></div>
-            <p id="progressText" class="text-sm text-gray-500 mt-1"></p>
+            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2"><div id="progressBar" class="bg-blue-600 h-2 rounded-full w-0 transition-all"></div></div>
+            <p id="progressText" class="text-sm text-gray-500 dark:text-gray-400 mt-1"></p>
         </div>
         <div id="uploadResult" class="mt-4 hidden"></div>
         <div class="mt-4 flex gap-2" id="uploadActions">
             <button onclick="uploadFiles()" id="uploadBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50" disabled><i class="fa fa-upload mr-1"></i> Upload</button>
-            <button onclick="closeUploadModal()" type="button" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50 text-sm">Cancel</button>
+            <button onclick="closeUploadModal()" type="button" class="px-4 py-2 border dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">Cancel</button>
         </div>
     </div>
 </div>
 
 <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center" onclick="if(event.target===this)closeDetailModal()">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold" id="detailName">File Details</h3>
-            <button onclick="closeDetailModal()" type="button" class="text-gray-400 hover:text-gray-600"><i class="fa fa-times text-xl"></i></button>
+            <h3 class="text-lg font-semibold dark:text-gray-200" id="detailName">File Details</h3>
+            <button onclick="closeDetailModal()" type="button" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"><i class="fa fa-times text-xl"></i></button>
         </div>
         <div class="flex flex-col md:flex-row gap-6">
             <div class="flex-shrink-0">
-                <img id="detailPreview" src="" alt="" class="w-48 h-48 object-cover rounded border">
+                <img id="detailPreview" src="" alt="" class="w-48 h-48 object-cover rounded border dark:border-gray-600">
             </div>
-            <div class="flex-1 space-y-3 text-sm">
-                <div><span class="font-medium text-gray-600">Path:</span> <code id="detailPath" class="text-blue-600 break-all"></code></div>
-                <div><span class="font-medium text-gray-600">Directory:</span> <span id="detailDir" class="text-gray-700"></span></div>
-                <div><span class="font-medium text-gray-600">Size:</span> <span id="detailSize"></span></div>
-                <div><span class="font-medium text-gray-600">Dimensions:</span> <span id="detailDim"></span></div>
-                <div><span class="font-medium text-gray-600">Modified:</span> <span id="detailModified"></span></div>
-                <div><span class="font-medium text-gray-600">Type:</span> <span id="detailType"></span></div>
+            <div class="flex-1 space-y-3 text-sm dark:text-gray-200">
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Path:</span> <code id="detailPath" class="text-blue-600 dark:text-blue-400 break-all"></code></div>
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Directory:</span> <span id="detailDir" class="text-gray-700 dark:text-gray-300"></span></div>
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Size:</span> <span id="detailSize"></span></div>
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Dimensions:</span> <span id="detailDim"></span></div>
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Modified:</span> <span id="detailModified"></span></div>
+                <div><span class="font-medium text-gray-600 dark:text-gray-400">Type:</span> <span id="detailType"></span></div>
             </div>
         </div>
         <div class="mt-6" id="detailSourcesContainer">
-            <h4 class="font-medium text-gray-700 mb-2">Referenced In:</h4>
-            <ul id="detailSources" class="list-disc list-inside text-sm text-gray-600 space-y-1"></ul>
-            <p id="detailNoSources" class="text-sm text-gray-400 hidden">This file is not referenced anywhere in the database.</p>
+            <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-2">Referenced In:</h4>
+            <ul id="detailSources" class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1"></ul>
+            <p id="detailNoSources" class="text-sm text-gray-400 dark:text-gray-500 hidden">This file is not referenced anywhere in the database.</p>
         </div>
         <div class="mt-6 flex gap-2">
             <a id="detailViewLink" href="#" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"><i class="fa fa-external-link mr-1"></i> View File</a>
-            <button onclick="closeDetailModal()" type="button" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50 text-sm">Close</button>
+            <button onclick="closeDetailModal()" type="button" class="px-4 py-2 border dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">Close</button>
         </div>
     </div>
 </div>
@@ -403,19 +403,19 @@ function renderTable() {
         var dimLbl = (f.width && f.height) ? f.width + 'x' + f.height : '-';
         var dateLbl = fmtDate(f.mtime);
         var preview = (f.ext === 'jpg' || f.ext === 'jpeg' || f.ext === 'png' || f.ext === 'gif' || f.ext === 'webp')
-            ? '<img src="../' + esc(f.rel) + '" alt="" class="w-12 h-12 object-cover rounded border" loading="lazy">'
-            : '<div class="w-12 h-12 flex items-center justify-center bg-gray-100 rounded border text-gray-400"><i class="fa fa-file-image"></i></div>';
+            ? '<img src="../' + esc(f.rel) + '" alt="" class="w-12 h-12 object-cover rounded border dark:border-gray-600" loading="lazy">'
+            : '<div class="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded border dark:border-gray-600 text-gray-400 dark:text-gray-500"><i class="fa fa-file-image"></i></div>';
         var statusBadge = f.used
-            ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-medium">In Use</span>'
-            : '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded font-medium">Unused</span>';
-        var rowClass = f.used ? '' : 'bg-red-50';
+            ? '<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs px-2 py-1 rounded font-medium">In Use</span>'
+            : '<span class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs px-2 py-1 rounded font-medium">Unused</span>';
+        var rowClass = f.used ? '' : 'bg-red-50 dark:bg-red-900/10';
         var checked = selected[f.path] ? 'checked' : '';
         var disabled = f.used ? 'disabled' : '';
 
-        html += '<tr class="hover:bg-gray-50 ' + rowClass + ' cursor-pointer" onclick="openDetail(' + idx + ')">';
+        html += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 ' + rowClass + ' cursor-pointer" onclick="openDetail(' + idx + ')">';
         html += '<td class="px-4 py-3" onclick="event.stopPropagation()"><input type="checkbox" name="delete[]" value="' + esc(f.path) + '" class="file-checkbox" ' + disabled + ' ' + checked + ' onchange="updateCount()"></td>';
         html += '<td class="px-4 py-3">' + preview + '</td>';
-        html += '<td class="px-4 py-3"><a href="../' + esc(f.rel) + '" target="_blank" class="text-blue-600 hover:underline break-all" onclick="event.stopPropagation()">' + esc(f.name) + '</a><div class="text-xs text-gray-400">' + esc(f.dir) + '</div></td>';
+        html += '<td class="px-4 py-3"><a href="../' + esc(f.rel) + '" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline break-all" onclick="event.stopPropagation()">' + esc(f.name) + '</a><div class="text-xs text-gray-400 dark:text-gray-500">' + esc(f.dir) + '</div></td>';
         html += '<td class="px-4 py-3 whitespace-nowrap">' + sizeLbl + '</td>';
         html += '<td class="px-4 py-3 whitespace-nowrap">' + dimLbl + '</td>';
         html += '<td class="px-4 py-3 whitespace-nowrap">' + dateLbl + '</td>';
@@ -426,15 +426,15 @@ function renderTable() {
 
     var pgHtml = '';
     if (totalPages > 1) {
-        pgHtml += '<button onclick="gotoPage(' + (currentPage - 1) + ')" class="px-3 py-1 border rounded hover:bg-gray-50 ' + (currentPage <= 1 ? 'opacity-30 cursor-not-allowed' : '') + '" ' + (currentPage <= 1 ? 'disabled' : '') + '><i class="fa fa-chevron-left"></i></button>';
+        pgHtml += '<button onclick="gotoPage(' + (currentPage - 1) + ')" class="px-3 py-1 border dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 ' + (currentPage <= 1 ? 'opacity-30 cursor-not-allowed' : '') + '" ' + (currentPage <= 1 ? 'disabled' : '') + '><i class="fa fa-chevron-left"></i></button>';
         for (var p = 1; p <= totalPages; p++) {
             if (p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)) {
-                pgHtml += '<button onclick="gotoPage(' + p + ')" class="px-3 py-1 border rounded ' + (p === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50') + '">' + p + '</button>';
+                pgHtml += '<button onclick="gotoPage(' + p + ')" class="px-3 py-1 border dark:border-gray-600 rounded ' + (p === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-50 dark:hover:bg-gray-700') + '">' + p + '</button>';
             } else if (p === currentPage - 3 || p === currentPage + 3) {
-                pgHtml += '<span class="px-2 text-gray-400">...</span>';
+                pgHtml += '<span class="px-2 text-gray-400 dark:text-gray-500">...</span>';
             }
         }
-        pgHtml += '<button onclick="gotoPage(' + (currentPage + 1) + ')" class="px-3 py-1 border rounded hover:bg-gray-50 ' + (currentPage >= totalPages ? 'opacity-30 cursor-not-allowed' : '') + '" ' + (currentPage >= totalPages ? 'disabled' : '') + '><i class="fa fa-chevron-right"></i></button>';
+        pgHtml += '<button onclick="gotoPage(' + (currentPage + 1) + ')" class="px-3 py-1 border dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 ' + (currentPage >= totalPages ? 'opacity-30 cursor-not-allowed' : '') + '" ' + (currentPage >= totalPages ? 'disabled' : '') + '><i class="fa fa-chevron-right"></i></button>';
     }
     document.getElementById('pagination').innerHTML = pgHtml;
     updateCount();

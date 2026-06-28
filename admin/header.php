@@ -67,6 +67,26 @@
         html.dark .shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.4); }
         html.dark .divide-gray-200 > * { border-color: #374151; }
         html.dark hr { border-color: #374151; }
+        html.dark .text-gray-400 { color: #9ca3af; }
+        html.dark .text-gray-300 { color: #d1d5db; }
+        html.dark .bg-red-50 { background-color: rgba(127,29,29,0.2); }
+        html.dark .bg-green-50 { background-color: rgba(6,78,59,0.2); }
+        html.dark .bg-yellow-50 { background-color: rgba(113,63,18,0.2); }
+        html.dark .bg-purple-50 { background-color: rgba(73,27,105,0.2); }
+        html.dark .bg-teal-100 { background-color: rgba(17,94,89,0.3); }
+        html.dark .bg-pink-100 { background-color: rgba(131,24,67,0.3); }
+        html.dark .bg-orange-100 { background-color: rgba(120,53,15,0.3); }
+        html.dark .bg-cyan-100 { background-color: rgba(21,94,117,0.3); }
+        html.dark .text-teal-600 { color: #2dd4bf; }
+        html.dark .text-cyan-600 { color: #22d3ee; }
+        html.dark .text-indigo-600 { color: #818cf8; }
+        html.dark .text-pink-600 { color: #f472b6; }
+        html.dark .text-orange-600 { color: #fb923c; }
+        html.dark .bg-blue-50\/50 { background-color: rgba(30,58,138,0.3); }
+        html.dark .hover\:bg-blue-100:hover { background-color: rgba(30,58,138,0.4); }
+        html.dark .hover\:bg-green-100:hover { background-color: rgba(6,78,59,0.4); }
+        html.dark .hover\:bg-yellow-100:hover { background-color: rgba(113,63,18,0.4); }
+        html.dark .hover\:bg-purple-100:hover { background-color: rgba(73,27,105,0.4); }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">

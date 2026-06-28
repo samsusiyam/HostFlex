@@ -54,84 +54,84 @@ $offers = mysqli_query($conn, "SELECT * FROM offers ORDER BY sort_order ASC");
 <?php include 'header.php'; ?>
 <div class="mb-6 flex justify-between items-center">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">Offers & Deals</h1>
-        <p class="text-gray-500">Manage promotional offers and deals</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Offers & Deals</h1>
+        <p class="text-gray-500 dark:text-gray-400">Manage promotional offers and deals</p>
     </div>
     <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-plus"></i> Add Offer</a>
 </div>
 
-<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
+<?php if ($success): ?><div class="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
 
 <?php if (isset($_GET['action']) && $_GET['action'] === 'add' || $edit_offer): ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-lg font-semibold mb-4"><?php echo $edit_offer ? 'Edit Offer' : 'Add New Offer'; ?></h2>
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4 dark:text-gray-200"><?php echo $edit_offer ? 'Edit Offer' : 'Add New Offer'; ?></h2>
     <form method="POST">
         <?= csrfField() ?>
         <?php if ($edit_offer): ?><input type="hidden" name="id" value="<?php echo $edit_offer['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
                 <input type="text" name="title" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['title']) : ''; ?>" required class="w-full border rounded px-3 py-2">
             </div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <textarea name="description" rows="3" class="w-full border rounded px-3 py-2"><?php echo $edit_offer ? htmlspecialchars($edit_offer['description']) : ''; ?></textarea>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Badge</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Badge</label>
                 <input type="text" name="badge" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['badge']) : ''; ?>" class="w-full border rounded px-3 py-2" placeholder="HOT, POPULAR, etc.">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Price Label</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price Label</label>
                 <input type="text" name="price_label" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['price_label']) : ''; ?>" class="w-full border rounded px-3 py-2" placeholder="<?php echo getSetting('currency_symbol') ?: 'TK.'; ?>50/mo">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link URL</label>
                 <input type="text" name="link_url" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['link_url']) : ''; ?>" class="w-full border rounded px-3 py-2">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Link Text</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link Text</label>
                 <input type="text" name="link_text" value="<?php echo $edit_offer ? htmlspecialchars($edit_offer['link_text']) : 'Learn More'; ?>" class="w-full border rounded px-3 py-2">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort Order</label>
                 <input type="number" name="sort_order" value="<?php echo $edit_offer ? $edit_offer['sort_order'] : '0'; ?>" class="w-full border rounded px-3 py-2">
             </div>
             <div class="flex items-center">
-                <label class="flex items-center"><input type="checkbox" name="status" value="1" <?php echo (!$edit_offer || $edit_offer['status']) ? 'checked' : ''; ?> class="mr-2"> Active</label>
+                <label class="flex items-center dark:text-gray-200"><input type="checkbox" name="status" value="1" <?php echo (!$edit_offer || $edit_offer['status']) ? 'checked' : ''; ?> class="mr-2"> Active</label>
             </div>
         </div>
         <div class="mt-4">
             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><?php echo $edit_offer ? 'Update Offer' : 'Add Offer'; ?></button>
-            <a href="offers.php" class="ml-2 text-gray-600 px-4 py-2 border rounded hover:bg-gray-50">Cancel</a>
+            <a href="offers.php" class="ml-2 text-gray-600 dark:text-gray-400 px-4 py-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</a>
         </div>
     </form>
 </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full">
-        <thead class="bg-gray-50">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <table class="min-w-full dark:text-gray-200">
+        <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Badge</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Order</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Title</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Badge</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Price</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <?php while ($offer = mysqli_fetch_assoc($offers)): ?>
             <tr>
                 <td class="px-6 py-4 text-sm"><?php echo $offer['sort_order']; ?></td>
                 <td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($offer['title']); ?></td>
-                <td class="px-6 py-4 text-sm"><span class="bg-red-100 text-red-600 px-2 py-0.5 rounded text-xs"><?php echo htmlspecialchars($offer['badge']); ?></span></td>
+                <td class="px-6 py-4 text-sm"><span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded text-xs"><?php echo htmlspecialchars($offer['badge']); ?></span></td>
                 <td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($offer['price_label']); ?></td>
-                <td class="px-6 py-4 text-sm"><?php echo $offer['status'] ? '<span class="text-green-600 font-medium">Active</span>' : '<span class="text-red-600 font-medium">Inactive</span>'; ?></td>
+                <td class="px-6 py-4 text-sm"><?php echo $offer['status'] ? '<span class="text-green-600 dark:text-green-400 font-medium">Active</span>' : '<span class="text-red-600 dark:text-red-400 font-medium">Inactive</span>'; ?></td>
                 <td class="px-6 py-4 text-sm space-x-2">
-                    <a href="?edit=<?php echo $offer['id']; ?>" class="text-blue-600 hover:text-blue-800"><i class="fa fa-edit"></i></a>
-                    <a href="?delete=<?php echo $offer['id']; ?>" onclick="return confirm('Delete this offer?')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a>
+                    <a href="?edit=<?php echo $offer['id']; ?>" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"><i class="fa fa-edit"></i></a>
+                    <a href="?delete=<?php echo $offer['id']; ?>" onclick="return confirm('Delete this offer?')" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
             <?php endwhile; ?>

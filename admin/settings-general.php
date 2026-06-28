@@ -29,22 +29,22 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">General Settings</h1>
-    <p class="text-gray-500">Site name, tagline, contact info, currency</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">General Settings</h1>
+    <p class="text-gray-500 dark:text-gray-400">Site name, tagline, contact info, currency</p>
 </div>
-<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
+<?php if (isset($success)): ?><div class="bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST" accept-charset="UTF-8">
     <?= csrfField() ?>
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Site Name</label><input type="text" name="site_name" value="<?php echo htmlspecialchars($s['site_name'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Currency Symbol</label><input type="text" name="currency_symbol" value="<?php echo htmlspecialchars($s['currency_symbol'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Site Tagline</label><input type="text" name="site_tagline" value="<?php echo htmlspecialchars($s['site_tagline'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Site Description</label><textarea name="site_description" rows="3" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($s['site_description'] ?? ''); ?></textarea></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Site Email</label><input type="email" name="site_email" value="<?php echo htmlspecialchars($s['site_email'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Site Phone</label><input type="text" name="site_phone" value="<?php echo htmlspecialchars($s['site_phone'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Site Address</label><input type="text" name="site_address" value="<?php echo htmlspecialchars($s['site_address'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Footer Copyright</label><input type="text" name="footer_copyright" value="<?php echo htmlspecialchars($s['footer_copyright'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Name</label><input type="text" name="site_name" value="<?php echo htmlspecialchars($s['site_name'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Currency Symbol</label><input type="text" name="currency_symbol" value="<?php echo htmlspecialchars($s['currency_symbol'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Tagline</label><input type="text" name="site_tagline" value="<?php echo htmlspecialchars($s['site_tagline'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Description</label><textarea name="site_description" rows="3" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($s['site_description'] ?? ''); ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Email</label><input type="email" name="site_email" value="<?php echo htmlspecialchars($s['site_email'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Phone</label><input type="text" name="site_phone" value="<?php echo htmlspecialchars($s['site_phone'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Address</label><input type="text" name="site_address" value="<?php echo htmlspecialchars($s['site_address'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Footer Copyright</label><input type="text" name="footer_copyright" value="<?php echo htmlspecialchars($s['footer_copyright'] ?? ''); ?>" class="w-full border rounded px-3 py-2"></div>
         </div>
     </div>
     <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>
