@@ -1,21 +1,17 @@
 <?php
-$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (!empty($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
-    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-@ini_set('session.cookie_secure', $is_https ? '1' : '0');
-@ini_set('session.cookie_httponly', '1');
-@ini_set('session.cookie_samesite', 'Lax');
 @ini_set('expose_php', 'Off');
 
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $is_https,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start([
+        'cookie_lifetime' => 0,
+        'cookie_path' => '/',
+        'cookie_domain' => '',
+        'cookie_secure' => 1,
+        'cookie_httponly' => 1,
+        'cookie_samesite' => 'Lax',
+        'use_strict_mode' => 1,
+    ]);
+}
 
 if (empty(headers_sent())) {
     header_remove('X-Powered-By');

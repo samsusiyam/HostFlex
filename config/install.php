@@ -53,7 +53,7 @@ function testDbConnection($host, $user, $pass, $name) {
 
 function writeDatabaseConfig($host, $user, $pass, $name) {
     $content = '<?php' . "\n";
-    $content .= 'session_start();' . "\n\n";
+    $content .= 'require_once __DIR__ . \'/headers.php\';' . "\n\n";
     $content .= '$db_host = ' . var_export($host, true) . ";\n";
     $content .= '$db_user = ' . var_export($user, true) . ";\n";
     $content .= '$db_pass = ' . var_export($pass, true) . ";\n";

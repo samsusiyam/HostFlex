@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/headers.php';
 
 $db_host = 'localhost';
 $db_user = 'root';
