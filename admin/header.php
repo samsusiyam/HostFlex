@@ -102,7 +102,7 @@
             <div class="flex items-center">
                 <button onclick="toggleSidebar()" class="md:hidden mr-3 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"><i class="fa fa-bars text-xl"></i></button>
                 <a href="dashboard.php" class="flex items-center space-x-3">
-                    <img src="../<?php echo htmlspecialchars(getSetting('header_logo') ?: 'images/bg.webp'); ?>" class="h-8" alt="<?php echo escSetting('site_name'); ?>">
+                    <img src="../<?php echo htmlspecialchars(getSetting('header_logo') ?: 'images/bg.webp'); ?>" class="h-8 dark:invert dark:brightness-200" alt="<?php echo escSetting('site_name'); ?>">
                     <span class="font-semibold text-gray-700 dark:text-gray-200 hidden sm:inline">Admin Panel</span>
                 </a>
             </div>
