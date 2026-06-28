@@ -99,7 +99,8 @@ $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = 
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">New Password</label>
-                    <input type="password" name="new_password" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                    <input type="password" name="new_password" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" oninput="checkPwdStrength(this, 'pwdStrength')">
+                    <div id="pwdStrength" class="text-xs mt-1 h-4"></div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Confirm New Password</label>
@@ -110,4 +111,17 @@ $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = 
         </form>
     </div>
 </div>
+<script>
+function checkPwdStrength(el, targetId) {
+    var p = el.value, s = 0, t = document.getElementById(targetId);
+    if (!p) { t.innerHTML = ''; return; }
+    if (p.length >= 8) s++;
+    if (p.length >= 12) s++;
+    if (/[A-Z]/.test(p)) s++;
+    if (/[0-9]/.test(p)) s++;
+    if (/[^A-Za-z0-9]/.test(p)) s++;
+    var labels = ['<span class="text-red-500">Very Weak</span>','<span class="text-red-400">Weak</span>','<span class="text-yellow-500">Fair</span>','<span class="text-yellow-400">Good</span>','<span class="text-green-500">Strong</span>','<span class="text-green-400">Very Strong</span>'];
+    t.innerHTML = labels[Math.min(s, 5)];
+}
+</script>
 <?php include 'footer.php'; ?>

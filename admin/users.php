@@ -90,7 +90,7 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at DESC");
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Username</label><input type="text" name="username" value="<?php echo htmlspecialchars($eu['username']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label><input type="email" name="email" value="<?php echo htmlspecialchars($eu['email']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
-            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password <?php echo $is_new ? '' : '(leave blank to keep)'; ?></label><input type="password" name="password" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" <?php echo $is_new ? 'required' : ''; ?>></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password <?php echo $is_new ? '' : '(leave blank to keep)'; ?></label><input type="password" name="password" id="userPassword" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" <?php echo $is_new ? 'required' : ''; ?> oninput="checkPwdStrength(this, 'pwdStrength')"><div id="pwdStrength" class="text-xs mt-1 h-4"></div></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Role</label>
                 <select name="role" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                     <option value="admin" <?php echo ($eu['role']??'') == 'admin' ? 'selected' : ''; ?>>Admin</option>
@@ -143,4 +143,17 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at DESC");
         </tbody>
     </table>
 </div>
+<script>
+function checkPwdStrength(el, targetId) {
+    var p = el.value, s = 0, t = document.getElementById(targetId);
+    if (!p) { t.innerHTML = ''; return; }
+    if (p.length >= 8) s++;
+    if (p.length >= 12) s++;
+    if (/[A-Z]/.test(p)) s++;
+    if (/[0-9]/.test(p)) s++;
+    if (/[^A-Za-z0-9]/.test(p)) s++;
+    var labels = ['<span class="text-red-500">Very Weak</span>','<span class="text-red-400">Weak</span>','<span class="text-yellow-500">Fair</span>','<span class="text-yellow-400">Good</span>','<span class="text-green-500">Strong</span>','<span class="text-green-400">Very Strong</span>'];
+    t.innerHTML = labels[Math.min(s, 5)];
+}
+</script>
 <?php include 'footer.php'; ?>
