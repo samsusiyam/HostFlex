@@ -82,7 +82,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($type === 'hero'): ?>
 <!-- Hero Section -->
 <section class="py-16 bg-white">
-<div class="content grid-cols-2 lg:grid">
+<div class="content grid grid-cols-1 lg:grid-cols-2">
 <div class="flex self-center flex-col justify-center gap-6 md:gap-12">
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
 <p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
@@ -91,7 +91,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle());'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden self-center lg:block w-full px-6"><img src="images/cloud.jpg" alt="Host Nibo Hero" width="800" height="600" style="width:100%;height:auto;max-height:500px;object-fit:contain"></div>
+<div class="hidden self-center lg:block w-full px-6"><picture><source srcset="images/cloud.webp" type="image/webp"><img src="images/cloud.jpg" alt="Host Nibo Hero" width="800" height="600" style="width:100%;height:auto;max-height:500px;object-fit:contain"></picture></div>
 </div>
 
 
@@ -270,8 +270,8 @@ if (empty($cards)) {
 <div class="content">
 <div class="w-fit mx-auto">
 <div class="mb-12 flex flex-col gap-2">
-<?php $ref_img = $c['image'] ?? 'images/refund.png'; ?>
-<img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="200" height="150" loading="lazy">
+<?php $ref_img = $c['image'] ?? 'images/refund.png'; $ref_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $ref_img); ?>
+<picture><source srcset="<?php echo htmlspecialchars($ref_webp); ?>" type="image/webp"><img src="<?php echo htmlspecialchars($ref_img); ?>" alt="Refund Guarantee" width="200" height="150" loading="lazy"></picture>
 <h2 class="text-black text-2xl font-bold"><?php echo htmlspecialchars($c['heading'] ?? ''); ?></h2>
 <p><?php echo htmlspecialchars($c['text'] ?? ''); ?></p>
 </div>

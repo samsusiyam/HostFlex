@@ -70,7 +70,15 @@ function writeDatabaseConfig($host, $user, $pass, $name) {
 }
 
 function getDbConn() {
-    if (session_status() === PHP_SESSION_NONE) @session_start();
+    if (session_status() === PHP_SESSION_NONE) @session_start([
+        'cookie_lifetime' => 0,
+        'cookie_path' => '/',
+        'cookie_domain' => '',
+        'cookie_secure' => 1,
+        'cookie_httponly' => 1,
+        'cookie_samesite' => 'Lax',
+        'use_strict_mode' => 1,
+    ]);
     // Try direct from session first (most reliable)
     if (!empty($_SESSION['install_db_host'])) {
         try {
