@@ -69,3 +69,15 @@ document.addEventListener('DOMContentLoaded',function(){document.querySelectorAl
 }
 })();
 </script>
+<script>
+(function(){
+var d=document,w=window;
+function t(){
+var h=new XMLHttpRequest();
+h.open('POST','/admin/track.php',true);
+h.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+h.send('url='+encodeURIComponent(d.location.pathname)+'&t='+encodeURIComponent(d.title)+'&r='+encodeURIComponent(w.referrer||''));
+}
+if(d.readyState==='complete'||d.readyState==='interactive')t();else d.addEventListener('DOMContentLoaded',t);
+})();
+</script>

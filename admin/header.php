@@ -122,6 +122,9 @@
             <a href="dashboard.php" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''; ?>">
                 <i class="fa fa-chart-pie w-5"></i><span>Dashboard</span>
             </a>
+            <a href="analytics.php" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 <?php echo basename($_SERVER['PHP_SELF']) == 'analytics.php' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''; ?>">
+                <i class="fa fa-chart-line w-5"></i><span>Analytics</span>
+            </a>
             <a href="plans.php" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'plans') !== false && strpos($_SERVER['PHP_SELF'], 'categories') === false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''; ?>">
                 <i class="fa fa-server w-5"></i><span>Hosting Plans</span>
             </a>
@@ -184,7 +187,7 @@
                 </div>
             </div>
             <div>
-                <a href="javascript:void(0)" onclick="toggleSecurity()" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 <?php echo preg_match('/users|roles|activity-logs|login-logs|database-backup|update/', $_SERVER['PHP_SELF']) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''; ?>">
+                <a href="javascript:void(0)" onclick="toggleSecurity()" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 <?php echo preg_match('/users|roles|activity-logs|login-logs|database-backup|update|broken-link|seo-score|file-manager/', $_SERVER['PHP_SELF']) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''; ?>">
                     <i class="fa fa-lock w-5"></i><span>Security</span>
                     <i class="fa fa-chevron-down ml-auto text-xs transition-transform" id="securityArrow"></i>
                 </a>
@@ -195,6 +198,8 @@
                     <a href="login-logs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'login-logs') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-sign-in-alt w-4"></i><span>Login Logs</span></a>
                     <a href="database-backup.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'database-backup') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-database w-4"></i><span>Database Backup</span></a>
                     <a href="file-manager.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'file-manager') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-folder-open w-4"></i><span>File Manager</span></a>
+                    <a href="broken-link-checker.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'broken-link') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-unlink w-4"></i><span>Broken Links</span></a>
+                    <a href="seo-score-checker.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'seo-score') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-search w-4"></i><span>SEO Checker</span></a>
                     <a href="update.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 <?php echo strpos($_SERVER['PHP_SELF'], 'update') !== false ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : ''; ?>"><i class="fa fa-sync-alt w-4"></i><span>System Update</span></a>
                 </div>
             </div>
@@ -275,7 +280,7 @@
             document.getElementById('settingsArrow').style.transform = 'rotate(180deg)';
         });
         <?php endif; ?>
-        <?php if (preg_match('/users|roles|activity-logs|login-logs|database-backup|file-manager|update/', $_SERVER['PHP_SELF'])): ?>
+        <?php if (preg_match('/users|roles|activity-logs|login-logs|database-backup|file-manager|update|broken-link|seo-score/', $_SERVER['PHP_SELF'])): ?>
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('securitySub').classList.add('open');
             document.getElementById('securityArrow').style.transform = 'rotate(180deg)';
