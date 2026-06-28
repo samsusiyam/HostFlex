@@ -121,56 +121,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['do_update']) && $late
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800"><i class="fa fa-sync-alt mr-2"></i> System Update</h1>
-    <p class="text-gray-500">Check for updates and update your system</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100"><i class="fa fa-sync-alt mr-2"></i> System Update</h1>
+    <p class="text-gray-500 dark:text-gray-400">Check for updates and update your system</p>
 </div>
 
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300"><?php echo $error; ?></div><?php endif; ?>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-4">Current Installation</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4 dark:text-gray-100">Current Installation</h2>
         <div class="space-y-3">
-            <div class="flex justify-between py-2 border-b"><span class="text-gray-600">Application</span><span class="font-medium"><?php echo APP_NAME; ?></span></div>
-            <div class="flex justify-between py-2 border-b"><span class="text-gray-600">Current Version</span><span class="font-medium text-blue-600">v<?php echo APP_VERSION; ?></span></div>
-            <div class="flex justify-between py-2 border-b"><span class="text-gray-600">Release Date</span><span class="font-medium"><?php echo APP_VERSION_DATE; ?></span></div>
-            <div class="flex justify-between py-2 border-b"><span class="text-gray-600">GitHub Repo</span><span class="font-medium"><?php echo $repo ?: '<span class="text-red-500">Not configured</span>'; ?></span></div>
+            <div class="flex justify-between py-2 border-b dark:border-gray-700"><span class="text-gray-600 dark:text-gray-300">Application</span><span class="font-medium dark:text-gray-100"><?php echo APP_NAME; ?></span></div>
+            <div class="flex justify-between py-2 border-b dark:border-gray-700"><span class="text-gray-600 dark:text-gray-300">Current Version</span><span class="font-medium text-blue-600 dark:text-blue-400">v<?php echo APP_VERSION; ?></span></div>
+            <div class="flex justify-between py-2 border-b dark:border-gray-700"><span class="text-gray-600 dark:text-gray-300">Release Date</span><span class="font-medium dark:text-gray-100"><?php echo APP_VERSION_DATE; ?></span></div>
+            <div class="flex justify-between py-2 border-b dark:border-gray-700"><span class="text-gray-600 dark:text-gray-300">GitHub Repo</span><span class="font-medium dark:text-gray-100"><?php echo $repo ?: '<span class="text-red-500 dark:text-red-400">Not configured</span>'; ?></span></div>
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-4">Update Status</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4 dark:text-gray-100">Update Status</h2>
         <?php if (!$repo): ?>
             <div class="text-center py-8">
                 <i class="fa fa-exclamation-triangle text-4xl text-yellow-500 mb-3"></i>
-                <p class="text-gray-600">GitHub repository not configured.</p>
-                <p class="text-sm text-gray-400 mt-1">Set <code>GITHUB_REPO</code> in <code>config/version.php</code></p>
+                <p class="text-gray-600 dark:text-gray-300">GitHub repository not configured.</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Set <code>GITHUB_REPO</code> in <code>config/version.php</code></p>
             </div>
         <?php elseif ($latest === null): ?>
             <div class="text-center py-8">
                 <i class="fa fa-times-circle text-4xl text-red-400 mb-3"></i>
-                <p class="text-gray-600">Could not check for updates.</p>
-                <p class="text-sm text-gray-400 mt-1">Make sure your GitHub repo has releases.</p>
+                <p class="text-gray-600 dark:text-gray-300">Could not check for updates.</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Make sure your GitHub repo has releases.</p>
             </div>
         <?php elseif ($update_available): ?>
             <div class="text-center py-4">
                 <i class="fa fa-arrow-circle-up text-5xl text-green-500 mb-3"></i>
-                <h3 class="text-xl font-bold text-green-600">v<?php echo $latest['version']; ?> Available!</h3>
-                <p class="text-sm text-gray-500 mt-1">Released: <?php echo date('d M Y', strtotime($latest['published'])); ?></p>
+                <h3 class="text-xl font-bold text-green-600 dark:text-green-400">v<?php echo $latest['version']; ?> Available!</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Released: <?php echo date('d M Y', strtotime($latest['published'])); ?></p>
                 <?php if ($latest['notes']): ?>
-                <div class="mt-4 text-left bg-gray-50 rounded p-3 text-sm max-h-32 overflow-y-auto"><?php echo nl2br(htmlspecialchars($latest['notes'])); ?></div>
+                <div class="mt-4 text-left bg-gray-50 dark:bg-gray-700 rounded p-3 text-sm max-h-32 overflow-y-auto dark:text-gray-200"><?php echo nl2br(htmlspecialchars($latest['notes'])); ?></div>
                 <?php endif; ?>
                 <form method="POST" class="mt-4" onsubmit="return confirm('Update to v<?php echo $latest['version']; ?>? This will overwrite system files. Your database and uploads will be preserved.')">
                     <?= csrfField() ?>
-                    <button type="submit" name="do_update" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 shadow"><i class="fa fa-download mr-2"></i> Update to v<?php echo $latest['version']; ?></button>
+                    <button type="submit" name="do_update" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 shadow"><i class="fa fa-download mr-2"></i> Update to v<?php echo $latest['version']; ?></button>
                 </form>
             </div>
         <?php else: ?>
             <div class="text-center py-8">
                 <i class="fa fa-check-circle text-5xl text-green-500 mb-3"></i>
-                <h3 class="text-xl font-bold text-gray-800">You're up to date!</h3>
-                <p class="text-gray-500 mt-1">v<?php echo APP_VERSION; ?> is the latest version.</p>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">You're up to date!</h3>
+                <p class="text-gray-500 dark:text-gray-400 mt-1">v<?php echo APP_VERSION; ?> is the latest version.</p>
             </div>
         <?php endif; ?>
     </div>
