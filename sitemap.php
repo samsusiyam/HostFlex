@@ -50,16 +50,19 @@ $xml .= sm_url(SITE_URL . 'offers.php', 'monthly', '0.5');
 
 if ($conn) {
     $queries = [
-        ['sql' => 'SELECT slug, updated_at FROM blog_posts WHERE status = 1', 'url' => 'blog/', 'freq' => 'weekly', 'pri' => '0.6', 'date_col' => 'updated_at'],
-        ['sql' => 'SELECT slug FROM pages WHERE status = 1', 'url' => 'page/', 'freq' => 'monthly', 'pri' => '0.5', 'date_col' => ''],
-        ['sql' => 'SELECT slug FROM blog_categories WHERE status = 1', 'url' => 'category/', 'freq' => 'monthly', 'pri' => '0.5', 'date_col' => ''],
+        ['sql' => 'SELECT slug FROM blog_posts WHERE status = 1', 'url' => 'blog/', 'freq' => 'weekly', 'pri' => '0.6'],
+        ['sql' => 'SELECT slug FROM pages WHERE status = 1', 'url' => 'page/', 'freq' => 'monthly', 'pri' => '0.5'],
+        ['sql' => 'SELECT slug FROM blog_categories WHERE status = 1', 'url' => 'category/', 'freq' => 'monthly', 'pri' => '0.5'],
     ];
     foreach ($queries as $q) {
-        $r = @$conn->query($q['sql']);
+        try {
+            $r = $conn->query($q['sql']);
+        } catch (Throwable $e) {
+            continue;
+        }
         if (!$r) continue;
         while ($row = $r->fetch_assoc()) {
-            $lastmod = ($q['date_col'] && !empty($row[$q['date_col']])) ? date('c', strtotime($row[$q['date_col']])) : '';
-            $xml .= sm_url(SITE_URL . $q['url'] . $row['slug'], $q['freq'], $q['pri'], $lastmod);
+            $xml .= sm_url(SITE_URL . $q['url'] . $row['slug'], $q['freq'], $q['pri']);
         }
     }
     $conn->close();
