@@ -122,6 +122,7 @@
                     <a href="activity-logs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'activity-logs') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-history w-4"></i><span>Activity Logs</span></a>
                     <a href="login-logs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'login-logs') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-sign-in-alt w-4"></i><span>Login Logs</span></a>
                     <a href="database-backup.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'database-backup') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-database w-4"></i><span>Database Backup</span></a>
+                    <a href="file-manager.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'file-manager') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-folder-open w-4"></i><span>File Manager</span></a>
                     <a href="update.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'update') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-sync-alt w-4"></i><span>System Update</span></a>
                 </div>
             </div>
@@ -181,7 +182,7 @@
             document.getElementById('settingsArrow').style.transform = 'rotate(180deg)';
         });
         <?php endif; ?>
-        <?php if (preg_match('/users|roles|activity-logs|login-logs|database-backup|update/', $_SERVER['PHP_SELF'])): ?>
+        <?php if (preg_match('/users|roles|activity-logs|login-logs|database-backup|file-manager|update/', $_SERVER['PHP_SELF'])): ?>
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('securitySub').classList.add('open');
             document.getElementById('securityArrow').style.transform = 'rotate(180deg)';

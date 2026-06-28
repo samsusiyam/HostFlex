@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_perms'])) {
     validateCSRFToken($_POST['csrf_token'] ?? '');
     $perm_data = [];
     $roles = ['admin', 'editor', 'manager'];
-    $sections = ['dashboard', 'plans', 'offers', 'categories', 'pages', 'menus', 'contacts', 'subscribers', 'testimonials', 'faqs', 'partners', 'settings', 'blog', 'users', 'roles', 'logs', 'backup'];
+    $sections = ['dashboard', 'plans', 'offers', 'categories', 'pages', 'menus', 'contacts', 'subscribers', 'testimonials', 'faqs', 'partners', 'settings', 'blog', 'users', 'roles', 'logs', 'backup', 'file_manager'];
     $actions = ['view', 'create', 'edit', 'delete'];
 
     foreach ($roles as $role) {
@@ -41,8 +41,8 @@ $raw = getSetting($perm_key);
 $permissions = $raw ? json_decode($raw, true) : [];
 
 $roles = ['admin', 'editor', 'manager'];
-$sections = ['dashboard', 'plans', 'offers', 'categories', 'pages', 'menus', 'contacts', 'subscribers', 'testimonials', 'faqs', 'partners', 'settings', 'blog', 'users', 'roles', 'logs', 'backup'];
-$section_labels = ['dashboard' => 'Dashboard', 'plans' => 'Hosting Plans', 'offers' => 'Offers', 'categories' => 'Categories', 'pages' => 'CMS Pages', 'menus' => 'Menu Manager', 'contacts' => 'Contacts', 'subscribers' => 'Subscribers', 'testimonials' => 'Testimonials', 'faqs' => 'FAQs', 'partners' => 'Partners', 'settings' => 'Settings', 'blog' => 'Blog', 'users' => 'Admin Users', 'roles' => 'Roles', 'logs' => 'Activity Logs', 'backup' => 'Database Backup'];
+$sections = ['dashboard', 'plans', 'offers', 'categories', 'pages', 'menus', 'contacts', 'subscribers', 'testimonials', 'faqs', 'partners', 'settings', 'blog', 'users', 'roles', 'logs', 'backup', 'file_manager'];
+$section_labels = ['dashboard' => 'Dashboard', 'plans' => 'Hosting Plans', 'offers' => 'Offers', 'categories' => 'Categories', 'pages' => 'CMS Pages', 'menus' => 'Menu Manager', 'contacts' => 'Contacts', 'subscribers' => 'Subscribers', 'testimonials' => 'Testimonials', 'faqs' => 'FAQs', 'partners' => 'Partners', 'settings' => 'Settings', 'blog' => 'Blog', 'users' => 'Admin Users', 'roles' => 'Roles', 'logs' => 'Activity Logs', 'backup' => 'Database Backup', 'file_manager' => 'File Manager'];
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
