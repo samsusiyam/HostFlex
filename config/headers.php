@@ -2,8 +2,11 @@
 @ini_set('expose_php', 'Off');
 
 if (session_status() === PHP_SESSION_NONE) {
+    @ini_set('session.gc_maxlifetime', '28800');
+    @ini_set('session.cookie_lifetime', '28800');
     session_start([
-        'cookie_lifetime' => 0,
+        'cookie_lifetime' => 28800,
+        'gc_maxlifetime' => 28800,
         'cookie_path' => '/',
         'cookie_domain' => '',
         'cookie_secure' => 1,
