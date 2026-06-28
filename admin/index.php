@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="w-full max-w-md">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
         <div class="text-center mb-8">
-            <img src="../<?php echo htmlspecialchars(getSetting('header_logo') ?: 'images/bg.webp'); ?>" class="h-12 mx-auto mb-4" alt="<?php echo escSetting('site_name'); ?>">
+            <img src="../<?php echo htmlspecialchars(getSetting('header_logo') ?: 'images/bg.webp'); ?>" class="h-12 mx-auto mb-4 dark:invert dark:brightness-200" alt="<?php echo escSetting('site_name'); ?>">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Admin Login</h2>
             <p class="text-gray-500 dark:text-gray-400"><?php echo escSetting('site_name'); ?> Management Panel</p>
             </div>
