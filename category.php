@@ -5,7 +5,7 @@ $category = getCategoryBySlug($slug);
 
 if (!$category) {
     header('HTTP/1.0 404 Not Found');
-    echo '<h1>404 - Category Not Found</h1>';
+    include __DIR__ . '/404.php';
     exit;
 }
 ?>
@@ -21,7 +21,7 @@ if (!$category) {
 <div class="-z-50" style="background-image: url('img/7ee6a14d8e2-shutterstock_1394052911-scaled.html'); background-size: cover; background-position: center;">
 <div class="bg-blue-600 bg-opacity-70">
 <div class="space-y-16 content mx-auto py-16 lg:pt-20 lg:pb-20">
-<?php $breadcrumbs = [['label' => 'Blog', 'url' => '/blogs.php'], ['label' => $category['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
+<?php $breadcrumbs = [['label' => $category['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
 <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h2>

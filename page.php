@@ -5,7 +5,7 @@ $page = getPageBySlug($slug);
 
 if (!$page) {
     header('HTTP/1.0 404 Not Found');
-    echo '<h1>404 - Page Not Found</h1>';
+    include __DIR__ . '/404.php';
     exit;
 }
 ?>

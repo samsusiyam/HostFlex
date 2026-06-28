@@ -25,7 +25,9 @@ ErrorDocument 404 /404.php
 <IfModule mod_rewrite.c>
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^blog/([a-z0-9-]+)$ blog.php?slug=$1 [L,QSA]
   RewriteRule ^category/([a-z0-9-]+)$ category.php?slug=$1 [L,QSA]
+  RewriteRule ^page/([a-z0-9-]+)$ page.php?slug=$1 [L,QSA]
   RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
 </IfModule>
 
