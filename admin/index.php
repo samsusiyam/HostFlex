@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin Login - <?php echo escSetting('site_name'); ?></title>
     <link rel="shortcut icon" href="../<?php echo htmlspecialchars(escSetting('favicon') ?: 'images/favicon.ico'); ?>" type="image/x-icon" />
     <script>if(localStorage.getItem('adminDarkMode')==='true')document.documentElement.classList.add('dark')</script>
-    <script>tailwind.config={darkMode:'class'}</script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={darkMode:'class'}</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         html.dark .text-gray-500 { color: #9ca3af; }

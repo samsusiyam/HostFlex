@@ -7,8 +7,8 @@
     <title><?php echo $page_title ?? 'Dashboard'; ?> - <?php echo escSetting('site_name'); ?> Admin</title>
     <link rel="shortcut icon" href="../<?php echo htmlspecialchars(escSetting('favicon') ?: 'images/favicon.ico'); ?>" type="image/x-icon" />
     <script>if(localStorage.getItem('adminDarkMode')==='true')document.documentElement.classList.add('dark')</script>
-    <script>tailwind.config={darkMode:'class'}</script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={darkMode:'class'}</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         .sidebar-overlay { display: none; }
