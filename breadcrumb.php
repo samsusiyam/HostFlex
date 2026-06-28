@@ -1,6 +1,6 @@
 <?php
 if (!function_exists('escSetting')) { require_once __DIR__ . '/includes/functions.php'; }
-$site_name = escSetting('site_name') ?: 'Home';
+$site_name = 'Home';
 ?>
 <nav aria-label="Breadcrumb" class="mb-6">
     <ol class="flex flex-wrap items-center gap-1 text-sm" itemscope itemtype="https://schema.org/BreadcrumbList">
