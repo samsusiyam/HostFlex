@@ -2,8 +2,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
+ob_start();
 require 'config/database.php';
 require 'includes/functions.php';
+
+if (headers_sent()) {
+    ob_end_flush();
+    exit;
+}
+ob_end_clean();
 
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
