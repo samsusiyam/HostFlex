@@ -86,7 +86,7 @@ function buildRefMap() {
 
     $direct_tables = [
         ['categories', 'image', 'name'],
-        ['hosting_plans', 'image', 'name'],
+        // ['hosting_plans', 'image', 'name'], // table has no image column
         ['offers', 'image', 'title'],
         ['blog_posts', 'image', 'title'],
         ['testimonials', 'photo', 'name'],
