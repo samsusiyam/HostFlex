@@ -66,52 +66,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $items = mysqli_query($conn, "SELECT * FROM testimonials ORDER BY sort_order ASC");
 ?>
 <?php include 'header.php'; ?>
-<div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">Testimonials</h1><p class="text-gray-500">Client reviews and ratings</p></div>
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" id="msgBox"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<div class="mb-6"><h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Testimonials</h1><p class="text-gray-500 dark:text-gray-400">Client reviews and ratings</p></div>
+<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300 px-4 py-3 rounded mb-4" id="msgBox"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4" id="formTitle">Add Testimonial</h2>
         <form method="POST" enctype="multipart/form-data" id="itemForm">
             <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <input type="hidden" name="existing_photo" id="existingPhoto" value="">
             <div class="space-y-3">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" name="name" id="fName" required class="w-full border rounded px-3 py-2"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Company</label><input type="text" name="company" id="fCompany" class="w-full border rounded px-3 py-2"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
-                    <input type="file" name="photo" accept="image/*" class="w-full border rounded px-3 py-2 text-sm">
-                    <div id="photoPreview" class="mt-1 hidden"><img class="max-h-12 rounded"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label><input type="text" name="name" id="fName" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Company</label><input type="text" name="company" id="fCompany" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Photo</label>
+                    <input type="file" name="photo" accept="image/*" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                    <div id="photoPreview" class="mt-1 hidden"><img class="max-h-12 rounded dark:border-gray-600"></div>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                    <select name="rating" id="fRating" class="w-full border rounded px-3 py-2">
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Rating</label>
+                    <select name="rating" id="fRating" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                         <?php for ($i = 5; $i >= 1; $i--): ?>
                         <option value="<?php echo $i; ?>"><?php echo str_repeat('★', $i) . str_repeat('☆', 5-$i); ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Review</label><textarea name="review" id="fReview" rows="4" required class="w-full border rounded px-3 py-2"></textarea></div>
-                <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"><i class="fa fa-plus mr-1"></i> Add</button>
-                <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 w-full hidden" id="cancelBtn"><i class="fa fa-times mr-1"></i> Cancel</button>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Review</label><textarea name="review" id="fReview" rows="4" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>
+                <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600 w-full"><i class="fa fa-plus mr-1"></i> Add</button>
+                <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 w-full hidden" id="cancelBtn"><i class="fa fa-times mr-1"></i> Cancel</button>
             </div>
         </form>
     </div>
-    <div class="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden">
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <table class="w-full">
-            <thead class="bg-gray-50 border-b">
-                <tr><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Photo</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Name</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Company</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Rating</th><th class="text-right px-4 py-3 text-sm font-semibold text-gray-600">Actions</th></tr>
+            <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                <tr><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Photo</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Name</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Company</th><th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Rating</th><th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th></tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y dark:divide-gray-600">
                 <?php while ($row = mysqli_fetch_assoc($items)): ?>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3"><?php if ($row['photo']): ?><img src="../<?php echo htmlspecialchars($row['photo']); ?>" class="w-10 h-10 rounded-full object-cover"><?php else: ?><span class="w-10 h-10 rounded-full bg-gray-200 inline-block"></span><?php endif; ?></td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-4 py-3"><?php if ($row['photo']): ?><img src="../<?php echo htmlspecialchars($row['photo']); ?>" class="w-10 h-10 rounded-full object-cover"><?php else: ?><span class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 inline-block"></span><?php endif; ?></td>
                     <td class="px-4 py-3 text-sm font-medium"><?php echo htmlspecialchars($row['name']); ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($row['company'] ?: '-'); ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($row['company'] ?: '-'); ?></td>
                     <td class="px-4 py-3 text-sm text-yellow-500"><?php echo str_repeat('★', (int)$row['rating']) . str_repeat('☆', 5-(int)$row['rating']); ?></td>
                     <td class="px-4 py-3 text-right">
-                        <button onclick="editItem(<?php echo $row['id']; ?>,<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES); ?>)" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fa fa-edit"></i></button>
-                        <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a>
+                        <button onclick="editItem(<?php echo $row['id']; ?>,<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES); ?>)" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2"><i class="fa fa-edit"></i></button>
+                        <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
                 <?php endwhile; ?>

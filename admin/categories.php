@@ -67,51 +67,51 @@ $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY sort_order 
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6 flex justify-between items-center">
-    <div><h1 class="text-2xl font-bold text-gray-800">Categories</h1><p class="text-gray-500">Drag & drop to reorder</p></div>
-    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-plus"></i> Add Category</a>
+    <div><h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Categories</h1><p class="text-gray-500 dark:text-gray-400">Drag & drop to reorder</p></div>
+    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-plus"></i> Add Category</a>
 </div>
 
 <?php if (isset($_GET['action']) || $edit): ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Category' : 'Add Category'; ?></h2>
     <form method="POST" enctype="multipart/form-data">
         <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" name="name" value="<?php echo $edit ? htmlspecialchars($edit['name']) : ''; ?>" required class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Slug</label><input type="text" name="slug" value="<?php echo $edit ? htmlspecialchars($edit['slug']) : ''; ?>" required class="w-full border rounded px-3 py-2" placeholder="e.g. basic-web"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="description" rows="3" class="w-full border rounded px-3 py-2"><?php echo $edit ? htmlspecialchars($edit['description']) : ''; ?></textarea></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                <input type="file" name="image_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm">
-                <input type="text" name="image" value="<?php echo $edit ? htmlspecialchars($edit['image']) : 'images/s.png'; ?>" class="w-full border rounded px-3 py-2 text-sm mt-1" placeholder="Or enter path">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label><input type="text" name="name" value="<?php echo $edit ? htmlspecialchars($edit['name']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label><input type="text" name="slug" value="<?php echo $edit ? htmlspecialchars($edit['slug']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="e.g. basic-web"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="description" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo $edit ? htmlspecialchars($edit['description']) : ''; ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label>
+                <input type="file" name="image_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                <input type="text" name="image" value="<?php echo $edit ? htmlspecialchars($edit['image']) : 'images/s.png'; ?>" class="w-full border rounded px-3 py-2 text-sm mt-1 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Or enter path">
                 <?php if ($edit && $edit['image']): ?><img src="../<?php echo htmlspecialchars($edit['image']); ?>" class="mt-2 max-h-12 rounded"><?php endif; ?>
             </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label><input type="number" name="sort_order" value="<?php echo $edit ? $edit['sort_order'] : '0'; ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Sort Order</label><input type="number" name="sort_order" value="<?php echo $edit ? $edit['sort_order'] : '0'; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <div class="mt-4 flex items-center space-x-4">
             <label class="flex items-center"><input type="checkbox" name="status" value="1" <?php echo (!$edit || $edit['status']) ? 'checked' : ''; ?> class="mr-2"> Active</label>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><?php echo $edit ? 'Update' : 'Add'; ?></button>
-            <a href="categories.php" class="text-gray-600 px-4 py-2 border rounded hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><?php echo $edit ? 'Update' : 'Add'; ?></button>
+            <a href="categories.php" class="text-gray-600 dark:text-gray-400 px-4 py-2 border rounded dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</a>
         </div>
     </form>
 </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
     <table class="min-w-full">
-        <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-12">#</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead>
-        <tbody id="sortableCategories" class="divide-y divide-gray-200">
+        <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12">#</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Image</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th></tr></thead>
+        <tbody id="sortableCategories" class="divide-y divide-gray-200 dark:divide-gray-600">
             <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
-            <tr data-id="<?php echo $cat['id']; ?>" class="hover:bg-gray-50 cursor-move">
-                <td class="px-6 py-4 text-sm text-gray-400"><i class="fa fa-grip-vertical"></i></td>
+            <tr data-id="<?php echo $cat['id']; ?>" class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-move">
+                <td class="px-6 py-4 text-sm text-gray-400 dark:text-gray-500"><i class="fa fa-grip-vertical"></i></td>
                 <td class="px-6 py-4"><?php if ($cat['image']): ?><img src="../<?php echo htmlspecialchars($cat['image']); ?>" class="h-8 w-8 object-contain rounded"><?php endif; ?></td>
                 <td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($cat['name']); ?></td>
-                <td class="px-6 py-4 text-sm text-gray-500"><?php echo $cat['slug']; ?></td>
-                <td class="px-6 py-4 text-sm"><?php echo $cat['status'] ? '<span class="text-green-600">Active</span>' : '<span class="text-red-600">Inactive</span>'; ?></td>
+                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><?php echo $cat['slug']; ?></td>
+                <td class="px-6 py-4 text-sm"><?php echo $cat['status'] ? '<span class="text-green-600 dark:text-green-400">Active</span>' : '<span class="text-red-600 dark:text-red-400">Inactive</span>'; ?></td>
                 <td class="px-6 py-4 text-sm space-x-2">
-                    <a href="/category.php?slug=<?php echo $cat['slug']; ?>" target="_blank" title="View on site" class="text-green-600 hover:text-green-800"><i class="fa fa-eye"></i></a>
-                    <a href="?edit=<?php echo $cat['id']; ?>" class="text-blue-600 hover:text-blue-800"><i class="fa fa-edit"></i></a>
-                    <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a>
+                    <a href="/category.php?slug=<?php echo $cat['slug']; ?>" target="_blank" title="View on site" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"><i class="fa fa-eye"></i></a>
+                    <a href="?edit=<?php echo $cat['id']; ?>" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"><i class="fa fa-edit"></i></a>
+                    <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
             <?php endwhile; ?>

@@ -113,38 +113,38 @@ if ($social_buttons_raw) {
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Popup Notice & Social</h1>
-    <p class="text-gray-500">Popup notification, social links, and FAB button configuration</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Popup Notice & Social</h1>
+    <p class="text-gray-500 dark:text-gray-400">Popup notification, social links, and FAB button configuration</p>
 </div>
 
-<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><?php echo $success; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $success; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
     <?= csrfField() ?>
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-bell text-yellow-600 mr-2"></i> Popup Notice</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-bell text-yellow-600 dark:text-yellow-400 mr-2"></i> Popup Notice</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex items-center gap-2 md:col-span-2">
                 <input type="hidden" name="popup_notice_enabled" value="0">
-                <input type="checkbox" name="popup_notice_enabled" value="1" <?php echo (!isset($s['popup_notice_enabled']) || $s['popup_notice_enabled'] == '1') ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded">
-                <label class="text-sm font-medium text-gray-700">Enable Popup Notice</label>
+                <input type="checkbox" name="popup_notice_enabled" value="1" <?php echo (!isset($s['popup_notice_enabled']) || $s['popup_notice_enabled'] == '1') ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded dark:border-gray-600">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Enable Popup Notice</label>
             </div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Popup Title</label><input type="text" name="popup_notice_title" value="<?php echo htmlspecialchars($s['popup_notice_title'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Popup Message</label><textarea name="popup_notice_message" rows="5" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($s['popup_notice_message'] ?? ''); ?></textarea></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label><input type="text" name="popup_notice_bg_color" value="<?php echo htmlspecialchars($s['popup_notice_bg_color'] ?? 'rgba(255,255,255,0.8)'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="rgba(255,255,255,0.8)"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Text Color</label><input type="text" name="popup_notice_text_color" value="<?php echo htmlspecialchars($s['popup_notice_text_color'] ?? '#333'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="#333"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">"Don't show again" Label</label><input type="text" name="popup_hide_label" value="<?php echo htmlspecialchars($s['popup_hide_label'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Don't show again today"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Close Button Text</label><input type="text" name="popup_close_text" value="<?php echo htmlspecialchars($s['popup_close_text'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="❌ Close"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Popup Title</label><input type="text" name="popup_notice_title" value="<?php echo htmlspecialchars($s['popup_notice_title'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Popup Message</label><textarea name="popup_notice_message" rows="5" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($s['popup_notice_message'] ?? ''); ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Background Color</label><input type="text" name="popup_notice_bg_color" value="<?php echo htmlspecialchars($s['popup_notice_bg_color'] ?? 'rgba(255,255,255,0.8)'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="rgba(255,255,255,0.8)"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Text Color</label><input type="text" name="popup_notice_text_color" value="<?php echo htmlspecialchars($s['popup_notice_text_color'] ?? '#333'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="#333"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">"Don't show again" Label</label><input type="text" name="popup_hide_label" value="<?php echo htmlspecialchars($s['popup_hide_label'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Don't show again today"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Close Button Text</label><input type="text" name="popup_close_text" value="<?php echo htmlspecialchars($s['popup_close_text'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="❌ Close"></div>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold flex items-center"><i class="fa fa-share-alt text-blue-500 mr-2"></i> Social Links (Footer)</h2>
-            <button type="button" onclick="showAddSocialLink()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 transition shadow text-sm font-medium"><i class="fa fa-plus mr-1"></i> Add Link</button>
+            <h2 class="text-lg font-semibold flex items-center"><i class="fa fa-share-alt text-blue-500 dark:text-blue-400 mr-2"></i> Social Links (Footer)</h2>
+            <button type="button" onclick="showAddSocialLink()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow text-sm font-medium"><i class="fa fa-plus mr-1"></i> Add Link</button>
         </div>
-        <p class="text-sm text-gray-500 mb-4">These social icons appear in the footer.</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">These social icons appear in the footer.</p>
         <div id="socialLinksContainer">
             <?php
             $social_links_raw = $s['social_links'] ?? '';
@@ -166,33 +166,33 @@ if ($social_buttons_raw) {
                 }
             }
             if (empty($social_links)): ?>
-            <div id="noSocialLinksMsg" class="text-center py-8 text-gray-400">
+            <div id="noSocialLinksMsg" class="text-center py-8 text-gray-400 dark:text-gray-500">
                 <i class="fa fa-share-alt text-4xl mb-2"></i>
                 <p>No social links configured yet.</p>
             </div>
             <?php endif; ?>
             <?php foreach ($social_links as $i => $link): ?>
-            <div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200" data-idx="<?php echo $i; ?>">
-                <div class="flex-[3]"><input type="text" name="social_links[name][]" value="<?php echo htmlspecialchars($link['name'] ?? ''); ?>" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
-                <div class="w-36"><input type="text" name="social_links[icon][]" value="<?php echo htmlspecialchars($link['icon'] ?? 'fab fa-globe'); ?>" placeholder="FA class (fab fa-facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs"></div>
-                <div class="w-28"><input type="text" name="social_links[color][]" value="<?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left:4px solid <?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>"></div>
-                <div class="flex-[4]"><input type="url" name="social_links[url][]" value="<?php echo htmlspecialchars($link['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
-                <button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>
+            <div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600" data-idx="<?php echo $i; ?>">
+                <div class="flex-[3]"><input type="text" name="social_links[name][]" value="<?php echo htmlspecialchars($link['name'] ?? ''); ?>" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <div class="w-36"><input type="text" name="social_links[icon][]" value="<?php echo htmlspecialchars($link['icon'] ?? 'fab fa-globe'); ?>" placeholder="FA class (fab fa-facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <div class="w-28"><input type="text" name="social_links[color][]" value="<?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" style="border-left:4px solid <?php echo htmlspecialchars($link['color'] ?? '#1877f2'); ?>"></div>
+                <div class="flex-[4]"><input type="url" name="social_links[url][]" value="<?php echo htmlspecialchars($link['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>
             </div>
             <?php endforeach; ?>
         </div>
         <div id="deletedLinksContainer"></div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold flex items-center"><i class="fa fa-plus-circle text-green-600 mr-2"></i> FAB Social Buttons (Dynamic)</h2>
-            <button type="button" onclick="showAddSocialBtn()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 transition shadow text-sm font-medium"><i class="fa fa-plus mr-1"></i> Add Button</button>
+            <h2 class="text-lg font-semibold flex items-center"><i class="fa fa-plus-circle text-green-600 dark:text-green-400 mr-2"></i> FAB Social Buttons (Dynamic)</h2>
+            <button type="button" onclick="showAddSocialBtn()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow text-sm font-medium"><i class="fa fa-plus mr-1"></i> Add Button</button>
         </div>
-        <p class="text-sm text-gray-500 mb-4">These buttons appear in the floating action button (FAB) on the frontend.</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">These buttons appear in the floating action button (FAB) on the frontend.</p>
         <div id="socialButtonsContainer">
             <?php if (empty($social_buttons)): ?>
-            <div id="noSocialMsg" class="text-center py-8 text-gray-400">
+            <div id="noSocialMsg" class="text-center py-8 text-gray-400 dark:text-gray-500">
                 <i class="fa fa-share-alt text-4xl mb-2"></i>
                 <p>No social buttons configured yet.</p>
             </div>
@@ -200,88 +200,88 @@ if ($social_buttons_raw) {
             <?php foreach ($social_buttons as $i => $btn): ?>
             <?php $is_img_icon = (strpos($btn['icon'] ?? '', '/') !== false || strpos($btn['icon'] ?? '', '.') !== false); ?>
             <?php $btn_name = trim($btn['name'] ?? ''); $btn_icon = trim($btn['icon'] ?? ''); ?>
-            <div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200" data-idx="<?php echo $i; ?>">
-                <div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="<?php echo htmlspecialchars($btn_name); ?>" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
+            <div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600" data-idx="<?php echo $i; ?>">
+                <div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="<?php echo htmlspecialchars($btn_name); ?>" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
                 <div class="flex flex-col items-center gap-1">
                     <div class="flex items-center gap-1">
-                        <div class="relative flex items-center justify-center w-8 h-8 rounded bg-white border">
+                        <div class="relative flex items-center justify-center w-8 h-8 rounded bg-white dark:bg-gray-700 border dark:border-gray-600">
                             <img src="<?php echo $is_img_icon ? '../' . htmlspecialchars($btn_icon) : ''; ?>" class="max-w-full max-h-full object-contain icon-preview<?php echo $is_img_icon ? '' : ' hidden'; ?>" alt="icon">
                             <span class="text-lg icon-emoji<?php echo $is_img_icon || !$btn_icon ? ' hidden' : ''; ?>"><?php echo htmlspecialchars($btn_icon); ?></span>
                             <?php if (!$btn_icon && !$is_img_icon): ?>
-                            <span class="text-[10px] text-gray-400 icon-empty-label">∅</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 icon-empty-label">∅</span>
                             <?php endif; ?>
                         </div>
-                        <input type="text" name="social_buttons[icon][]" class="icon-hidden w-16 border rounded px-1 py-1 text-xs font-mono" value="<?php echo htmlspecialchars($btn_icon); ?>" placeholder="emoji">
+                        <input type="text" name="social_buttons[icon][]" class="icon-hidden w-16 border rounded px-1 py-1 text-xs font-mono dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" value="<?php echo htmlspecialchars($btn_icon); ?>" placeholder="emoji">
                     </div>
                     <div class="flex items-center gap-1">
-                        <label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][<?php echo $i; ?>]" accept="image/*" class="hidden icon-file-input" onchange="var r=this.closest('.social-btn-row');r.querySelector('.icon-preview').src=window.URL.createObjectURL(this.files[0]);r.querySelector('.icon-preview').classList.remove('hidden');r.querySelector('.icon-preview').style.display='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-empty-label')?.remove();r.querySelector('.icon-hidden').value='';"></label>
+                        <label class="text-[10px] text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][<?php echo $i; ?>]" accept="image/*" class="hidden icon-file-input" onchange="var r=this.closest('.social-btn-row');r.querySelector('.icon-preview').src=window.URL.createObjectURL(this.files[0]);r.querySelector('.icon-preview').classList.remove('hidden');r.querySelector('.icon-preview').style.display='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-empty-label')?.remove();r.querySelector('.icon-hidden').value='';"></label>
                         <?php if ($btn_icon): ?>
-                        <button type="button" onclick="var r=this.closest('.social-btn-row');r.querySelector('.icon-hidden').value='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-preview').classList.add('hidden');var e=r.querySelector('.icon-empty-label')||document.createElement('span');e.className='text-[10px] text-gray-400 icon-empty-label';e.textContent='∅';r.querySelector('.flex.items-center.gap-1').appendChild(e);" class="text-[10px] text-red-500 hover:text-red-700">✕</button>
+                        <button type="button" onclick="var r=this.closest('.social-btn-row');r.querySelector('.icon-hidden').value='';r.querySelector('.icon-emoji').classList.add('hidden');r.querySelector('.icon-preview').classList.add('hidden');var e=r.querySelector('.icon-empty-label')||document.createElement('span');e.className='text-[10px] text-gray-400 dark:text-gray-500 icon-empty-label';e.textContent='∅';r.querySelector('.flex.items-center.gap-1').appendChild(e);" class="text-[10px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">✕</button>
                         <?php endif; ?>
                     </div>
                 </div>
-                <div class="w-24"><input type="text" name="social_buttons[color][]" value="<?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left: 4px solid <?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>"></div>
-                <div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="<?php echo htmlspecialchars($btn['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>
-                <button type="button" onclick="deleteSocialBtn(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>
+                <div class="w-24"><input type="text" name="social_buttons[color][]" value="<?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" style="border-left: 4px solid <?php echo htmlspecialchars($btn['color'] ?? '#25D366'); ?>"></div>
+                <div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="<?php echo htmlspecialchars($btn['url'] ?? ''); ?>" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <button type="button" onclick="deleteSocialBtn(this)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>
             </div>
             <?php endforeach; ?>
         </div>
         <div id="deletedBtnsContainer"></div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-cog text-gray-600 mr-2"></i> FAB Button Settings</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-cog text-gray-600 dark:text-gray-400 mr-2"></i> FAB Button Settings</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex items-center gap-2">
                 <input type="hidden" name="fab_enabled" value="0">
-                <input type="checkbox" name="fab_enabled" value="1" <?php echo (isset($s['fab_enabled']) && $s['fab_enabled'] == '1') ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded">
-                <label class="text-sm font-medium text-gray-700">Enable FAB Button</label>
+                <input type="checkbox" name="fab_enabled" value="1" <?php echo (isset($s['fab_enabled']) && $s['fab_enabled'] == '1') ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded dark:border-gray-600">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Enable FAB Button</label>
             </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">FAB Icon</label><input type="text" name="fab_icon" value="<?php echo htmlspecialchars($s['fab_icon'] ?? '💬'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">FAB Icon</label><input type="text" name="fab_icon" value="<?php echo htmlspecialchars($s['fab_icon'] ?? '💬'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
     </div>
 
-    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save All Settings</button>
+    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save All Settings</button>
 </form>
 
 <div id="addSocialModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 mr-2"></i> Add Social Button</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 dark:text-green-400 mr-2"></i> Add Social Button</h3>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-gray-400 font-normal">(optional — leave empty for icon only)</span></label><input type="text" id="newBtnName" placeholder="WhatsApp" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon <span class="text-gray-400 font-normal">(optional — leave empty for text only)</span></label>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name <span class="text-gray-400 dark:text-gray-500 font-normal">(optional — leave empty for icon only)</span></label><input type="text" id="newBtnName" placeholder="WhatsApp" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Icon <span class="text-gray-400 dark:text-gray-500 font-normal">(optional — leave empty for text only)</span></label>
                 <div class="flex gap-2 items-start">
-                    <input type="text" id="newBtnIcon" value="💬" placeholder="Emoji or leave empty" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="newBtnIcon" value="💬" placeholder="Emoji or leave empty" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                     <div class="flex flex-col items-center gap-1">
-                        <label class="text-xs bg-gray-100 px-3 py-2 rounded cursor-pointer hover:bg-gray-200 border"><i class="fa fa-image"></i> Upload</label>
+                        <label class="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 border dark:border-gray-600"><i class="fa fa-image"></i> Upload</label>
                         <input type="file" id="newBtnIconFile" accept="image/*" class="hidden" onchange="document.getElementById('newBtnIconPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('newBtnIconPreview').classList.remove('hidden');document.getElementById('newBtnIcon').value='';">
                         <img id="newBtnIconPreview" class="hidden w-8 h-8 object-contain mt-1">
                     </div>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Enter emoji or upload an image</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Enter emoji or upload an image</p>
             </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label><input type="text" id="newBtnColor" value="#25D366" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">URL</label><input type="url" id="newBtnUrl" placeholder="https://wa.me/88016XXXXXXXX" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Background Color</label><input type="text" id="newBtnColor" value="#25D366" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">URL</label><input type="url" id="newBtnUrl" placeholder="https://wa.me/88016XXXXXXXX" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <div class="mt-6 flex items-center gap-3">
-            <button type="button" onclick="addSocialBtn()" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition shadow font-medium"><i class="fa fa-plus mr-1"></i> Add</button>
-            <button type="button" onclick="closeAddSocial()" class="text-gray-600 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
+            <button type="button" onclick="addSocialBtn()" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow font-medium"><i class="fa fa-plus mr-1"></i> Add</button>
+            <button type="button" onclick="closeAddSocial()" class="text-gray-600 dark:text-gray-400 px-4 py-2 border rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
         </div>
     </div>
 </div>
 
 <div id="addSocialLinkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 mr-2"></i> Add Footer Social Link</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 dark:text-green-400 mr-2"></i> Add Footer Social Link</h3>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" id="newLinkName" placeholder="Facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Font Awesome Class</label><input type="text" id="newLinkIcon" value="fab fa-facebook" placeholder="fab fa-facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-sm"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label><input type="text" id="newLinkColor" value="#1877f2" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">URL</label><input type="url" id="newLinkUrl" placeholder="https://facebook.com/yourpage" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label><input type="text" id="newLinkName" placeholder="Facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Font Awesome Class</label><input type="text" id="newLinkIcon" value="fab fa-facebook" placeholder="fab fa-facebook" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Background Color</label><input type="text" id="newLinkColor" value="#1877f2" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">URL</label><input type="url" id="newLinkUrl" placeholder="https://facebook.com/yourpage" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <div class="mt-6 flex items-center gap-3">
-            <button type="button" onclick="addSocialLink()" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition shadow font-medium"><i class="fa fa-plus mr-1"></i> Add</button>
-            <button type="button" onclick="closeAddSocialLink()" class="text-gray-600 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
+            <button type="button" onclick="addSocialLink()" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow font-medium"><i class="fa fa-plus mr-1"></i> Add</button>
+            <button type="button" onclick="closeAddSocialLink()" class="text-gray-600 dark:text-gray-400 px-4 py-2 border rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition"><i class="fa fa-times mr-1"></i> Cancel</button>
         </div>
     </div>
 </div>
@@ -305,24 +305,24 @@ function addSocialBtn() {
     var msg = document.getElementById('noSocialMsg');
     if (msg) msg.style.display = 'none';
     var rnd = Date.now();
-    var html = '<div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
-    html += '<div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="' + escHtml(name) + '" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
+    var html = '<div class="social-btn-row flex items-center gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">';
+    html += '<div class="flex-[3]"><input type="text" name="social_buttons[name][]" value="' + escHtml(name) + '" placeholder="Name (leave empty for icon only)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
     html += '<div class="flex flex-col items-center gap-1">';
     html += '<div class="flex items-center gap-1">';
-    html += '<div class="relative flex items-center justify-center w-8 h-8 rounded bg-white border">';
+    html += '<div class="relative flex items-center justify-center w-8 h-8 rounded bg-white dark:bg-gray-700 border dark:border-gray-600">';
     html += '<img src="' + (hasFile ? URL.createObjectURL(fileInput.files[0]) : '') + '" class="max-w-full max-h-full object-contain icon-preview"' + (hasFile ? '' : ' style="display:none"') + '>';
     html += '<span class="text-lg icon-emoji' + (hasFile || !icon ? ' hidden' : '') + '">' + escHtml(icon) + '</span>';
-    if (!icon && !hasFile) html += '<span class="text-[10px] text-gray-400 icon-empty-label">∅</span>';
+    if (!icon && !hasFile) html += '<span class="text-[10px] text-gray-400 dark:text-gray-500 icon-empty-label">∅</span>';
     html += '</div>';
-    html += '<input type="text" name="social_buttons[icon][]" class="icon-hidden w-16 border rounded px-1 py-1 text-xs font-mono" value="' + escHtml(icon) + '" placeholder="emoji">';
+    html += '<input type="text" name="social_buttons[icon][]" class="icon-hidden w-16 border rounded px-1 py-1 text-xs font-mono dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" value="' + escHtml(icon) + '" placeholder="emoji">';
     html += '</div>';
     html += '<div class="flex items-center gap-1">';
-    html += '<label class="text-[10px] text-blue-600 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][' + rnd + ']" accept="image/*" class="hidden icon-file-input" onchange="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-preview\').src=window.URL.createObjectURL(this.files[0]);r.querySelector(\'.icon-preview\').style.display=\'\';r.querySelector(\'.icon-preview\').classList.remove(\'hidden\');r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-empty-label\')?.remove();r.querySelector(\'.icon-hidden\').value=\'\'"></label>';
-    if (icon || hasFile) html += '<button type="button" onclick="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-hidden\').value=\'\';r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-preview\').classList.add(\'hidden\');var e=r.querySelector(\'.icon-empty-label\')||document.createElement(\'span\');e.className=\'text-[10px] text-gray-400 icon-empty-label\';e.textContent=\'∅\';r.querySelector(\'.flex.items-center.gap-1\').appendChild(e);" class="text-[10px] text-red-500 hover:text-red-700">✕</button>';
+    html += '<label class="text-[10px] text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">Upload<input type="file" name="social_buttons[icon][' + rnd + ']" accept="image/*" class="hidden icon-file-input" onchange="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-preview\').src=window.URL.createObjectURL(this.files[0]);r.querySelector(\'.icon-preview\').style.display=\'\';r.querySelector(\'.icon-preview\').classList.remove(\'hidden\');r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-empty-label\')?.remove();r.querySelector(\'.icon-hidden\').value=\'\'"></label>';
+    if (icon || hasFile) html += '<button type="button" onclick="var r=this.closest(\'.social-btn-row\');r.querySelector(\'.icon-hidden\').value=\'\';r.querySelector(\'.icon-emoji\').classList.add(\'hidden\');r.querySelector(\'.icon-preview\').classList.add(\'hidden\');var e=r.querySelector(\'.icon-empty-label\')||document.createElement(\'span\');e.className=\'text-[10px] text-gray-400 dark:text-gray-500 icon-empty-label\';e.textContent=\'∅\';r.querySelector(\'.flex.items-center.gap-1\').appendChild(e);" class="text-[10px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">✕</button>';
     html += '</div>';
     html += '</div>';
-    html += '<div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="' + escHtml(url) + '" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
-    html += '<button type="button" onclick="deleteSocialBtn(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+    html += '<div class="flex-[4]"><input type="url" name="social_buttons[url][]" value="' + escHtml(url) + '" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+    html += '<button type="button" onclick="deleteSocialBtn(this)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>';
     html += '</div>';
     container.insertAdjacentHTML('beforeend', html);
     document.getElementById('newBtnName').value = '';
@@ -361,12 +361,12 @@ function addSocialLink() {
     var msg = document.getElementById('noSocialLinksMsg');
     if (msg) msg.style.display = 'none';
     var rnd = Date.now();
-    var html = '<div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
-    html += '<div class="flex-[3]"><input type="text" name="social_links[name][]" value="' + escHtml(name) + '" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
-    html += '<div class="w-36"><input type="text" name="social_links[icon][]" value="' + escHtml(icon) + '" placeholder="FA class" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs"></div>';
-    html += '<div class="w-28"><input type="text" name="social_links[color][]" value="' + escHtml(color) + '" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" style="border-left:4px solid ' + escHtml(color) + '"></div>';
-    html += '<div class="flex-[4]"><input type="url" name="social_links[url][]" value="' + escHtml(url) + '" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"></div>';
-    html += '<button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+    var html = '<div class="social-link-row flex items-center gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">';
+    html += '<div class="flex-[3]"><input type="text" name="social_links[name][]" value="' + escHtml(name) + '" placeholder="Name (e.g. Facebook)" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+    html += '<div class="w-36"><input type="text" name="social_links[icon][]" value="' + escHtml(icon) + '" placeholder="FA class" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+    html += '<div class="w-28"><input type="text" name="social_links[color][]" value="' + escHtml(color) + '" placeholder="Color" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" style="border-left:4px solid ' + escHtml(color) + '"></div>';
+    html += '<div class="flex-[4]"><input type="url" name="social_links[url][]" value="' + escHtml(url) + '" placeholder="URL" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+    html += '<button type="button" onclick="deleteSocialLink(this)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110 transition-transform px-2" title="Delete"><i class="fa fa-trash-alt"></i></button>';
     html += '</div>';
     container.insertAdjacentHTML('beforeend', html);
     document.getElementById('newLinkName').value = '';

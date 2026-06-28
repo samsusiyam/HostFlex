@@ -44,30 +44,30 @@ $pages = mysqli_query($conn, "SELECT * FROM pages ORDER BY title ASC");
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6 flex justify-between items-center">
-    <div><h1 class="text-2xl font-bold text-gray-800">CMS Pages</h1><p class="text-gray-500">Manage About, Terms, Policy & custom pages</p></div>
-    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-plus"></i> Add Page</a>
+    <div><h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">CMS Pages</h1><p class="text-gray-500 dark:text-gray-400">Manage About, Terms, Policy & custom pages</p></div>
+    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-plus"></i> Add Page</a>
 </div>
 
 <?php if (isset($_GET['action']) || $edit): ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Page' : 'Add Page'; ?></h2>
     <form method="POST">
         <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Title</label><input type="text" name="title" value="<?php echo $edit ? htmlspecialchars($edit['title']) : ''; ?>" required class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Slug</label><input type="text" name="slug" value="<?php echo $edit ? htmlspecialchars($edit['slug']) : ''; ?>" required class="w-full border rounded px-3 py-2" placeholder="e.g. about-us"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label><input type="text" name="meta_description" value="<?php echo $edit ? htmlspecialchars($edit['meta_description']) : ''; ?>" class="w-full border rounded px-3 py-2"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo $edit ? htmlspecialchars($edit['meta_keywords']) : ''; ?>" class="w-full border rounded px-3 py-2"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label><input type="text" name="title" value="<?php echo $edit ? htmlspecialchars($edit['title']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label><input type="text" name="slug" value="<?php echo $edit ? htmlspecialchars($edit['slug']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="e.g. about-us"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><input type="text" name="meta_description" value="<?php echo $edit ? htmlspecialchars($edit['meta_description']) : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo $edit ? htmlspecialchars($edit['meta_keywords']) : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Content (HTML)</label>
-                <textarea name="content" id="pageContent" rows="15" class="w-full border rounded px-3 py-2"><?php echo $edit ? htmlspecialchars($edit['content']) : ''; ?></textarea>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Content (HTML)</label>
+                <textarea name="content" id="pageContent" rows="15" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo $edit ? htmlspecialchars($edit['content']) : ''; ?></textarea>
             </div>
         </div>
         <div class="mt-4 flex items-center space-x-4">
             <label class="flex items-center"><input type="checkbox" name="status" value="1" <?php echo (!$edit || $edit['status']) ? 'checked' : ''; ?> class="mr-2"> Active</label>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><?php echo $edit ? 'Update' : 'Add'; ?></button>
-            <a href="pages.php" class="text-gray-600 px-4 py-2 border rounded hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><?php echo $edit ? 'Update' : 'Add'; ?></button>
+            <a href="pages.php" class="text-gray-600 dark:text-gray-400 px-4 py-2 border rounded dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</a>
         </div>
     </form>
 </div>
@@ -100,12 +100,12 @@ $('form').on('submit', function() {
     tinymce.triggerSave();
 });
 </script>
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
     <table class="min-w-full">
-        <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead>
-        <tbody class="divide-y divide-gray-200">
+        <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th></tr></thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
             <?php while ($p = mysqli_fetch_assoc($pages)): ?>
-            <tr><td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($p['title']); ?></td><td class="px-6 py-4 text-sm"><?php echo $p['slug']; ?></td><td class="px-6 py-4 text-sm"><?php echo $p['status'] ? '<span class="text-green-600">Active</span>' : '<span class="text-red-600">Inactive</span>'; ?></td><td class="px-6 py-4 text-sm space-x-2"><a href="?edit=<?php echo $p['id']; ?>" class="text-blue-600"><i class="fa fa-edit"></i></a> <a href="../page.php?slug=<?php echo $p['slug']; ?>" target="_blank" class="text-green-600"><i class="fa fa-eye"></i></a> <a href="?delete=<?php echo $p['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600"><i class="fa fa-trash"></i></a></td></tr>
+            <tr><td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($p['title']); ?></td><td class="px-6 py-4 text-sm"><?php echo $p['slug']; ?></td><td class="px-6 py-4 text-sm"><?php echo $p['status'] ? '<span class="text-green-600 dark:text-green-400">Active</span>' : '<span class="text-red-600 dark:text-red-400">Inactive</span>'; ?></td><td class="px-6 py-4 text-sm space-x-2"><a href="?edit=<?php echo $p['id']; ?>" class="text-blue-600 dark:text-blue-400"><i class="fa fa-edit"></i></a> <a href="../page.php?slug=<?php echo $p['slug']; ?>" target="_blank" class="text-green-600 dark:text-green-400"><i class="fa fa-eye"></i></a> <a href="?delete=<?php echo $p['id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 dark:text-red-400"><i class="fa fa-trash"></i></a></td></tr>
             <?php endwhile; ?>
         </tbody>
     </table>

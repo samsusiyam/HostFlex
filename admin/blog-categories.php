@@ -54,48 +54,48 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Blog Categories</h1>
-    <p class="text-gray-500">Manage blog post categories</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Blog Categories</h1>
+    <p class="text-gray-500 dark:text-gray-400">Manage blog post categories</p>
 </div>
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold mb-4">Add Category</h2>
         <form method="POST" id="categoryForm">
             <?= csrfField() ?>
             <input type="hidden" name="edit_id" id="editId" value="0">
             <div class="space-y-3">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" name="name" id="catName" required class="w-full border rounded px-3 py-2"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Slug</label><input type="text" name="slug" id="catSlug" required class="w-full border rounded px-3 py-2" placeholder="my-category"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="description" id="catDesc" rows="3" class="w-full border rounded px-3 py-2"></textarea></div>
-                <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-plus mr-1"></i> Add Category</button>
-                <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 hidden" id="cancelBtn"><i class="fa fa-times mr-1"></i> Cancel</button>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label><input type="text" name="name" id="catName" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label><input type="text" name="slug" id="catSlug" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="my-category"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="description" id="catDesc" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>
+                <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-plus mr-1"></i> Add Category</button>
+                <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 hidden" id="cancelBtn"><i class="fa fa-times mr-1"></i> Cancel</button>
             </div>
         </form>
     </div>
-    <div class="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden">
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+            <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                 <tr>
-                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Name</th>
-                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Slug</th>
-                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Posts</th>
-                    <th class="text-right px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Name</th>
+                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Slug</th>
+                    <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Posts</th>
+                    <th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y dark:divide-gray-600">
                 <?php while ($cat = mysqli_fetch_assoc($categories)):
                     $post_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE category_id = {$cat['id']}"));
                 ?>
-                <tr class="hover:bg-gray-50">
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td class="px-4 py-3 text-sm font-medium"><?php echo htmlspecialchars($cat['name']); ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($cat['slug']); ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($cat['slug']); ?></td>
                     <td class="px-4 py-3 text-sm"><?php echo $post_count['c']; ?></td>
                     <td class="px-4 py-3 text-right">
-                        <button onclick="editCat(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['slug'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['description'] ?? '', ENT_QUOTES); ?>')" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fa fa-edit"></i></button>
-                        <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category? Related posts will become uncategorized.')" class="text-red-600 hover:text-red-800"><i class="fa fa-trash"></i></a>
+                        <button onclick="editCat(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['slug'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['description'] ?? '', ENT_QUOTES); ?>')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2"><i class="fa fa-edit"></i></button>
+                        <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category? Related posts will become uncategorized.')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
                 <?php endwhile; ?>

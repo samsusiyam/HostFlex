@@ -61,59 +61,59 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
 }
 include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Logo & Branding</h1>
-    <p class="text-gray-500">Header logo, footer logo, description text</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Logo & Branding</h1>
+    <p class="text-gray-500 dark:text-gray-400">Header logo, footer logo, description text</p>
 </div>
-<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
+<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST" enctype="multipart/form-data">
     <?= csrfField() ?>
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Header Logo</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Header Logo</label>
                 <?php $header_logo = $s['header_logo'] ?? ''; ?>
                 <?php if ($header_logo): ?>
-                <div class="mb-2"><img src="../<?php echo htmlspecialchars($header_logo); ?>" class="max-h-16 rounded border" id="headerLogoPreview"></div>
+                <div class="mb-2"><img src="../<?php echo htmlspecialchars($header_logo); ?>" class="max-h-16 rounded border dark:border-gray-600" id="headerLogoPreview"></div>
                 <?php else: ?>
-                <div class="mb-2"><img class="max-h-16 hidden rounded border" id="headerLogoPreview"></div>
+                <div class="mb-2"><img class="max-h-16 hidden rounded border dark:border-gray-600" id="headerLogoPreview"></div>
                 <?php endif; ?>
-                <input type="file" name="header_logo_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('headerLogoPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('headerLogoPreview').classList.remove('hidden')">
-                <input type="text" name="header_logo" value="<?php echo htmlspecialchars($header_logo); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2">
-                <p class="text-xs text-gray-400 mt-1">Upload image or enter path manually</p>
+                <input type="file" name="header_logo_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" onchange="document.getElementById('headerLogoPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('headerLogoPreview').classList.remove('hidden')">
+                <input type="text" name="header_logo" value="<?php echo htmlspecialchars($header_logo); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Upload image or enter path manually</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Footer Logo</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Footer Logo</label>
                 <?php $footer_logo = $s['footer_logo'] ?? ''; ?>
                 <?php if ($footer_logo): ?>
-                <div class="mb-2"><img src="../<?php echo htmlspecialchars($footer_logo); ?>" class="max-h-16 rounded border" id="footerLogoPreview"></div>
+                <div class="mb-2"><img src="../<?php echo htmlspecialchars($footer_logo); ?>" class="max-h-16 rounded border dark:border-gray-600" id="footerLogoPreview"></div>
                 <?php else: ?>
-                <div class="mb-2"><img class="max-h-16 hidden rounded border" id="footerLogoPreview"></div>
+                <div class="mb-2"><img class="max-h-16 hidden rounded border dark:border-gray-600" id="footerLogoPreview"></div>
                 <?php endif; ?>
-                <input type="file" name="footer_logo_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('footerLogoPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('footerLogoPreview').classList.remove('hidden')">
-                <input type="text" name="footer_logo" value="<?php echo htmlspecialchars($footer_logo); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2">
-                <p class="text-xs text-gray-400 mt-1">Upload image or enter path manually</p>
+                <input type="file" name="footer_logo_file" accept="image/*" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" onchange="document.getElementById('footerLogoPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('footerLogoPreview').classList.remove('hidden')">
+                <input type="text" name="footer_logo" value="<?php echo htmlspecialchars($footer_logo); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Upload image or enter path manually</p>
             </div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Footer Description Text</label>
-                <textarea name="footer_description" rows="3" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($s['footer_description'] ?? ''); ?></textarea>
-                <p class="text-xs text-gray-400 mt-1">Appears below the footer logo</p>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Footer Description Text</label>
+                <textarea name="footer_description" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($s['footer_description'] ?? ''); ?></textarea>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Appears below the footer logo</p>
             </div>
         </div>
     </div>
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4">Favicon</h2>
         <div>
             <?php $favicon = $s['favicon'] ?? ''; ?>
             <?php if ($favicon): ?>
-            <div class="mb-2"><img src="../<?php echo htmlspecialchars($favicon); ?>" class="h-10 rounded border" id="faviconPreview"></div>
+            <div class="mb-2"><img src="../<?php echo htmlspecialchars($favicon); ?>" class="h-10 rounded border dark:border-gray-600" id="faviconPreview"></div>
             <?php else: ?>
-            <div class="mb-2"><img class="h-10 hidden rounded border" id="faviconPreview"></div>
+            <div class="mb-2"><img class="h-10 hidden rounded border dark:border-gray-600" id="faviconPreview"></div>
             <?php endif; ?>
-            <input type="file" name="favicon_file" accept="image/x-icon,image/png,image/gif,image/webp,image/svg+xml" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('faviconPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('faviconPreview').classList.remove('hidden')">
-            <input type="text" name="favicon" value="<?php echo htmlspecialchars($favicon); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2">
-            <p class="text-xs text-gray-400 mt-1">Upload .ico, .png, .svg or enter path manually</p>
+            <input type="file" name="favicon_file" accept="image/x-icon,image/png,image/gif,image/webp,image/svg+xml" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" onchange="document.getElementById('faviconPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('faviconPreview').classList.remove('hidden')">
+            <input type="text" name="favicon" value="<?php echo htmlspecialchars($favicon); ?>" placeholder="Or enter path" class="w-full border rounded px-3 py-2 text-sm mt-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Upload .ico, .png, .svg or enter path manually</p>
         </div>
     </div>
-    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>
+    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-save"></i> Save Settings</button>
 </form>
 <?php include 'footer.php'; ?>

@@ -51,42 +51,42 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">SMTP Settings</h1>
-    <p class="text-gray-500">Configure outgoing email server settings</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">SMTP Settings</h1>
+    <p class="text-gray-500 dark:text-gray-400">Configure outgoing email server settings</p>
 </div>
 
-<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><?php echo $success; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300 px-4 py-3 rounded-lg mb-4"><?php echo $success; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST">
     <?= csrfField() ?>
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-server text-purple-600 mr-2"></i> SMTP Configuration</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-server text-purple-600 dark:text-purple-400 mr-2"></i> SMTP Configuration</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">SMTP Host</label><input type="text" name="smtp_host" value="<?php echo htmlspecialchars($s['smtp_host'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="smtp.gmail.com"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Port</label><input type="number" name="smtp_port" value="<?php echo htmlspecialchars($s['smtp_port'] ?? '587'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="587"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Encryption</label><select name="smtp_encryption" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">SMTP Host</label><input type="text" name="smtp_host" value="<?php echo htmlspecialchars($s['smtp_host'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="smtp.gmail.com"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Port</label><input type="number" name="smtp_port" value="<?php echo htmlspecialchars($s['smtp_port'] ?? '587'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="587"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Encryption</label><select name="smtp_encryption" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 <option value="">NONE</option>
                 <option value="tls" <?php echo ($s['smtp_encryption'] ?? '') === 'tls' ? 'selected' : ''; ?>>TLS</option>
                 <option value="ssl" <?php echo ($s['smtp_encryption'] ?? '') === 'ssl' ? 'selected' : ''; ?>>SSL</option>
             </select></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Username</label><input type="text" name="smtp_username" value="<?php echo htmlspecialchars($s['smtp_username'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" autocomplete="off"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" name="smtp_password" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" autocomplete="new-password" placeholder="Leave blank to keep current"><p class="text-xs text-gray-400 mt-1">Leave blank to keep existing password</p></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Username</label><input type="text" name="smtp_username" value="<?php echo htmlspecialchars($s['smtp_username'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" autocomplete="off"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password</label><input type="password" name="smtp_password" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" autocomplete="new-password" placeholder="Leave blank to keep current"><p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Leave blank to keep existing password</p></div>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-envelope text-blue-600 mr-2"></i> Sender Details</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-envelope text-blue-600 dark:text-blue-400 mr-2"></i> Sender Details</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">From Email</label><input type="email" name="smtp_from_email" value="<?php echo htmlspecialchars($s['smtp_from_email'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="noreply@example.com"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">From Name</label><input type="text" name="smtp_from_name" value="<?php echo htmlspecialchars($s['smtp_from_name'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Your Site Name"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Reply-To Email</label><input type="email" name="smtp_reply_to" value="<?php echo htmlspecialchars($s['smtp_reply_to'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="reply@example.com"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">From Email</label><input type="email" name="smtp_from_email" value="<?php echo htmlspecialchars($s['smtp_from_email'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="noreply@example.com"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">From Name</label><input type="text" name="smtp_from_name" value="<?php echo htmlspecialchars($s['smtp_from_name'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Your Site Name"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Reply-To Email</label><input type="email" name="smtp_reply_to" value="<?php echo htmlspecialchars($s['smtp_reply_to'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="reply@example.com"></div>
         </div>
     </div>
 
     <div class="flex items-center gap-4">
-        <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save Settings</button>
-        <button type="submit" name="test_email" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition shadow font-medium"><i class="fa fa-paper-plane mr-1"></i> Send Test Email</button>
+        <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save Settings</button>
+        <button type="submit" name="test_email" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow font-medium"><i class="fa fa-paper-plane mr-1"></i> Send Test Email</button>
     </div>
 </form>
 

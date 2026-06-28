@@ -36,48 +36,48 @@ if (isset($_GET['clear']) && $_GET['clear'] == '1') {
 <?php include 'header.php'; ?>
 <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">Activity Logs</h1>
-        <p class="text-gray-500">Track admin user actions</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Activity Logs</h1>
+        <p class="text-gray-500 dark:text-gray-400">Track admin user actions</p>
     </div>
     <?php if (!$no_table): ?>
     <div class="flex gap-2">
-        <a href="?clear=1" onclick="return confirm('Clear all logs?')" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700"><i class="fa fa-trash mr-1"></i> Clear Logs</a>
+        <a href="?clear=1" onclick="return confirm('Clear all logs?')" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700 dark:hover:bg-red-600"><i class="fa fa-trash mr-1"></i> Clear Logs</a>
     </div>
     <?php endif; ?>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <div class="p-4 border-b flex items-center justify-between">
+<div class="bg-white rounded-lg shadow overflow-hidden dark:bg-gray-800">
+    <div class="p-4 border-b flex items-center justify-between dark:border-gray-600">
         <form method="GET" class="flex gap-2">
-            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search logs..." class="border rounded px-3 py-2 text-sm">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search logs..." class="border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
             <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded text-sm"><i class="fa fa-search"></i></button>
-            <?php if ($search): ?><a href="activity-logs.php" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm">Clear</a><?php endif; ?>
+            <?php if ($search): ?><a href="activity-logs.php" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm dark:bg-gray-600 dark:text-gray-200">Clear</a><?php endif; ?>
         </form>
-        <span class="text-sm text-gray-500"><?php echo $total; ?> total</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400"><?php echo $total; ?> total</span>
     </div>
     <table class="w-full">
-        <thead class="bg-gray-50 border-b">
+        <thead class="bg-gray-50 border-b dark:bg-gray-700 dark:border-gray-600">
             <tr>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">User</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Action</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Details</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">IP</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Time</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">User</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Action</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Details</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">IP</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Time</th>
             </tr>
         </thead>
-        <tbody class="divide-y">
+        <tbody class="divide-y dark:divide-gray-600">
             <?php if ($no_table): ?>
-            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">Please run <code>config/migrate-system.php</code> to create required tables.</td></tr>
+            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">Please run <code>config/migrate-system.php</code> to create required tables.</td></tr>
             <?php elseif (mysqli_num_rows($logs) > 0): while ($log = mysqli_fetch_assoc($logs)): ?>
-            <tr class="hover:bg-gray-50 text-sm">
+            <tr class="hover:bg-gray-50 text-sm dark:hover:bg-gray-700">
                 <td class="px-4 py-3 font-medium"><?php echo htmlspecialchars($log['username']); ?></td>
-                <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700"><?php echo htmlspecialchars($log['action']); ?></span></td>
-                <td class="px-4 py-3 text-gray-500 max-w-xs truncate"><?php echo htmlspecialchars($log['details'] ?? '-'); ?></td>
-                <td class="px-4 py-3 text-gray-500 font-mono"><?php echo htmlspecialchars($log['ip_address']); ?></td>
-                <td class="px-4 py-3 text-gray-500 whitespace-nowrap"><?php echo date('d M Y H:i', strtotime($log['created_at'])); ?></td>
+                <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"><?php echo htmlspecialchars($log['action']); ?></span></td>
+                <td class="px-4 py-3 text-gray-500 max-w-xs truncate dark:text-gray-400"><?php echo htmlspecialchars($log['details'] ?? '-'); ?></td>
+                <td class="px-4 py-3 text-gray-500 font-mono dark:text-gray-400"><?php echo htmlspecialchars($log['ip_address']); ?></td>
+                <td class="px-4 py-3 text-gray-500 whitespace-nowrap dark:text-gray-400"><?php echo date('d M Y H:i', strtotime($log['created_at'])); ?></td>
             </tr>
             <?php endwhile; else: ?>
-            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No logs yet.</td></tr>
+            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No logs yet.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -85,7 +85,7 @@ if (isset($_GET['clear']) && $_GET['clear'] == '1') {
 <?php if (!$no_table && $pages > 1): ?>
 <div class="flex justify-center mt-4 gap-1">
     <?php for ($i = 1; $i <= $pages; $i++): ?>
-    <a href="?p=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-1 rounded text-sm <?php echo $i == $page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
+    <a href="?p=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-1 rounded text-sm <?php echo $i == $page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'; ?>"><?php echo $i; ?></a>
     <?php endfor; ?>
 </div>
 <?php endif; ?>

@@ -87,51 +87,51 @@ $templates = mysqli_query($conn, "SELECT * FROM email_templates ORDER BY name AS
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6 flex justify-between items-center">
-    <div><h1 class="text-2xl font-bold text-gray-800">Email Templates</h1><p class="text-gray-500">Manage transactional email templates for your site</p></div>
-    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa fa-plus"></i> Add Template</a>
+    <div><h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Email Templates</h1><p class="text-gray-500 dark:text-gray-400">Manage transactional email templates for your site</p></div>
+    <a href="?action=add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-plus"></i> Add Template</a>
 </div>
 
 <?php if (isset($_GET['action']) || $edit): ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
+<div class="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-800">
     <h2 class="text-lg font-semibold mb-4"><?php echo $edit ? 'Edit Template' : 'Add Template'; ?></h2>
     <form method="POST">
         <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input type="text" name="name" value="<?php echo $edit ? htmlspecialchars($edit['name']) : ''; ?>" required class="w-full border rounded px-3 py-2" placeholder="e.g. Welcome Email">
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Name</label>
+                <input type="text" name="name" value="<?php echo $edit ? htmlspecialchars($edit['name']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="e.g. Welcome Email">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                <input type="text" name="subject" value="<?php echo $edit ? htmlspecialchars($edit['subject']) : ''; ?>" required class="w-full border rounded px-3 py-2" placeholder="e.g. Welcome to {site_name}!">
-                <p class="text-xs text-gray-400 mt-1">Use variables like <code class="bg-gray-100 px-1 rounded">{name}</code>, <code class="bg-gray-100 px-1 rounded">{site_name}</code></p>
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Subject</label>
+                <input type="text" name="subject" value="<?php echo $edit ? htmlspecialchars($edit['subject']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="e.g. Welcome to {site_name}!">
+                <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">Use variables like <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{name}</code>, <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{site_name}</code></p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Variables (comma-separated)</label>
-                <input type="text" name="variables" value="<?php echo $edit ? htmlspecialchars($edit['variables']) : ''; ?>" class="w-full border rounded px-3 py-2" placeholder="name,email,site_name" readonly onfocus="this.removeAttribute('readonly')">
-                <p class="text-xs text-gray-400 mt-1">Available: <code class="bg-gray-100 px-1 rounded">{name}</code> <code class="bg-gray-100 px-1 rounded">{email}</code> <code class="bg-gray-100 px-1 rounded">{site_name}</code> <code class="bg-gray-100 px-1 rounded">{site_url}</code> <code class="bg-gray-100 px-1 rounded">{reset_link}</code> <code class="bg-gray-100 px-1 rounded">{message}</code></p>
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Variables (comma-separated)</label>
+                <input type="text" name="variables" value="<?php echo $edit ? htmlspecialchars($edit['variables']) : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="name,email,site_name" readonly onfocus="this.removeAttribute('readonly')">
+                <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">Available: <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{name}</code> <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{email}</code> <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{site_name}</code> <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{site_url}</code> <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{reset_link}</code> <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{message}</code></p>
             </div>
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Body (HTML)</label>
-                <textarea name="body" rows="15" class="w-full border rounded px-3 py-2 font-mono text-sm"><?php echo $edit ? htmlspecialchars($edit['body']) : ''; ?></textarea>
-                <p class="text-xs text-gray-400 mt-1">Use any variables listed above wrapped in curly braces, e.g. <code class="bg-gray-100 px-1 rounded">{name}</code></p>
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Body (HTML)</label>
+                <textarea name="body" rows="15" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 font-mono text-sm"><?php echo $edit ? htmlspecialchars($edit['body']) : ''; ?></textarea>
+                <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">Use any variables listed above wrapped in curly braces, e.g. <code class="bg-gray-100 px-1 rounded dark:bg-gray-700">{name}</code></p>
             </div>
         </div>
         <div class="mt-4 flex items-center space-x-4">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><?php echo $edit ? 'Update' : 'Add'; ?></button>
-            <a href="email-templates.php" class="text-gray-600 px-4 py-2 border rounded hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><?php echo $edit ? 'Update' : 'Add'; ?></button>
+            <a href="email-templates.php" class="text-gray-600 px-4 py-2 border rounded hover:bg-gray-50 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700">Cancel</a>
         </div>
     </form>
 </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow overflow-hidden dark:bg-gray-800">
     <table class="min-w-full">
-        <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Updated</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead>
-        <tbody class="divide-y divide-gray-200">
+        <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Subject</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Updated</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Actions</th></tr></thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
             <?php while ($t = mysqli_fetch_assoc($templates)): ?>
-            <tr><td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($t['name']); ?></td><td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($t['subject']); ?></td><td class="px-6 py-4 text-sm"><?php echo $t['updated_at']; ?></td><td class="px-6 py-4 text-sm space-x-2"><a href="?edit=<?php echo $t['id']; ?>" class="text-blue-600"><i class="fa fa-edit"></i></a> <a href="?delete=<?php echo $t['id']; ?>" onclick="return confirm('Delete this template?')" class="text-red-600"><i class="fa fa-trash"></i></a></td></tr>
+            <tr><td class="px-6 py-4 text-sm font-medium"><?php echo htmlspecialchars($t['name']); ?></td><td class="px-6 py-4 text-sm"><?php echo htmlspecialchars($t['subject']); ?></td><td class="px-6 py-4 text-sm"><?php echo $t['updated_at']; ?></td><td class="px-6 py-4 text-sm space-x-2"><a href="?edit=<?php echo $t['id']; ?>" class="text-blue-600 dark:text-blue-400"><i class="fa fa-edit"></i></a> <a href="?delete=<?php echo $t['id']; ?>" onclick="return confirm('Delete this template?')" class="text-red-600 dark:text-red-400"><i class="fa fa-trash"></i></a></td></tr>
             <?php endwhile; ?>
         </tbody>
     </table>

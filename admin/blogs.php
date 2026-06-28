@@ -135,17 +135,17 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
 <?php include 'header.php'; ?>
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">Blog Posts</h1>
-        <p class="text-gray-500">Create and manage blog posts</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Blog Posts</h1>
+        <p class="text-gray-500 dark:text-gray-400">Create and manage blog posts</p>
     </div>
-    <a href="?edit=0" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm <?php echo $edit_post !== null ? 'hidden' : ''; ?>"><i class="fa fa-plus mr-1"></i> New Post</a>
+    <a href="?edit=0" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 text-sm <?php echo $edit_post !== null ? 'hidden' : ''; ?>"><i class="fa fa-plus mr-1"></i> New Post</a>
 </div>
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <?php if ($edit_post !== null || isset($_GET['edit'])): ?>
 <?php $ep = $edit_post; $is_new = !$ep && isset($_GET['edit']) && $_GET['edit'] == 0; $ep = $ep ?: ['id'=>0,'title'=>'','slug'=>'','content'=>'','excerpt'=>'','image'=>'','category_id'=>0,'author'=>$admin_username,'status'=>1,'meta_description'=>'','meta_keywords'=>'']; ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $is_new ? 'New Post' : 'Edit Post'; ?></h2>
     <form method="POST" enctype="multipart/form-data">
         <?= csrfField() ?>
@@ -153,104 +153,104 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2">
                 <div class="space-y-4">
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Title</label><input type="text" name="title" value="<?php echo htmlspecialchars($ep['title']); ?>" required class="w-full border rounded px-3 py-2"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Slug</label><input type="text" name="slug" value="<?php echo htmlspecialchars($ep['slug']); ?>" required class="w-full border rounded px-3 py-2" placeholder="my-post-title"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                        <textarea name="content" id="blogContent" rows="16" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($ep['content']); ?></textarea>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label><input type="text" name="title" value="<?php echo htmlspecialchars($ep['title']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label><input type="text" name="slug" value="<?php echo htmlspecialchars($ep['slug']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="my-post-title"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Content</label>
+                        <textarea name="content" id="blogContent" rows="16" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($ep['content']); ?></textarea>
                     </div>
                 </div>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category</label>
                     <div class="flex gap-2">
-                        <select name="category_id" id="catSelect" class="flex-1 border rounded px-3 py-2">
+                        <select name="category_id" id="catSelect" class="flex-1 border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                             <option value="">None</option>
                             <?php foreach ($all_cats as $c): ?>
                             <option value="<?php echo $c['id']; ?>" <?php echo $ep['category_id'] == $c['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($c['name']); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="button" onclick="showCatForm()" class="bg-green-600 text-white px-3 py-2 rounded text-sm" title="Add Category"><i class="fa fa-plus"></i></button>
-                        <button type="button" onclick="editCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm" title="Edit Category"><i class="fa fa-pencil-alt"></i></button>
-                        <button type="button" onclick="deleteCat()" class="bg-red-600 text-white px-3 py-2 rounded text-sm" title="Delete Category"><i class="fa fa-trash"></i></button>
+                        <button type="button" onclick="showCatForm()" class="bg-green-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-green-600" title="Add Category"><i class="fa fa-plus"></i></button>
+                        <button type="button" onclick="editCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-blue-600" title="Edit Category"><i class="fa fa-pencil-alt"></i></button>
+                        <button type="button" onclick="deleteCat()" class="bg-red-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-red-600" title="Delete Category"><i class="fa fa-trash"></i></button>
                     </div>
-                    <div id="catForm" class="hidden mt-2 p-2 bg-gray-50 rounded border flex gap-2 items-center">
-                        <input type="text" id="catName" placeholder="Category name" class="flex-1 border rounded px-3 py-2 text-sm">
+                    <div id="catForm" class="hidden mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600 flex gap-2 items-center">
+                        <input type="text" id="catName" placeholder="Category name" class="flex-1 border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                         <input type="hidden" id="catEditId" value="">
-                        <button type="button" onclick="saveCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Save</button>
-                        <button type="button" onclick="hideCatForm()" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm">Cancel</button>
+                        <button type="button" onclick="saveCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-blue-600">Save</button>
+                        <button type="button" onclick="hideCatForm()" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
                     </div>
-                    <p class="text-xs text-gray-400 mt-1">Manage categories inline</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Manage categories inline</p>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                    <input type="text" name="author" value="<?php echo htmlspecialchars($ep['author']); ?>" class="w-full border rounded px-3 py-2">
-                    <p class="text-xs text-gray-400 mt-1">Auto-filled with your username</p>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Author</label>
+                    <input type="text" name="author" value="<?php echo htmlspecialchars($ep['author']); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Auto-filled with your username</p>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
-                    <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('blogImgPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('blogImgPreview').classList.remove('hidden')">
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Featured Image</label>
+                    <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" onchange="document.getElementById('blogImgPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('blogImgPreview').classList.remove('hidden')">
                     <?php if ($ep['image']): ?>
-                    <img id="blogImgPreview" src="../<?php echo htmlspecialchars($ep['image']); ?>" class="mt-2 max-h-32 rounded border">
+                    <img id="blogImgPreview" src="../<?php echo htmlspecialchars($ep['image']); ?>" class="mt-2 max-h-32 rounded border dark:border-gray-600">
                     <?php else: ?>
-                    <img id="blogImgPreview" class="mt-2 max-h-32 rounded border hidden">
+                    <img id="blogImgPreview" class="mt-2 max-h-32 rounded border dark:border-gray-600 hidden">
                     <?php endif; ?>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Excerpt</label><textarea name="excerpt" rows="2" class="w-full border rounded px-3 py-2 text-sm"><?php echo htmlspecialchars($ep['excerpt']); ?></textarea></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Excerpt</label><textarea name="excerpt" rows="2" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($ep['excerpt']); ?></textarea></div>
                 <hr>
-                <p class="text-sm font-semibold text-gray-700">SEO</p>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label><textarea name="meta_description" rows="2" class="w-full border rounded px-3 py-2 text-sm"><?php echo htmlspecialchars($ep['meta_description']); ?></textarea></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($ep['meta_keywords']); ?>" class="w-full border rounded px-3 py-2 text-sm"></div>
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">SEO</p>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><textarea name="meta_description" rows="2" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($ep['meta_description']); ?></textarea></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($ep['meta_keywords']); ?>" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" name="status" value="1" id="postStatus" <?php echo $ep['status'] ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded">
-                    <label for="postStatus" class="text-sm font-medium text-gray-700">Published</label>
+                    <input type="checkbox" name="status" value="1" id="postStatus" <?php echo $ep['status'] ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 dark:text-blue-400 border dark:border-gray-600 rounded">
+                    <label for="postStatus" class="text-sm font-medium text-gray-700 dark:text-gray-200">Published</label>
                 </div>
-                <button type="submit" name="save_post" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 w-full"><i class="fa fa-save mr-1"></i> <?php echo $is_new ? 'Create Post' : 'Update Post'; ?></button>
+                <button type="submit" name="save_post" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600 w-full"><i class="fa fa-save mr-1"></i> <?php echo $is_new ? 'Create Post' : 'Update Post'; ?></button>
             </div>
         </div>
     </form>
 </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <div class="p-4 border-b flex items-center justify-between">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b dark:border-gray-600 flex items-center justify-between">
         <form method="GET" class="flex gap-2">
-            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search posts..." class="border rounded px-3 py-2 text-sm">
-            <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded text-sm"><i class="fa fa-search"></i></button>
-            <?php if ($search): ?><a href="blogs.php" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm">Clear</a><?php endif; ?>
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search posts..." class="border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+            <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-blue-600"><i class="fa fa-search"></i></button>
+            <?php if ($search): ?><a href="blogs.php" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Clear</a><?php endif; ?>
         </form>
-        <span class="text-sm text-gray-500"><?php echo $total; ?> total</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400"><?php echo $total; ?> total</span>
     </div>
     <table class="w-full">
-        <thead class="bg-gray-50 border-b">
+        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
             <tr>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Title</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Category</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Author</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Date</th>
-                <th class="text-right px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Title</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Category</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Author</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Date</th>
+                <th class="text-right px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y">
+        <tbody class="divide-y dark:divide-gray-600">
             <?php if (mysqli_num_rows($posts) > 0): while ($post = mysqli_fetch_assoc($posts)): ?>
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td class="px-4 py-3 text-sm font-medium">
                     <?php if ($post['image']): ?><img src="../<?php echo htmlspecialchars($post['image']); ?>" class="w-8 h-8 object-cover rounded inline mr-2"><?php endif; ?>
                     <?php echo htmlspecialchars($post['title']); ?>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($post['category_name'] ?? 'Uncategorized'); ?></td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($post['author'] ?: '-'); ?></td>
+                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($post['category_name'] ?? 'Uncategorized'); ?></td>
+                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($post['author'] ?: '-'); ?></td>
                 <td class="px-4 py-3">
-                    <span class="text-xs px-2 py-1 rounded-full <?php echo $post['status'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'; ?>"><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
+                    <span class="text-xs px-2 py-1 rounded-full <?php echo $post['status'] ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'; ?>"><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo date('d M Y', strtotime($post['created_at'])); ?></td>
+                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo date('d M Y', strtotime($post['created_at'])); ?></td>
                 <td class="px-4 py-3 text-right">
-                    <a href="../blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 mr-2" title="View"><i class="fa fa-eye"></i></a>
-                    <a href="?edit=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 mr-2" title="Edit"><i class="fa fa-edit"></i></a>
-                    <a href="?delete=<?php echo $post['id']; ?>" onclick="return confirm('Delete this post?')" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa fa-trash"></i></a>
+                    <a href="../blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 mr-2" title="View"><i class="fa fa-eye"></i></a>
+                    <a href="?edit=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2" title="Edit"><i class="fa fa-edit"></i></a>
+                    <a href="?delete=<?php echo $post['id']; ?>" onclick="return confirm('Delete this post?')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" title="Delete"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
             <?php endwhile; else: ?>
-            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No posts yet.</td></tr>
+            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No posts yet.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -258,7 +258,7 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
 <?php if ($pages > 1): ?>
 <div class="flex justify-center mt-4 gap-1">
     <?php for ($i = 1; $i <= $pages; $i++): ?>
-    <a href="?p=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-1 rounded text-sm <?php echo $i == $page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
+    <a href="?p=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-1 rounded text-sm <?php echo $i == $page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'; ?>"><?php echo $i; ?></a>
     <?php endfor; ?>
 </div>
 <?php endif; ?>

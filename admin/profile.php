@@ -58,54 +58,54 @@ $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = 
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Admin Profile</h1>
-    <p class="text-gray-500">Manage your account information and password</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Admin Profile</h1>
+    <p class="text-gray-500 dark:text-gray-400">Manage your account information and password</p>
 </div>
 
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $msg; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300"><?php echo $error; ?></div><?php endif; ?>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-user text-blue-600 mr-2"></i> Account Info</h2>
+    <div class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-user text-blue-600 mr-2 dark:text-blue-400"></i> Account Info</h2>
         <form method="POST">
             <?= csrfField() ?>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                    <input type="text" name="username" value="<?php echo htmlspecialchars($admin['username']); ?>" required class="w-full border rounded px-3 py-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Username</label>
+                    <input type="text" name="username" value="<?php echo htmlspecialchars($admin['username']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" required class="w-full border rounded px-3 py-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Email</label>
+                    <input type="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
-                    <p class="text-gray-500 text-sm"><?php echo date('d M Y, g:i a', strtotime($admin['created_at'])); ?></p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Member Since</label>
+                    <p class="text-gray-500 text-sm dark:text-gray-400"><?php echo date('d M Y, g:i a', strtotime($admin['created_at'])); ?></p>
                 </div>
-                <button type="submit" name="update_info" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"><i class="fa fa-save mr-1"></i> Update Info</button>
+                <button type="submit" name="update_info" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-save mr-1"></i> Update Info</button>
             </div>
         </form>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-lock text-green-600 mr-2"></i> Change Password</h2>
+    <div class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
+        <h2 class="text-lg font-semibold mb-4 flex items-center"><i class="fa fa-lock text-green-600 mr-2 dark:text-green-400"></i> Change Password</h2>
         <form method="POST">
             <?= csrfField() ?>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                    <input type="password" name="current_password" required class="w-full border rounded px-3 py-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Current Password</label>
+                    <input type="password" name="current_password" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                    <input type="password" name="new_password" required class="w-full border rounded px-3 py-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">New Password</label>
+                    <input type="password" name="new_password" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-                    <input type="password" name="confirm_password" required class="w-full border rounded px-3 py-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">Confirm New Password</label>
+                    <input type="password" name="confirm_password" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                 </div>
-                <button type="submit" name="change_password" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700"><i class="fa fa-key mr-1"></i> Change Password</button>
+                <button type="submit" name="change_password" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600"><i class="fa fa-key mr-1"></i> Change Password</button>
             </div>
         </form>
     </div>

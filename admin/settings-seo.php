@@ -29,18 +29,18 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">SEO Settings</h1>
-    <p class="text-gray-500">Meta tags for search engines</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">SEO Settings</h1>
+    <p class="text-gray-500 dark:text-gray-400">Meta tags for search engines</p>
 </div>
-<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
+<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST">
     <?= csrfField() ?>
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($s['meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2" placeholder="hosting, domain, web hosting"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Author</label><input type="text" name="meta_author" value="<?php echo htmlspecialchars($s['meta_author'] ?? ''); ?>" class="w-full border rounded px-3 py-2" placeholder="<?php echo escSetting('site_name'); ?>"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($s['meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="hosting, domain, web hosting"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Author</label><input type="text" name="meta_author" value="<?php echo htmlspecialchars($s['meta_author'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="<?php echo escSetting('site_name'); ?>"></div>
         </div>
     </div>
-    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>
+    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-save"></i> Save Settings</button>
 </form>
 <?php include 'footer.php'; ?>

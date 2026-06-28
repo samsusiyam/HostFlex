@@ -221,13 +221,13 @@ $type_icons = ['hero' => 'fa-film', 'domain_search' => 'fa-search', 'features' =
 <?php include 'header.php'; ?>
 <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">Homepage Editor</h1>
-        <p class="text-gray-500">Drag, edit, and manage homepage sections</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Homepage Editor</h1>
+        <p class="text-gray-500 dark:text-gray-400">Drag, edit, and manage homepage sections</p>
     </div>
 </div>
 
-<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"><?php echo $success; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"><?php echo $error; ?></div><?php endif; ?>
+<?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $success; ?></div><?php endif; ?>
+<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300"><?php echo $error; ?></div><?php endif; ?>
 
 <form method="POST" id="sectionsForm" enctype="multipart/form-data">
 <?= csrfField() ?>
@@ -240,53 +240,53 @@ $type_icons = ['hero' => 'fa-film', 'domain_search' => 'fa-search', 'features' =
     $label = $type_labels[$type] ?? ucfirst($type);
     $enabled = ($section['enabled'] ?? '1') === '1';
 ?>
-<div class="section-card bg-white rounded-xl shadow-md border border-gray-200 mb-5 overflow-hidden" data-index="<?php echo $idx; ?>">
-    <div class="flex items-center justify-between px-5 py-3 bg-gray-50 border-b border-gray-200">
+<div class="section-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 mb-5 overflow-hidden" data-index="<?php echo $idx; ?>">
+    <div class="flex items-center justify-between px-5 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center gap-3 flex-1">
-            <span class="text-gray-400 cursor-move"><i class="fa fa-grip-vertical"></i></span>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700"><i class="fa <?php echo $icon; ?> mr-1"></i> <?php echo $label; ?></span>
-            <input type="number" name="sections[<?php echo $idx; ?>][sort_order]" value="<?php echo $section['sort_order'] ?? 0; ?>" class="w-16 text-center border rounded text-sm px-2 py-1" placeholder="Order">
+            <span class="text-gray-400 dark:text-gray-500 cursor-move"><i class="fa fa-grip-vertical"></i></span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700<?php echo ($color === 'gray') ? ' dark:bg-gray-700 dark:text-gray-300' : ' dark:bg-' . $color . '-900/50 dark:text-' . $color . '-300'; ?>"><i class="fa <?php echo $icon; ?> mr-1"></i> <?php echo $label; ?></span>
+            <input type="number" name="sections[<?php echo $idx; ?>][sort_order]" value="<?php echo $section['sort_order'] ?? 0; ?>" class="w-16 text-center border rounded text-sm px-2 py-1 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Order">
             <input type="hidden" name="sections[<?php echo $idx; ?>][type]" value="<?php echo $type; ?>">
         </div>
         <div class="flex items-center gap-3">
             <label class="flex items-center cursor-pointer select-none text-sm">
                 <input type="checkbox" name="sections[<?php echo $idx; ?>][enabled]" value="1" <?php echo $enabled ? 'checked' : ''; ?> class="mr-1.5 rounded">
-                <span class="text-gray-600 font-medium">Active</span>
+                <span class="text-gray-600 dark:text-gray-300 font-medium">Active</span>
             </label>
-            <button type="button" onclick="toggleEdit(<?php echo $idx; ?>)" class="text-blue-600 hover:text-blue-800 hover:scale-110 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></button>
-            <button type="button" onclick="deleteSection(<?php echo $idx; ?>)" class="text-red-600 hover:text-red-800 hover:scale-110 transition-transform" title="Delete"><i class="fa fa-trash-alt"></i></button>
+            <button type="button" onclick="toggleEdit(<?php echo $idx; ?>)" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:scale-110 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></button>
+            <button type="button" onclick="deleteSection(<?php echo $idx; ?>)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110 transition-transform" title="Delete"><i class="fa fa-trash-alt"></i></button>
         </div>
     </div>
     <div class="section-edit-body px-5 py-4 <?php echo $idx === 0 ? '' : 'hidden'; ?>" id="editBody<?php echo $idx; ?>">
         <?php if ($type === 'hero'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Tagline</label><input type="text" name="sections[<?php echo $idx; ?>][content][tagline]" value="<?php echo htmlspecialchars($content['tagline'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="sections[<?php echo $idx; ?>][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($content['description'] ?? ''); ?></textarea></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tagline</label><input type="text" name="sections[<?php echo $idx; ?>][content][tagline]" value="<?php echo htmlspecialchars($content['tagline'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="sections[<?php echo $idx; ?>][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($content['description'] ?? ''); ?></textarea></div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label>
                 <div class="flex items-center gap-2">
-                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/cloud.jpg'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="heroImg<?php echo $idx; ?>">
-                    <label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'heroImg<?php echo $idx; ?>', 'heroPrev<?php echo $idx; ?>')"></label>
+                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/cloud.jpg'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="heroImg<?php echo $idx; ?>">
+                    <label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'heroImg<?php echo $idx; ?>', 'heroPrev<?php echo $idx; ?>')"></label>
                 </div>
-                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/cloud.jpg'); ?>" class="mt-2 max-h-24 rounded border" id="heroPrev<?php echo $idx; ?>">
+                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/cloud.jpg'); ?>" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="heroPrev<?php echo $idx; ?>">
             </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Button Text</label><input type="text" name="sections[<?php echo $idx; ?>][content][button_text]" value="<?php echo htmlspecialchars($content['button_text'] ?? 'Get Started'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Button URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][button_url]" value="<?php echo htmlspecialchars($content['button_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Chat Text</label><input type="text" name="sections[<?php echo $idx; ?>][content][chat_text]" value="<?php echo htmlspecialchars($content['chat_text'] ?? 'Live Chat'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Chat URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][chat_url]" value="<?php echo htmlspecialchars($content['chat_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Button Text</label><input type="text" name="sections[<?php echo $idx; ?>][content][button_text]" value="<?php echo htmlspecialchars($content['button_text'] ?? 'Get Started'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Button URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][button_url]" value="<?php echo htmlspecialchars($content['button_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Chat Text</label><input type="text" name="sections[<?php echo $idx; ?>][content][chat_text]" value="<?php echo htmlspecialchars($content['chat_text'] ?? 'Live Chat'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Chat URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][chat_url]" value="<?php echo htmlspecialchars($content['chat_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <?php elseif ($type === 'domain_search'): ?>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Search URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][search_url]" value="<?php echo htmlspecialchars($content['search_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Search URL</label><input type="text" name="sections[<?php echo $idx; ?>][content][search_url]" value="<?php echo htmlspecialchars($content['search_url'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Pricing Items</label>
-                <textarea name="sections[<?php echo $idx; ?>][content][pricing_items]" rows="5" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500"><?php
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Pricing Items</label>
+                <textarea name="sections[<?php echo $idx; ?>][content][pricing_items]" rows="5" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php
                     $pricing = $content['pricing'] ?? [];
                     foreach ($pricing as $p) {
                         echo htmlspecialchars(($p['tld'] ?? '') . '|' . ($p['price'] ?? '')) . "\n";
                     }
                 ?></textarea>
-                <p class="text-xs text-gray-400 mt-1">One per line: TLD|Price (e.g., .com|999)</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">One per line: TLD|Price (e.g., .com|999)</p>
             </div>
         </div>
         <?php elseif ($type === 'features'): ?>
@@ -306,83 +306,83 @@ $type_icons = ['hero' => 'fa-film', 'domain_search' => 'fa-search', 'features' =
         }
         ?>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Feature Cards</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Feature Cards</label>
                 <div id="featuresContainer<?php echo $idx; ?>" class="space-y-3" data-card-count="<?php echo count($cards); ?>">
                     <?php foreach ($cards as $ci => $card): ?>
-                    <div class="card-item border rounded-lg p-3 bg-gray-50">
+                    <div class="card-item border rounded-lg p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                         <div class="flex gap-2 mb-2">
                             <div class="flex-1">
-                                <input type="text" name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][icon]" placeholder="Icon path" value="<?php echo htmlspecialchars($card['icon'] ?? ''); ?>" class="w-full border rounded px-3 py-2 text-sm" id="cardIcon<?php echo $idx; ?>_<?php echo $ci; ?>">
+                                <input type="text" name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][icon]" placeholder="Icon path" value="<?php echo htmlspecialchars($card['icon'] ?? ''); ?>" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="cardIcon<?php echo $idx; ?>_<?php echo $ci; ?>">
                             </div>
-                            <label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'cardIcon<?php echo $idx; ?>_<?php echo $ci; ?>', 'cardPrev<?php echo $idx; ?>_<?php echo $ci; ?>')"></label>
-                            <button type="button" onclick="this.closest('.card-item').remove()" class="text-red-600 hover:text-red-800 px-2"><i class="fa fa-trash"></i></button>
+                            <label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'cardIcon<?php echo $idx; ?>_<?php echo $ci; ?>', 'cardPrev<?php echo $idx; ?>_<?php echo $ci; ?>')"></label>
+                            <button type="button" onclick="this.closest('.card-item').remove()" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 px-2"><i class="fa fa-trash"></i></button>
                         </div>
-                        <img src="../<?php echo htmlspecialchars($card['icon'] ?? ''); ?>" class="mb-2 max-h-16 rounded border" id="cardPrev<?php echo $idx; ?>_<?php echo $ci; ?>" onerror="this.style.display='none'">
-                        <input type="text" name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][title]" placeholder="Title" value="<?php echo htmlspecialchars($card['title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 text-sm mb-2">
-                        <textarea name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][description]" placeholder="Description" rows="2" class="w-full border rounded px-3 py-2 text-sm"><?php echo htmlspecialchars($card['description'] ?? ''); ?></textarea>
+                        <img src="../<?php echo htmlspecialchars($card['icon'] ?? ''); ?>" class="mb-2 max-h-16 rounded border dark:border-gray-600" id="cardPrev<?php echo $idx; ?>_<?php echo $ci; ?>" onerror="this.style.display='none'">
+                        <input type="text" name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][title]" placeholder="Title" value="<?php echo htmlspecialchars($card['title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 text-sm mb-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
+                        <textarea name="sections[<?php echo $idx; ?>][content][cards][<?php echo $ci; ?>][description]" placeholder="Description" rows="2" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($card['description'] ?? ''); ?></textarea>
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <button type="button" onclick="addFeatureCard(<?php echo $idx; ?>)" class="mt-2 text-sm bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700"><i class="fa fa-plus mr-1"></i> Add Card</button>
+                <button type="button" onclick="addFeatureCard(<?php echo $idx; ?>)" class="mt-2 text-sm bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 dark:hover:bg-green-600"><i class="fa fa-plus mr-1"></i> Add Card</button>
             </div>
         </div>
         <?php elseif ($type === 'bottom_cta'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="sections[<?php echo $idx; ?>][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($content['description'] ?? ''); ?></textarea></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="sections[<?php echo $idx; ?>][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($content['description'] ?? ''); ?></textarea></div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label>
                 <div class="flex items-center gap-2">
-                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/tp.png'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="ctaImg<?php echo $idx; ?>">
-                    <label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'ctaImg<?php echo $idx; ?>', 'ctaPrev<?php echo $idx; ?>')"></label>
+                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/tp.png'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="ctaImg<?php echo $idx; ?>">
+                    <label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'ctaImg<?php echo $idx; ?>', 'ctaPrev<?php echo $idx; ?>')"></label>
                 </div>
-                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/tp.png'); ?>" class="mt-2 max-h-24 rounded border" id="ctaPrev<?php echo $idx; ?>">
+                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/tp.png'); ?>" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="ctaPrev<?php echo $idx; ?>">
             </div>
         </div>
         <?php elseif ($type === 'refund'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Text</label><textarea name="sections[<?php echo $idx; ?>][content][text]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($content['text'] ?? ''); ?></textarea></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? ''); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Text</label><textarea name="sections[<?php echo $idx; ?>][content][text]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($content['text'] ?? ''); ?></textarea></div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label>
                 <div class="flex items-center gap-2">
-                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/refund.png'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="refundImg<?php echo $idx; ?>">
-                    <label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'refundImg<?php echo $idx; ?>', 'refundPrev<?php echo $idx; ?>')"></label>
+                    <input type="text" name="sections[<?php echo $idx; ?>][content][image]" value="<?php echo htmlspecialchars($content['image'] ?? 'images/refund.png'); ?>" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="refundImg<?php echo $idx; ?>">
+                    <label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, 'refundImg<?php echo $idx; ?>', 'refundPrev<?php echo $idx; ?>')"></label>
                 </div>
-                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/refund.png'); ?>" class="mt-2 max-h-24 rounded border" id="refundPrev<?php echo $idx; ?>">
+                <img src="../<?php echo htmlspecialchars($content['image'] ?? 'images/refund.png'); ?>" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="refundPrev<?php echo $idx; ?>">
             </div>
         </div>
         <?php elseif ($type === 'blog'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Latest Blog'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Posts to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 3); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Latest Blog'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Posts to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 3); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <?php elseif ($type === 'categories'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Our Hosting Plans'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Categories to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 4); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Our Hosting Plans'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Categories to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 4); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
         <?php elseif ($type === 'testimonials'): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'What Our Clients Say'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Count to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 4); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'What Our Clients Say'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Count to Show</label><input type="number" name="sections[<?php echo $idx; ?>][content][count]" value="<?php echo (int)($content['count'] ?? 4); ?>" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
-        <p class="text-xs text-gray-400 mt-2">Manage testimonials from <a href="testimonials.php" class="text-blue-600 hover:underline">Testimonials page</a></p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Manage testimonials from <a href="testimonials.php" class="text-blue-600 hover:underline dark:text-blue-400">Testimonials page</a></p>
         <?php elseif ($type === 'faqs'): ?>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Frequently Asked Questions'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Frequently Asked Questions'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
-        <p class="text-xs text-gray-400 mt-2">Manage FAQs from <a href="faqs.php" class="text-blue-600 hover:underline">FAQs page</a></p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Manage FAQs from <a href="faqs.php" class="text-blue-600 hover:underline dark:text-blue-400">FAQs page</a></p>
         <?php elseif ($type === 'partners'): ?>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Our Partners'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[<?php echo $idx; ?>][content][heading]" value="<?php echo htmlspecialchars($content['heading'] ?? 'Our Partners'); ?>" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
         </div>
-        <p class="text-xs text-gray-400 mt-2">Manage partners from <a href="partners.php" class="text-blue-600 hover:underline">Partners page</a></p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Manage partners from <a href="partners.php" class="text-blue-600 hover:underline dark:text-blue-400">Partners page</a></p>
         <?php elseif ($type === 'custom_html'): ?>
         <div class="grid grid-cols-1 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Raw HTML Content</label><textarea name="sections[<?php echo $idx; ?>][content][html]" rows="8" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500"><?php echo htmlspecialchars($content['html'] ?? ''); ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Raw HTML Content</label><textarea name="sections[<?php echo $idx; ?>][content][html]" rows="8" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo htmlspecialchars($content['html'] ?? ''); ?></textarea></div>
         </div>
         <?php endif; ?>
     </div>
@@ -393,24 +393,24 @@ $type_icons = ['hero' => 'fa-film', 'domain_search' => 'fa-search', 'features' =
 <div id="deletedContainer"></div>
 
 <div class="flex items-center gap-4 mb-6">
-    <button type="submit" name="save_sections" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save All Sections</button>
-    <button type="button" onclick="showAddSection()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition shadow font-medium"><i class="fa fa-plus-circle mr-1"></i> Add Section</button>
+    <button type="submit" name="save_sections" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition shadow font-medium"><i class="fa fa-save mr-1"></i> Save All Sections</button>
+    <button type="button" onclick="showAddSection()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition shadow font-medium"><i class="fa fa-plus-circle mr-1"></i> Add Section</button>
 </div>
 </form>
 
 <div id="addSectionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 mr-2"></i> Add New Section</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-plus-circle text-green-600 dark:text-green-400 mr-2"></i> Add New Section</h3>
         <div class="grid grid-cols-2 gap-3">
             <?php foreach ($section_types as $st): ?>
             <?php if ($st === 'custom_html') continue; ?>
-            <button type="button" onclick="addNewSection('<?php echo $st; ?>')" class="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-<?php echo $type_colors[$st]; ?>-500 hover:bg-<?php echo $type_colors[$st]; ?>-50 transition-all">
+            <button type="button" onclick="addNewSection('<?php echo $st; ?>')" class="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-<?php echo $type_colors[$st]; ?>-500 hover:bg-<?php echo $type_colors[$st]; ?>-50 dark:hover:border-<?php echo $type_colors[$st]; ?>-400 dark:hover:bg-<?php echo $type_colors[$st]; ?>-900/20 transition-all">
                 <i class="fa <?php echo $type_icons[$st]; ?> text-2xl text-<?php echo $type_colors[$st]; ?>-600"></i>
-                <span class="text-sm font-medium text-gray-700"><?php echo $type_labels[$st]; ?></span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><?php echo $type_labels[$st]; ?></span>
             </button>
             <?php endforeach; ?>
         </div>
-        <button type="button" onclick="closeAddSection()" class="mt-4 w-full text-center text-gray-500 hover:text-gray-700 text-sm font-medium"><i class="fa fa-times mr-1"></i> Cancel</button>
+        <button type="button" onclick="closeAddSection()" class="mt-4 w-full text-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium"><i class="fa fa-times mr-1"></i> Cancel</button>
     </div>
 </div>
 
@@ -445,14 +445,14 @@ function addFeatureCard(idx) {
     var container = document.getElementById('featuresContainer' + idx);
     if (!container) return;
     var div = document.createElement('div');
-    div.className = 'card-item border rounded-lg p-3 bg-gray-50';
+    div.className = 'card-item border rounded-lg p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600';
     div.innerHTML = '<div class="flex gap-2 mb-2">' +
-        '<div class="flex-1"><input type="text" name="sections[' + idx + '][content][cards][' + ci + '][icon]" placeholder="Icon path" class="w-full border rounded px-3 py-2 text-sm" id="cardIcon' + idx + '_' + ci + '"></div>' +
-        '<label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'cardIcon' + idx + '_' + ci + '\', \'cardPrev' + idx + '_' + ci + '\')"></label>' +
-        '<button type="button" onclick="this.closest(\'.card-item\').remove()" class="text-red-600 hover:text-red-800 px-2"><i class="fa fa-trash"></i></button></div>' +
-        '<img class="mb-2 max-h-16 rounded border hidden" id="cardPrev' + idx + '_' + ci + '">' +
-        '<input type="text" name="sections[' + idx + '][content][cards][' + ci + '][title]" placeholder="Title" class="w-full border rounded px-3 py-2 text-sm mb-2">' +
-        '<textarea name="sections[' + idx + '][content][cards][' + ci + '][description]" placeholder="Description" rows="2" class="w-full border rounded px-3 py-2 text-sm"></textarea>';
+        '<div class="flex-1"><input type="text" name="sections[' + idx + '][content][cards][' + ci + '][icon]" placeholder="Icon path" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="cardIcon' + idx + '_' + ci + '"></div>' +
+        '<label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload"></i><input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'cardIcon' + idx + '_' + ci + '\', \'cardPrev' + idx + '_' + ci + '\')"></label>' +
+        '<button type="button" onclick="this.closest(\'.card-item\').remove()" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 px-2"><i class="fa fa-trash"></i></button></div>' +
+        '<img class="mb-2 max-h-16 rounded border dark:border-gray-600 hidden" id="cardPrev' + idx + '_' + ci + '">' +
+        '<input type="text" name="sections[' + idx + '][content][cards][' + ci + '][title]" placeholder="Title" class="w-full border rounded px-3 py-2 text-sm mb-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">' +
+        '<textarea name="sections[' + idx + '][content][cards][' + ci + '][description]" placeholder="Description" rows="2" class="w-full border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea>';
     container.appendChild(div);
 }
 
@@ -493,83 +493,83 @@ function addNewSection(type) {
 }
 
 function getSectionHTML(type, idx) {
-    var common = '<div class="section-card bg-white rounded-xl shadow-md border border-gray-200 mb-5 overflow-hidden" data-index="' + idx + '">';
-    common += '<div class="flex items-center justify-between px-5 py-3 bg-gray-50 border-b border-gray-200">';
+    var common = '<div class="section-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 mb-5 overflow-hidden" data-index="' + idx + '">';
+    common += '<div class="flex items-center justify-between px-5 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">';
     common += '<div class="flex items-center gap-3 flex-1">';
-    common += '<span class="text-gray-400 cursor-move"><i class="fa fa-grip-vertical"></i></span>';
+    common += '<span class="text-gray-400 dark:text-gray-500 cursor-move"><i class="fa fa-grip-vertical"></i></span>';
     var labels = <?php echo json_encode($type_labels); ?>;
     var colors = <?php echo json_encode($type_colors); ?>;
     var icons = <?php echo json_encode($type_icons); ?>;
-    common += '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-' + colors[type] + '-100 text-' + colors[type] + '-700"><i class="fa ' + icons[type] + ' mr-1"></i> ' + labels[type] + '</span>';
-    common += '<input type="number" name="sections[' + idx + '][sort_order]" value="0" class="w-16 text-center border rounded text-sm px-2 py-1" placeholder="Order">';
+    common += '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-' + colors[type] + '-100 text-' + colors[type] + '-700' + (colors[type] === 'gray' ? ' dark:bg-gray-700 dark:text-gray-300' : ' dark:bg-' + colors[type] + '-900/50 dark:text-' + colors[type] + '-300') + '"><i class="fa ' + icons[type] + ' mr-1"></i> ' + labels[type] + '</span>';
+    common += '<input type="number" name="sections[' + idx + '][sort_order]" value="0" class="w-16 text-center border rounded text-sm px-2 py-1 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Order">';
     common += '<input type="hidden" name="sections[' + idx + '][type]" value="' + type + '">';
     common += '</div><div class="flex items-center gap-3">';
-    common += '<label class="flex items-center cursor-pointer select-none text-sm"><input type="checkbox" name="sections[' + idx + '][enabled]" value="1" checked class="mr-1.5 rounded"><span class="text-gray-600 font-medium">Active</span></label>';
-    common += '<button type="button" onclick="toggleEdit(' + idx + ')" class="text-blue-600 hover:text-blue-800 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></button>';
-    common += '<button type="button" onclick="deleteSection(' + idx + ')" class="text-red-600 hover:text-red-800 transition-transform" title="Delete"><i class="fa fa-trash-alt"></i></button>';
+    common += '<label class="flex items-center cursor-pointer select-none text-sm"><input type="checkbox" name="sections[' + idx + '][enabled]" value="1" checked class="mr-1.5 rounded"><span class="text-gray-600 dark:text-gray-300 font-medium">Active</span></label>';
+    common += '<button type="button" onclick="toggleEdit(' + idx + ')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-transform" title="Edit"><i class="fa fa-pencil-alt"></i></button>';
+    common += '<button type="button" onclick="deleteSection(' + idx + ')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-transform" title="Delete"><i class="fa fa-trash-alt"></i></button>';
     common += '</div></div>';
     common += '<div class="section-edit-body px-5 py-4" id="editBody' + idx + '">';
 
     var body = '';
     if (type === 'hero') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Tagline</label><input type="text" name="sections[' + idx + '][content][tagline]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="sections[' + idx + '][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></textarea></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/cloud.jpg" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="heroImg' + idx + '"><label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'heroImg' + idx + '\', \'heroPrev' + idx + '\')"></label></div><img src="../images/cloud.jpg" class="mt-2 max-h-24 rounded border" id="heroPrev' + idx + '"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Button Text</label><input type="text" name="sections[' + idx + '][content][button_text]" value="Get Started" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Button URL</label><input type="text" name="sections[' + idx + '][content][button_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Chat Text</label><input type="text" name="sections[' + idx + '][content][chat_text]" value="Live Chat" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Chat URL</label><input type="text" name="sections[' + idx + '][content][chat_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tagline</label><input type="text" name="sections[' + idx + '][content][tagline]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="sections[' + idx + '][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/cloud.jpg" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="heroImg' + idx + '"><label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'heroImg' + idx + '\', \'heroPrev' + idx + '\')"></label></div><img src="../images/cloud.jpg" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="heroPrev' + idx + '"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Button Text</label><input type="text" name="sections[' + idx + '][content][button_text]" value="Get Started" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Button URL</label><input type="text" name="sections[' + idx + '][content][button_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Chat Text</label><input type="text" name="sections[' + idx + '][content][chat_text]" value="Live Chat" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Chat URL</label><input type="text" name="sections[' + idx + '][content][chat_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'domain_search') {
         body = '<div class="grid grid-cols-1 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Search URL</label><input type="text" name="sections[' + idx + '][content][search_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Pricing Items (one per line: TLD|Price)</label><textarea name="sections[' + idx + '][content][pricing_items]" rows="5" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500">.com|999\n.online|455\n.xyz|250</textarea></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Search URL</label><input type="text" name="sections[' + idx + '][content][search_url]" value="" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Pricing Items (one per line: TLD|Price)</label><textarea name="sections[' + idx + '][content][pricing_items]" rows="5" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">.com|999\n.online|455\n.xyz|250</textarea></div>';
         body += '</div>';
     } else if (type === 'features') {
         body = '<div class="grid grid-cols-1 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Why Choose Us" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-2">Feature Cards</label><div id="featuresContainer' + idx + '" class="space-y-3" data-card-count="0"></div>';
-        body += '<button type="button" onclick="addFeatureCard(' + idx + ')" class="mt-2 text-sm bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700"><i class="fa fa-plus mr-1"></i> Add Card</button></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Why Choose Us" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Feature Cards</label><div id="featuresContainer' + idx + '" class="space-y-3" data-card-count="0"></div>';
+        body += '<button type="button" onclick="addFeatureCard(' + idx + ')" class="mt-2 text-sm bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 dark:hover:bg-green-600"><i class="fa fa-plus mr-1"></i> Add Card</button></div>';
         body += '</div>';
     } else if (type === 'bottom_cta') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Do you have any questions?" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="sections[' + idx + '][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></textarea></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/tp.png" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="ctaImg' + idx + '"><label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'ctaImg' + idx + '\', \'ctaPrev' + idx + '\')"></label></div><img src="../images/tp.png" class="mt-2 max-h-24 rounded border" id="ctaPrev' + idx + '"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Do you have any questions?" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="sections[' + idx + '][content][description]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/tp.png" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="ctaImg' + idx + '"><label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'ctaImg' + idx + '\', \'ctaPrev' + idx + '\')"></label></div><img src="../images/tp.png" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="ctaPrev' + idx + '"></div>';
         body += '</div>';
     } else if (type === 'refund') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="7-Day Money Back Guarantee" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Text</label><textarea name="sections[' + idx + '][content][text]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></textarea></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/refund.png" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" id="refundImg' + idx + '"><label class="bg-gray-200 text-gray-700 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'refundImg' + idx + '\', \'refundPrev' + idx + '\')"></label></div><img src="../images/refund.png" class="mt-2 max-h-24 rounded border" id="refundPrev' + idx + '"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="7-Day Money Back Guarantee" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Text</label><textarea name="sections[' + idx + '][content][text]" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Image</label><div class="flex items-center gap-2"><input type="text" name="sections[' + idx + '][content][image]" value="images/refund.png" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" id="refundImg' + idx + '"><label class="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 rounded cursor-pointer text-sm hover:bg-gray-300 dark:hover:bg-gray-600 whitespace-nowrap"><i class="fa fa-upload mr-1"></i> Upload<input type="file" accept="image/*" class="hidden" onchange="uploadSectionImg(this, \'refundImg' + idx + '\', \'refundPrev' + idx + '\')"></label></div><img src="../images/refund.png" class="mt-2 max-h-24 rounded border dark:border-gray-600" id="refundPrev' + idx + '"></div>';
         body += '</div>';
     } else if (type === 'blog') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Latest Blog" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Posts to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="3" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Latest Blog" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Posts to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="3" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'categories') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Our Hosting Plans" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Categories to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="4" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Our Hosting Plans" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Categories to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="4" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'testimonials') {
         body = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="What Our Clients Say" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Count to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="4" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="What Our Clients Say" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Count to Show</label><input type="number" name="sections[' + idx + '][content][count]" value="4" min="1" max="20" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'faqs') {
         body = '<div class="grid grid-cols-1 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Frequently Asked Questions" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Frequently Asked Questions" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'partners') {
         body = '<div class="grid grid-cols-1 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Our Partners" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Heading</label><input type="text" name="sections[' + idx + '][content][heading]" value="Our Partners" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>';
         body += '</div>';
     } else if (type === 'custom_html') {
         body = '<div class="grid grid-cols-1 gap-4">';
-        body += '<div><label class="block text-sm font-medium text-gray-700 mb-1">Raw HTML</label><textarea name="sections[' + idx + '][content][html]" rows="8" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500"></textarea></div>';
+        body += '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Raw HTML</label><textarea name="sections[' + idx + '][content][html]" rows="8" class="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>';
         body += '</div>';
     }
 
@@ -583,7 +583,7 @@ function initSortable() {
         Sortable.create(container, {
             handle: '.fa-grip-vertical',
             animation: 150,
-            ghostClass: 'bg-blue-50',
+            ghostClass: 'bg-blue-50 dark:bg-blue-900/30',
             onEnd: function() {
                 var cards = container.querySelectorAll('.section-card');
                 cards.forEach(function(card, idx) {
