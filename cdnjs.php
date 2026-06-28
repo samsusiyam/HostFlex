@@ -97,4 +97,5 @@ $og_image = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cooltipz-css/cooltipz.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 </noscript>
+<?php $header_code = getSetting('header_code'); if ($header_code): ?><?php echo $header_code; ?><?php endif; ?>
 <?php include __DIR__ . '/scripts.php'; ?>

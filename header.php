@@ -2,7 +2,6 @@
 <?php $onesignal_id = getSetting('onesignal_app_id'); ?>
 <?php $tawkto_id = getSetting('tawkto_widget_id'); ?>
 <?php $crisp_id = getSetting('crisp_website_id'); ?>
-<?php $header_code = getSetting('header_code'); ?>
 <?php if ($onesignal_id): ?>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>window.OneSignalDeferred = window.OneSignalDeferred || [];OneSignalDeferred.push(function(OneSignal){OneSignal.init({appId:<?php echo json_encode($onesignal_id); ?>});});</script>
@@ -13,7 +12,6 @@
 <?php if ($crisp_id): ?>
 <script>window.$crisp=[];window.CRISP_WEBSITE_ID=<?php echo json_encode($crisp_id); ?>;(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 <?php endif; ?>
-<?php if ($header_code): echo $header_code; endif; ?>
 <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[999999] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 <?php if (isMaintenanceMode() && isset($_SESSION['admin_id'])): ?>
 <div class="bg-yellow-500 text-white text-center py-2 px-4 text-sm font-medium sticky top-0 z-[999999]">
