@@ -82,18 +82,42 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($type === 'hero'): ?>
 <!-- Hero Section -->
 <section class="py-16 bg-white">
-<div class="content flex flex-col items-center gap-8 text-center">
-<div class="flex flex-col justify-center gap-6 md:gap-12 max-w-3xl">
+<div class="content grid grid-cols-1 lg:grid-cols-2">
+<div class="flex self-center flex-col justify-center gap-6 md:gap-12">
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
-<p class="md:max-w-[600px] mx-auto"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
-<div class="flex justify-center gap-x-2">
+<p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
+<div class="flex w-fit gap-x-2">
 <a href="<?php echo htmlspecialchars($c['button_url'] ?: escSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle());'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="w-full max-w-3xl px-6"><picture><source srcset="images/cloud.webp" type="image/webp"><img src="images/cloud.jpg" alt="Host Nibo Hero" width="800" height="600" style="width:100%;height:auto;max-height:500px;object-fit:contain"></picture></div>
+<div class="hidden self-center lg:block w-full px-6"><picture><source srcset="images/cloud.webp" type="image/webp"><img src="images/cloud.jpg" alt="Host Nibo Hero" width="800" height="600" style="width:100%;height:auto;max-height:500px;object-fit:contain"></picture></div>
 </div>
 </section>
+
+<?php elseif ($type === 'domain_search'): ?>
+<!-- Domain Search -->
+<div class="content mt-32 mb-10">
+<div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
+<form method="get" action="<?php echo htmlspecialchars($c['search_url'] ?: escSetting('whmcs_domain_search_url')); ?>" toolname="search_domain" tooldescription="Searches for domain name availability and pricing" class="flex w-auto" aria-label="Domain search">
+<input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px] h-[53px]" type="search" toolparamdescription="The domain name to search for availability" aria-label="Search for a domain name" />
+<div class="ml-2 w-fit">
+<button type="submit" size="custom" class="h-[53px] btn btn-blue" aria-label="Search domain">
+<i class="fa fa-search"></i> <span class="hidden sm:block">Search</span>
+</button>
+</div>
+</form>
+<div class="flex justify-between gap-4 md:gap-8">
+<?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): ?>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
+<?php endforeach; else: ?>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1"><?php echo $currency_symbol; ?>999</span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1"><?php echo $currency_symbol; ?>455</span></span></a>
+<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1"><?php echo $currency_symbol; ?>250</span></span></a>
+<?php endif; ?>
+</div>
+</div>
+</div>
 
 <?php elseif ($type === 'categories'): ?>
 <!-- Categories Section -->
