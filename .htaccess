@@ -52,6 +52,12 @@ ErrorDocument 404 /404.php
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://embed.tawk.to; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.tailwindcss.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://embed.tawk.to wss://embed.tawk.to; frame-src https://embed.tawk.to https://www.youtube.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header unset Server
+  Header unset X-Powered-By
+  Header always unset Server
+  Header always unset X-Powered-By
   <FilesMatch "\.(jpg|jpeg|png|webp|svg|gif|ico|css|js|woff2|woff)$">
     Header set Cache-Control "public, immutable"
   </FilesMatch>
