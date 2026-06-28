@@ -7,9 +7,7 @@
     <title><?php echo $page_title ?? 'Dashboard'; ?> - <?php echo escSetting('site_name'); ?> Admin</title>
     <link rel="shortcut icon" href="../<?php echo htmlspecialchars(escSetting('favicon') ?: 'images/favicon.ico'); ?>" type="image/x-icon" />
     <script>if(localStorage.getItem('adminDarkMode')==='true')document.documentElement.classList.add('dark')</script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
+    <script>tailwind.config={darkMode:'class'}</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
@@ -22,74 +20,53 @@
         }
         .settings-sub { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
         .settings-sub.open { max-height: 500px; }
-        .dark .settings-sub a { color: #9ca3af; }
-        .dark .settings-sub a:hover { color: #60a5fa; background: rgba(55,65,81,0.5); }
-        .dark .settings-sub a.font-medium { color: #60a5fa; background: rgba(30,58,138,0.3); }
-        .dark .sidebar-overlay.open { background: rgba(0,0,0,0.7); }
-        .dark input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
-        .dark textarea, .dark select { background: #374151; color: #e5e7eb; border-color: #4b5563; }
-        .dark input:focus, .dark textarea:focus, .dark select:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59,130,246,0.3); }
-        .dark table { color: #d1d5db; }
-        .dark table thead { background: #1f2937; color: #9ca3af; }
-        .dark table tbody tr { border-color: #374151; }
-        .dark table tbody tr:hover { background: rgba(55,65,81,0.4); }
-        .dark .bg-white { background-color: #1f2937; }
-        .dark .bg-gray-50 { background-color: #111827; }
-        .dark .bg-gray-100 { background-color: #1f2937; }
-        .dark .bg-blue-50 { background-color: rgba(30,58,138,0.3); }
-        .dark .bg-green-100 { background-color: rgba(6,78,59,0.3); }
-        .dark .bg-red-100 { background-color: rgba(127,29,29,0.3); }
-        .dark .bg-yellow-100 { background-color: rgba(113,63,18,0.3); }
-        .dark .bg-purple-100 { background-color: rgba(73,27,105,0.3); }
-        .dark .bg-indigo-100 { background-color: rgba(30,58,138,0.3); }
-        .dark .bg-gray-200 { background-color: #374151; }
-        .dark .bg-blue-500 { background-color: #2563eb; }
-        .dark .bg-blue-600 { background-color: #1d4ed8; }
-        .dark .bg-blue-700 { background-color: #1e40af; }
-        .dark .bg-red-500 { background-color: #dc2626; }
-        .dark .bg-red-600 { background-color: #b91c1c; }
-        .dark .bg-green-500 { background-color: #16a34a; }
-        .dark .bg-green-600 { background-color: #15803d; }
-        .dark .bg-yellow-500 { background-color: #ca8a04; }
-        .dark .bg-purple-500 { background-color: #8b5cf6; }
-        .dark .bg-indigo-500 { background-color: #6366f1; }
-        .dark .bg-indigo-600 { background-color: #4f46e5; }
-        .dark .text-gray-500 { color: #9ca3af; }
-        .dark .text-gray-600 { color: #9ca3af; }
-        .dark .text-gray-700 { color: #d1d5db; }
-        .dark .text-gray-800 { color: #e5e7eb; }
-        .dark .text-gray-900 { color: #f3f4f6; }
-        .dark .text-blue-600 { color: #60a5fa; }
-        .dark .text-blue-500 { color: #3b82f6; }
-        .dark .text-red-600 { color: #f87171; }
-        .dark .text-red-500 { color: #ef4444; }
-        .dark .text-green-600 { color: #4ade80; }
-        .dark .text-green-700 { color: #22c55e; }
-        .dark .text-yellow-600 { color: #eab308; }
-        .dark .text-purple-600 { color: #a78bfa; }
-        .dark .text-white { color: #e5e7eb; }
-        .dark .border { border-color: #374151; }
-        .dark .border-b { border-color: #374151; }
-        .dark .border-t { border-color: #374151; }
-        .dark .border-r { border-color: #374151; }
-        .dark .border-l { border-color: #374151; }
-        .dark .border-gray-200 { border-color: #374151; }
-        .dark .border-gray-300 { border-color: #4b5563; }
-        .dark .border-blue-200 { border-color: rgba(59,130,246,0.3); }
-        .dark .border-blue-500 { border-color: #3b82f6; }
-        .dark .border-l-4.border-blue-500 { border-left-color: #3b82f6; }
-        .dark .border-l-4.border-green-500 { border-left-color: #22c55e; }
-        .dark .border-l-4.border-yellow-500 { border-left-color: #ca8a04; }
-        .dark .border-l-4.border-purple-500 { border-left-color: #8b5cf6; }
-        .dark .border-l-4.border-red-500 { border-left-color: #ef4444; }
-        .dark .border-l-4.border-indigo-500 { border-left-color: #6366f1; }
-        .dark .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .dark .shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-        .dark .shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.4); }
-        .dark .rounded { background-color: transparent; }
-        .dark .divide-gray-200 > * { border-color: #374151; }
-        .dark .ring-1 { box-shadow: 0 0 0 1px #4b5563; }
-        .dark hr { border-color: #374151; }
+        html.dark .settings-sub a { color: #9ca3af; }
+        html.dark .settings-sub a:hover { color: #60a5fa; background: rgba(55,65,81,0.5); }
+        html.dark .settings-sub a.font-medium { color: #60a5fa; background: rgba(30,58,138,0.3); }
+        html.dark .sidebar-overlay.open { background: rgba(0,0,0,0.7); }
+        html.dark input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+        html.dark textarea, html.dark select { background: #374151; color: #e5e7eb; border-color: #4b5563; }
+        html.dark input:focus, html.dark textarea:focus, html.dark select:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59,130,246,0.3); }
+        html.dark table { color: #d1d5db; }
+        html.dark table thead { background: #1f2937; color: #9ca3af; }
+        html.dark table tbody tr { border-color: #374151; }
+        html.dark table tbody tr:hover { background: rgba(55,65,81,0.4); }
+        html.dark .bg-white { background-color: #1f2937; }
+        html.dark .bg-gray-50 { background-color: #111827; }
+        html.dark .bg-gray-100 { background-color: #1f2937; }
+        html.dark .bg-blue-50 { background-color: rgba(30,58,138,0.3); }
+        html.dark .bg-green-100 { background-color: rgba(6,78,59,0.3); }
+        html.dark .bg-red-100 { background-color: rgba(127,29,29,0.3); }
+        html.dark .bg-yellow-100 { background-color: rgba(113,63,18,0.3); }
+        html.dark .bg-purple-100 { background-color: rgba(73,27,105,0.3); }
+        html.dark .bg-indigo-100 { background-color: rgba(30,58,138,0.3); }
+        html.dark .bg-gray-200 { background-color: #374151; }
+        html.dark .text-gray-500 { color: #9ca3af; }
+        html.dark .text-gray-600 { color: #9ca3af; }
+        html.dark .text-gray-700 { color: #d1d5db; }
+        html.dark .text-gray-800 { color: #e5e7eb; }
+        html.dark .text-gray-900 { color: #f3f4f6; }
+        html.dark .text-blue-600 { color: #60a5fa; }
+        html.dark .text-blue-500 { color: #3b82f6; }
+        html.dark .text-red-600 { color: #f87171; }
+        html.dark .text-red-500 { color: #ef4444; }
+        html.dark .text-green-600 { color: #4ade80; }
+        html.dark .text-green-700 { color: #22c55e; }
+        html.dark .text-yellow-600 { color: #eab308; }
+        html.dark .text-purple-600 { color: #a78bfa; }
+        html.dark .border { border-color: #374151; }
+        html.dark .border-b { border-color: #374151; }
+        html.dark .border-t { border-color: #374151; }
+        html.dark .border-r { border-color: #374151; }
+        html.dark .border-l { border-color: #374151; }
+        html.dark .border-gray-200 { border-color: #374151; }
+        html.dark .border-gray-300 { border-color: #4b5563; }
+        html.dark .border-blue-200 { border-color: rgba(59,130,246,0.3); }
+        html.dark .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        html.dark .shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+        html.dark .shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.4); }
+        html.dark .divide-gray-200 > * { border-color: #374151; }
+        html.dark hr { border-color: #374151; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
