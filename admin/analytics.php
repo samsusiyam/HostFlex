@@ -64,7 +64,6 @@ while ($row = mysqli_fetch_assoc($r)) {
     foreach ($browsers as &$b) { if ($b['browser'] === $browser) { $b['views'] += $row['views']; $found = true; break; } }
     if (!$found) $browsers[] = ['browser' => $browser, 'views' => $row['views']];
 }
-unset($browsers);
 usort($browsers, fn($a, $b) => $b['views'] - $a['views']);
 
 $devices = [];
@@ -80,7 +79,6 @@ while ($row = mysqli_fetch_assoc($r)) {
     foreach ($devices as &$d) { if ($d['device'] === $device) { $d['views'] += $row['views']; $found = true; break; } }
     if (!$found) $devices[] = ['device' => $device, 'views' => $row['views']];
 }
-unset($devices);
 usort($devices, fn($a, $b) => $b['views'] - $a['views']);
 ?>
 <?php include 'header.php'; ?>

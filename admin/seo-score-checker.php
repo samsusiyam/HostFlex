@@ -16,11 +16,11 @@ $pages_to_check = [
 
 $r = @$conn->query("SELECT slug, title FROM pages WHERE status = 1");
 if ($r) { while ($row = $r->fetch_assoc()) {
-    $pages_to_check[] = ['name' => $row['title'], 'url' => '/page/' . $row['slug']];
+    $pages_to_check[] = ['name' => $row['title'], 'url' => '/page.php?slug=' . $row['slug']];
 }}
 $r = @$conn->query("SELECT slug, title FROM blog_posts WHERE status = 1 LIMIT 10");
 if ($r) { while ($row = $r->fetch_assoc()) {
-    $pages_to_check[] = ['name' => 'Blog: ' . $row['title'], 'url' => '/blog/' . $row['slug']];
+    $pages_to_check[] = ['name' => 'Blog: ' . $row['title'], 'url' => '/blog.php?slug=' . $row['slug']];
 }}
 $r = @$conn->query("SELECT slug, name FROM blog_categories WHERE status = 1");
 if ($r) { while ($row = $r->fetch_assoc()) {
