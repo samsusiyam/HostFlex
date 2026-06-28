@@ -129,4 +129,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
         </form>
     </div>
 </div>
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mt-6 dark:bg-gray-800">
+    <div class="flex items-center gap-3 mb-4">
+        <i class="fa fa-clock text-2xl text-green-600 dark:text-green-400"></i>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Automatic Backups</h2>
+    </div>
+    <p class="text-gray-500 dark:text-gray-400 mb-4">Set up a cron job to automatically backup your database daily. Keeps the last 7 backups.</p>
+    <div class="bg-gray-50 dark:bg-gray-700 rounded p-4 font-mono text-sm text-gray-700 dark:text-gray-300 mb-4 overflow-x-auto">
+        <code>0 2 * * * php /home/hostnibo/public_html/auto-backup.php</code>
+    </div>
+    <p class="text-xs text-gray-400 dark:text-gray-500">Add the above line to your server's crontab (cPanel → Cron Jobs). Backups are saved to <code>/backups/</code> directory.</p>
+</div>
 <?php include 'footer.php'; ?>

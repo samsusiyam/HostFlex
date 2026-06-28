@@ -52,38 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     };
                     xhr.send('email=' + encodeURIComponent(params.email));
-                });
-            }
-        });
-        navigator.modelContext.registerTool({
-            name: 'send_contact_message',
-            description: 'Sends a contact message to HostNibo support team',
-            parameters: {
-                type: 'object',
-                properties: {
-                    name: { type: 'string', description: 'The sender full name' },
-                    email: { type: 'string', description: 'The sender email address' },
-                    subject: { type: 'string', description: 'The subject of the message' },
-                    message: { type: 'string', description: 'The message content to send' }
-                },
-                required: ['name', 'email', 'subject', 'message']
-            },
-            handler: function(params) {
-                var form = document.querySelector('form[toolname="send_contact_message"]');
-                if (form) {
-                    var nameInput = form.querySelector('input[name="name"]');
-                    var emailInput = form.querySelector('input[name="email"]');
-                    var subjectInput = form.querySelector('input[name="subject"]');
-                    var messageInput = form.querySelector('textarea[name="message"]');
-                    if (nameInput) nameInput.value = params.name;
-                    if (emailInput) emailInput.value = params.email;
-                    if (subjectInput) subjectInput.value = params.subject;
-                    if (messageInput) messageInput.value = params.message;
-                    form.submit();
-                }
-                return { success: true, message: 'Contact message submitted' };
-            }
-        });
-    }
 });
+});
+});
+</script>
+<script>
+(function(){
+var css=document.createElement('style');
+css.textContent='.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.fade-up.visible{opacity:1;transform:translateY(0)}';
+document.head.appendChild(css);
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+var obs=new IntersectionObserver(function(entries){
+entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:0.12});
+document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el)})});
+}
+})();
 </script>

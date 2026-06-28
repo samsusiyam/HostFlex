@@ -124,7 +124,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php $cat_count = (int)($c['count'] ?? 4); $cat_heading = $c['heading'] ?? 'Our Hosting Plans'; ?>
 <?php $categories = mysqli_query($conn, "SELECT * FROM categories WHERE status = 1 ORDER BY sort_order ASC LIMIT $cat_count"); ?>
 <?php if (mysqli_num_rows($categories) > 0): ?>
-<section class="section_gap bg-[#f8f7f7]">
+<section class="section_gap bg-[#f8f7f7] fade-up">
 <div class="content">
 <?php if ($cat_heading): ?><div class="mb-10 text-center"><h2 class="text-3xl font-bold"><?php echo htmlspecialchars($cat_heading); ?></h2></div><?php endif; ?>
 <div class="grid grid-cols-1 gap-8 xsm:grid-cols-2 lg:grid-cols-<?php echo min(4, $cat_count); ?>">
@@ -183,7 +183,7 @@ if (empty($cards)) {
     ];
 }
 ?>
-<section class="section_gap bg-white">
+<section class="section_gap bg-white fade-up">
 <div class="content">
 <?php if ($features_heading): ?>
 <div class="mb-10 text-center"><h2 class="text-3xl font-bold"><?php echo htmlspecialchars($features_heading); ?></h2></div>
@@ -205,7 +205,7 @@ if (empty($cards)) {
 <!-- Offers Section -->
 <?php $offers = getActiveOffers(); ?>
 <?php if (mysqli_num_rows($offers) > 0): ?>
-<section class="section_gap bg-white">
+<section class="section_gap bg-white fade-up">
 <div class="content">
 <div class="flex items-center justify-between">
 <div class="mb-12 flex flex-col gap-2">

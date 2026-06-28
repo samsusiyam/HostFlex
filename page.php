@@ -22,6 +22,7 @@ if (!$page) {
 <?php include "contact-btn.php"; ?>
 <section class="section_gap">
 <div class="content">
+<?php $breadcrumbs = [['label' => $page['title']]]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="mb-8">
 <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800"><?php echo htmlspecialchars($page['title']); ?></h1>
 </div>

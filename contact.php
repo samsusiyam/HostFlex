@@ -108,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include "contact-btn.php"; ?>
 <section class="section_gap flex items-center bg-gray-50 font-poppins dark:bg-gray-800" id="main-content">
 <div class="content">
+<?php $breadcrumbs = [['label' => 'Contact']]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="mb-20 text-center pb-7">
 <h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo escSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
 <p class="text-lg text-gray-500 sm:text-xl dark:text-gray-400"><?php echo escSetting('contact_page_subheading') ?: 'We would love to hear from you.'; ?></p>

@@ -13,6 +13,7 @@ $page_title = 'Blog';
 
 <section class="section_gap bg-white">
 <div class="content">
+<?php $breadcrumbs = [['label' => 'Blog']]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="mb-10 text-center">
     <h1 class="text-3xl font-bold">Our Blog</h1>
     <p class="text-gray-500 mt-2">Latest news, tips and updates</p>

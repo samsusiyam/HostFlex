@@ -30,6 +30,7 @@ $meta_kw = $post['meta_keywords'] ?? '';
 
 <section class="section_gap bg-white">
 <div class="content max-w-4xl mx-auto">
+    <?php $breadcrumbs = [['label' => 'Blog', 'url' => '/blogs.php'], ['label' => $post['title']]]; include __DIR__ . '/breadcrumb.php'; ?>
     <div class="mb-6">
         <?php if ($post['category_name']): ?>
         <a href="/category/<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
