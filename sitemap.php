@@ -3,8 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-require 'config/database.php';
-require 'includes/functions.php';
+$conn = @mysqli_connect('localhost', 'root', '', 'hostflex');
+if ($conn) {
+    mysqli_set_charset($conn, 'utf8mb4');
+}
 
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
@@ -13,18 +15,18 @@ define('SITE_URL', $protocol . '://' . $host . $dir . '/');
 
 header('Content-Type: application/xml; charset=utf-8');
 
-$xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
 function sm_url($loc, $changefreq = '', $priority = '0.5', $lastmod = '') {
-    $xml  = '    <url>' . "\n";
-    $xml .= '        <loc>' . htmlspecialchars($loc) . '</loc>' . "\n";
-    if ($lastmod) $xml .= '        <lastmod>' . $lastmod . '</lastmod>' . "\n";
-    if ($changefreq) $xml .= '        <changefreq>' . $changefreq . '</changefreq>' . "\n";
-    $xml .= '        <priority>' . $priority . '</priority>' . "\n";
-    $xml .= '    </url>' . "\n";
-    return $xml;
+    $out = '    <url>' . "\n";
+    $out .= '        <loc>' . htmlspecialchars($loc) . '</loc>' . "\n";
+    if ($lastmod) $out .= '        <lastmod>' . $lastmod . '</lastmod>' . "\n";
+    if ($changefreq) $out .= '        <changefreq>' . $changefreq . '</changefreq>' . "\n";
+    $out .= '        <priority>' . $priority . '</priority>' . "\n";
+    $out .= '    </url>' . "\n";
+    return $out;
 }
+
+$xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
 $xml .= sm_url(SITE_URL . 'index.php', '', '1.0');
 $xml .= sm_url(SITE_URL . 'blogs.php', 'weekly', '0.8');
@@ -32,21 +34,20 @@ $xml .= sm_url(SITE_URL . 'contact.php', 'monthly', '0.5');
 $xml .= sm_url(SITE_URL . 'offers.php', 'monthly', '0.5');
 
 if ($conn) {
-    $tables = [
-        ['table' => 'blog_posts', 'url' => 'blog/', 'changefreq' => 'weekly', 'priority' => '0.6', 'has_date' => true],
-        ['table' => 'pages', 'url' => 'page/', 'changefreq' => 'monthly', 'priority' => '0.5', 'has_date' => false],
-        ['table' => 'blog_categories', 'url' => 'category/', 'changefreq' => 'monthly', 'priority' => '0.5', 'has_date' => false],
+    $queries = [
+        ['sql' => 'SELECT slug, updated_at FROM blog_posts WHERE status = 1', 'url' => 'blog/', 'freq' => 'weekly', 'pri' => '0.6', 'date_col' => 'updated_at'],
+        ['sql' => 'SELECT slug FROM pages WHERE status = 1', 'url' => 'page/', 'freq' => 'monthly', 'pri' => '0.5', 'date_col' => ''],
+        ['sql' => 'SELECT slug FROM blog_categories WHERE status = 1', 'url' => 'category/', 'freq' => 'monthly', 'pri' => '0.5', 'date_col' => ''],
     ];
-    foreach ($tables as $t) {
-        $cols = 'slug';
-        if ($t['has_date']) $cols .= ', updated_at';
-        $r = @$conn->query("SELECT $cols FROM `{$t['table']}` WHERE status = 1");
+    foreach ($queries as $q) {
+        $r = @$conn->query($q['sql']);
         if (!$r) continue;
         while ($row = $r->fetch_assoc()) {
-            $lastmod = ($t['has_date'] && !empty($row['updated_at'])) ? date('c', strtotime($row['updated_at'])) : '';
-            $xml .= sm_url(SITE_URL . $t['url'] . $row['slug'], $t['changefreq'], $t['priority'], $lastmod);
+            $lastmod = ($q['date_col'] && !empty($row[$q['date_col']])) ? date('c', strtotime($row[$q['date_col']])) : '';
+            $xml .= sm_url(SITE_URL . $q['url'] . $row['slug'], $q['freq'], $q['pri'], $lastmod);
         }
     }
+    $conn->close();
 }
 
 $xml .= '</urlset>';
