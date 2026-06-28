@@ -3,9 +3,24 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-$conn = @mysqli_connect('localhost', 'root', '', 'hostflex');
-if ($conn) {
-    mysqli_set_charset($conn, 'utf8mb4');
+// Read DB credentials from database.php without triggering headers.php
+$db_file = __DIR__ . '/config/database.php';
+if (file_exists($db_file)) {
+    $db_content = file_get_contents($db_file);
+    preg_match_all("/\\$(db_\w+)\s*=\s*'([^']*)'/", $db_content, $m);
+    $creds = [];
+    for ($i = 0; $i < count($m[1]); $i++) {
+        $creds[$m[1][$i]] = $m[2][$i];
+    }
+    $conn = @mysqli_connect(
+        $creds['db_host'] ?? 'localhost',
+        $creds['db_user'] ?? 'root',
+        $creds['db_pass'] ?? '',
+        $creds['db_name'] ?? 'hostflex'
+    );
+    if ($conn) mysqli_set_charset($conn, 'utf8mb4');
+} else {
+    $conn = null;
 }
 
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
