@@ -30,12 +30,12 @@
 <body class="bg-gray-50 dark:bg-gray-900">
 <?php include "header.php"; ?>
 
-<section class="error-bg min-h-[70vh] flex items-center justify-center px-4">
+<section class="error-bg min-h-[75vh] flex items-center justify-center py-24 px-4">
 <div class="text-center max-w-xl mx-auto relative z-10">
     <div class="mb-6">
-        <span class="float-letter text-[100px] md:text-[140px] font-extrabold text-blue-600 dark:text-blue-400 leading-none" style="animation-delay: 0s;">4</span>
-        <span class="float-letter text-[100px] md:text-[140px] font-extrabold text-blue-400 dark:text-blue-300 leading-none" style="animation-delay: 0.3s;">0</span>
-        <span class="float-letter text-[100px] md:text-[140px] font-extrabold text-blue-600 dark:text-blue-400 leading-none" style="animation-delay: 0.6s;">4</span>
+        <span class="float-letter text-[140px] md:text-[200px] font-extrabold text-blue-600 dark:text-blue-400 leading-none" style="animation-delay: 0s;">4</span>
+        <span class="float-letter text-[140px] md:text-[200px] font-extrabold text-blue-400 dark:text-blue-300 leading-none" style="animation-delay: 0.3s;">0</span>
+        <span class="float-letter text-[140px] md:text-[200px] font-extrabold text-blue-600 dark:text-blue-400 leading-none" style="animation-delay: 0.6s;">4</span>
     </div>
 
     <h2 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-3">Oops! Page Not Found</h2>
