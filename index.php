@@ -249,15 +249,16 @@ if (empty($cards)) {
 <p class="mt-10 text-lg pr-0 sm:pr-8 dark:text-gray-400"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-6 py-10">
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt="Live Chat Support" class="w-12 h-14" width="48" height="56" loading="lazy"></div>
+<div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <a href="javascript:void(Tawk_API.toggle())"><h1 class="text-md text-gray-100 text-center bg-blue-600 py-3 px-4 font-semibold">Live Chat</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/EmailSupport.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/EmailSupport.svg" alt="Email Support" class="w-12 h-14" width="48" height="56" loading="lazy"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-purple-600 py-3 px-4 font-semibold">Email Support</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/Helpdesk.svg" alt class="w-12 h-14" width="48" height="56" loading="lazy"></div>
+<div class="flex justify-center px-4 py-5"><img src="images/svg/Helpdesk.svg" alt="24/7 Helpdesk Support" class="w-12 h-14" width="48" height="56" loading="lazy"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-indigo-600 py-3 px-4 font-semibold">24x7 Helpdesk</h1></a>
 </div>
 </div>
@@ -336,7 +337,7 @@ if (mysqli_num_rows($testimonials) > 0):
     <?php while ($t = mysqli_fetch_assoc($testimonials)): ?>
     <div class="bg-white rounded-xl shadow p-6 border">
         <div class="flex items-center gap-3 mb-3">
-            <?php if ($t['photo']): ?><img src="<?php echo htmlspecialchars($t['photo']); ?>" class="w-12 h-12 rounded-full object-cover" width="48" height="48"><?php endif; ?>
+            <?php if ($t['photo']): ?><img src="<?php echo htmlspecialchars($t['photo']); ?>" class="w-12 h-12 rounded-full object-cover" alt="<?php echo htmlspecialchars($t['name']); ?>" width="48" height="48"><?php endif; ?>
             <div>
                 <p class="font-semibold"><?php echo htmlspecialchars($t['name']); ?></p>
                 <?php if ($t['company']): ?><p class="text-sm text-gray-500"><?php echo htmlspecialchars($t['company']); ?></p><?php endif; ?>
