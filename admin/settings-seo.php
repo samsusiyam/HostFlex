@@ -35,12 +35,34 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
 <?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300"><?php echo $success; ?></div><?php endif; ?>
 <form method="POST">
     <?= csrfField() ?>
+
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-home text-blue-600 dark:text-blue-400"></i> Homepage SEO</h2>
+        <div class="grid grid-cols-1 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Homepage Title</label><input type="text" name="homepage_title" value="<?php echo htmlspecialchars($s['homepage_title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Best Web Hosting in Bangladesh - HostNibo"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Homepage Meta Description</label><textarea name="homepage_meta_description" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="HostNibo offers affordable, fast and reliable web hosting..."><?php echo htmlspecialchars($s['homepage_meta_description'] ?? ''); ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Homepage Meta Keywords</label><input type="text" name="homepage_meta_keywords" value="<?php echo htmlspecialchars($s['homepage_meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="web hosting, domain, VPS, WordPress"></div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-globe text-green-600 dark:text-green-400"></i> Global SEO</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($s['meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="hosting, domain, web hosting"></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Author</label><input type="text" name="meta_author" value="<?php echo htmlspecialchars($s['meta_author'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="<?php echo escSetting('site_name'); ?>"></div>
         </div>
     </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-info-circle text-purple-600 dark:text-purple-400"></i> SEO Tips</h2>
+        <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+            <li><strong>Title:</strong> 30-60 characters ideal. Include main keyword.</li>
+            <li><strong>Meta Description:</strong> 120-160 characters. Summarize the page.</li>
+            <li><strong>H1 Tag:</strong> One main heading per page (e.g., "Contact Us"). Search engines use it to understand the page topic.</li>
+            <li><strong>Keywords:</strong> Comma-separated. Less important for modern SEO but still used by some engines.</li>
+        </ul>
+    </div>
+
     <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-save"></i> Save Settings</button>
 </form>
 <?php include 'footer.php'; ?>

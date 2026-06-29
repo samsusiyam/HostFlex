@@ -101,7 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Contact - <?php echo escSetting('site_name'); ?></title>
+<?php
+$contact_title = getSetting('contact_page_title') ?: 'Contact Us';
+$contact_meta = getSetting('contact_meta_description') ?: getSetting('site_description') ?: 'Get in touch with our support team for hosting solutions, domain registration, and technical support.';
+$contact_kw = getSetting('contact_meta_keywords') ?: getSetting('meta_keywords') ?: 'contact, support, web hosting help';
+?>
+<title><?php echo htmlspecialchars($contact_title); ?> - <?php echo escSetting('site_name'); ?></title>
+<meta name="description" content="<?php echo htmlspecialchars($contact_meta); ?>">
+<meta name="keywords" content="<?php echo htmlspecialchars($contact_kw); ?>">
 </head>
 <body>
 <?php include "header.php"; ?>

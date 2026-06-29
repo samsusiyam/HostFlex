@@ -3,7 +3,13 @@
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
+<?php
+$offers_meta = getSetting('meta_description') ?: 'Check out our latest hosting offers and deals. Save big on web hosting, domains, and more at HostNibo.';
+$offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, web hosting sale';
+?>
 <title>Offers - <?php echo escSetting('site_name'); ?></title>
+<meta name="description" content="<?php echo htmlspecialchars($offers_meta); ?>">
+<meta name="keywords" content="<?php echo htmlspecialchars($offers_kw); ?>">
 </head>
 <body>
 <?php include "header.php"; ?>

@@ -64,7 +64,14 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo escSetting('site_name') ?: 'HostNibo'; ?> - Premium Web Hosting in Bangladesh</title>
+<?php
+$home_title = getSetting('homepage_title') ?: (escSetting('site_name') ?: 'HostNibo') . ' - Premium Web Hosting in Bangladesh';
+$home_meta = getSetting('homepage_meta_description') ?: getSetting('site_description') ?: 'Premium web hosting solutions with exceptional performance, reliability, and 24/7 support.';
+$home_kw = getSetting('homepage_meta_keywords') ?: getSetting('meta_keywords') ?: 'web hosting, domain, VPS, WordPress hosting';
+?>
+<title><?php echo htmlspecialchars($home_title); ?></title>
+<meta name="description" content="<?php echo htmlspecialchars($home_meta); ?>">
+<meta name="keywords" content="<?php echo htmlspecialchars($home_kw); ?>">
 </head>
 <body>
 

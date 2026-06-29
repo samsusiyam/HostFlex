@@ -58,6 +58,15 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
             </label>
         </div>
     </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-search text-purple-600 dark:text-purple-400"></i> Contact Page SEO</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Meta tags for the contact page (for search engines).</p>
+        <div class="grid grid-cols-1 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Contact Page Title</label><input type="text" name="contact_page_title" value="<?php echo htmlspecialchars($s['contact_page_title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Contact Us - HostNibo"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><textarea name="contact_meta_description" rows="2" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Get in touch with HostNibo support team..."><?php echo htmlspecialchars($s['contact_meta_description'] ?? ''); ?></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="contact_meta_keywords" value="<?php echo htmlspecialchars($s['contact_meta_keywords'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="contact, support, web hosting help"></div>
+        </div>
+    </div>
     <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-save"></i> Save Settings</button>
 </form>
 <?php include 'footer.php'; ?>
