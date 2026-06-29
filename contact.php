@@ -102,11 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <?php include "cdnjs.php"; ?>
 <?php
-$contact_title = getSetting('contact_page_title') ?: 'Contact Us';
-$contact_meta = getSetting('contact_meta_description') ?: getSetting('site_description') ?: 'Get in touch with our support team for hosting solutions, domain registration, and technical support.';
-$contact_kw = getSetting('contact_meta_keywords') ?: getSetting('meta_keywords') ?: 'contact, support, web hosting help';
+$site_name = escSetting('site_name') ?: 'HostNibo';
+$contact_title = getSetting('contact_page_title') ?: "Contact Us - $site_name Web Hosting Support";
+$contact_meta = getSetting('contact_meta_description') ?: "Get in touch with $site_name support team. We provide 24/7 web hosting support, domain registration help, and technical assistance for all your hosting needs.";
+$contact_kw = getSetting('contact_meta_keywords') ?: getSetting('meta_keywords') ?: 'contact, support, web hosting help, customer service, domain support';
 ?>
-<title><?php echo htmlspecialchars($contact_title); ?> - <?php echo escSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($contact_title); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($contact_meta); ?>">
 <meta name="keywords" content="<?php echo htmlspecialchars($contact_kw); ?>">
 </head>
@@ -117,7 +118,7 @@ $contact_kw = getSetting('contact_meta_keywords') ?: getSetting('meta_keywords')
 <div class="content">
 <?php $breadcrumbs = [['label' => 'Contact']]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="mb-20 text-center pb-7">
-<h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo escSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
+<h1 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo escSetting('contact_page_heading') ?: 'Contact Us'; ?></h1>
 <p class="text-lg text-gray-500 sm:text-xl dark:text-gray-400"><?php echo escSetting('contact_page_subheading') ?: 'We would love to hear from you.'; ?></p>
 </div>
 <?php if ($success): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto"><?php echo $success; ?></div><?php endif; ?>

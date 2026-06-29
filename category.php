@@ -13,7 +13,14 @@ if (!$category) {
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($category['name']); ?> - <?php echo escSetting('site_name'); ?></title>
+<?php
+$site_name = escSetting('site_name') ?: 'HostNibo';
+$cat_meta = $category['meta_description'] ?: htmlspecialchars($category['description']) ?: "Browse our " . htmlspecialchars($category['name']) . " hosting plans. Affordable, fast and reliable hosting at $site_name.";
+$cat_kw = $category['meta_keywords'] ?: htmlspecialchars($category['name']) . " hosting, $site_name";
+?>
+<title><?php echo htmlspecialchars($category['name']); ?> Hosting - <?php echo $site_name; ?> <?php echo htmlspecialchars($category['name']); ?> Plans</title>
+<meta name="description" content="<?php echo htmlspecialchars($cat_meta); ?>">
+<meta name="keywords" content="<?php echo htmlspecialchars($cat_kw); ?>">
 </head>
 <body>
 <?php include "header.php"; ?>
@@ -24,7 +31,7 @@ if (!$category) {
 <?php $breadcrumbs = [['label' => $category['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
-<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h2>
+<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h1>
 <p class="text-lg md:text-xl font-medium text-gray-200"><?php echo htmlspecialchars($category['description']); ?></p>
 </div>
 </div>

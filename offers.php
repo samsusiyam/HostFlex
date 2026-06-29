@@ -4,10 +4,11 @@
 <head>
 <?php include "cdnjs.php"; ?>
 <?php
-$offers_meta = getSetting('meta_description') ?: 'Check out our latest hosting offers and deals. Save big on web hosting, domains, and more at HostNibo.';
-$offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, web hosting sale';
+$site_name = escSetting('site_name') ?: 'HostNibo';
+$offers_meta = getSetting('meta_description') ?: "Check out our latest hosting offers and deals at $site_name. Save big on web hosting, domain registration, VPS, and dedicated server plans with exclusive discounts.";
+$offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, web hosting sale, domain offers, VPS deals';
 ?>
-<title>Offers - <?php echo escSetting('site_name'); ?></title>
+<title>Hosting Offers & Deals - <?php echo $site_name; ?> Exclusive Discounts</title>
 <meta name="description" content="<?php echo htmlspecialchars($offers_meta); ?>">
 <meta name="keywords" content="<?php echo htmlspecialchars($offers_kw); ?>">
 </head>
@@ -20,7 +21,7 @@ $offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, w
 <?php $breadcrumbs = [['label' => 'Offers']]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
-<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white">Hot Deals &amp; Offers</h2>
+<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-white">Hot Deals &amp; Offers</h1>
 <p class="text-lg md:text-xl font-medium text-gray-200">Unlock more possibilities at a fraction of the cost with our best deals</p>
 </div>
 </div>
