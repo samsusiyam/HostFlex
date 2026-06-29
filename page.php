@@ -8,14 +8,19 @@ if (!$page) {
     include __DIR__ . '/404.php';
     exit;
 }
+$skip_default_meta = true;
+$site_name = escSetting('site_name') ?: 'HostNibo';
+$page_title_seo = $page['title'] . " - " . $site_name;
+$page_meta = $page['meta_description'] ?: "Learn more about " . $page['title'] . " at " . $site_name . ". Everything you need to know about our web hosting services and policies.";
+$page_kw = $page['meta_keywords'] ?: $page['title'] . ", " . $site_name;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($page['title']); ?> - <?php echo escSetting('site_name'); ?></title>
-<meta name="description" content="<?php echo htmlspecialchars($page['meta_description']); ?>">
-<meta name="keywords" content="<?php echo htmlspecialchars($page['meta_keywords']); ?>">
+<title><?php echo htmlspecialchars($page_title_seo); ?></title>
+<meta name="description" content="<?php echo htmlspecialchars($page_meta); ?>">
+<meta name="keywords" content="<?php echo htmlspecialchars($page_kw); ?>">
 </head>
 <body>
 <?php include "header.php"; ?>
