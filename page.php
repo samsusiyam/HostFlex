@@ -9,8 +9,8 @@ if (!$page) {
     exit;
 }
 $skip_default_meta = true;
-$site_name = escSetting('site_name') ?: 'HostNibo';
-$page_title_seo = $page['title'] . " - " . $site_name;
+$site_name = escSetting('site_name') ?: 'Host Nibo';
+$page_title_seo = stripos($page['title'], $site_name) !== false ? $page['title'] : $page['title'] . " - " . $site_name;
 $page_meta = $page['meta_description'] ?: "Learn more about " . $page['title'] . " at " . $site_name . ". Everything you need to know about our web hosting services and policies.";
 $page_kw = $page['meta_keywords'] ?: $page['title'] . ", " . $site_name;
 ?>
