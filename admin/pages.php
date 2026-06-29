@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = sanitize($_POST['title']);
     $slug = sanitize($_POST['slug']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
+    $meta_title = sanitize($_POST['meta_title']);
     $meta_description = sanitize($_POST['meta_description']);
     $meta_keywords = sanitize($_POST['meta_keywords']);
     $status = isset($_POST['status']) ? 1 : 0;
@@ -25,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         checkPermission('pages', 'edit');
         $id = (int)$_POST['id'];
-        mysqli_query($conn, "UPDATE pages SET title='$title', slug='$slug', content='$content', meta_description='$meta_description', meta_keywords='$meta_keywords', status=$status WHERE id=$id");
+        mysqli_query($conn, "UPDATE pages SET title='$title', slug='$slug', content='$content', meta_title='$meta_title', meta_description='$meta_description', meta_keywords='$meta_keywords', status=$status WHERE id=$id");
     } else {
         checkPermission('pages', 'create');
-        mysqli_query($conn, "INSERT INTO pages (title, slug, content, meta_description, meta_keywords, status) VALUES ('$title', '$slug', '$content', '$meta_description', '$meta_keywords', $status)");
+        mysqli_query($conn, "INSERT INTO pages (title, slug, content, meta_title, meta_description, meta_keywords, status) VALUES ('$title', '$slug', '$content', '$meta_title', '$meta_description', '$meta_keywords', $status)");
     }
     header('Location: pages.php');
     exit;
@@ -41,6 +42,11 @@ if (isset($_GET['edit'])) {
     $edit = mysqli_fetch_assoc($r);
 }
 $pages = mysqli_query($conn, "SELECT * FROM pages ORDER BY title ASC");
+
+$has_meta_title = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM pages LIKE 'meta_title'"));
+if (!$has_meta_title) {
+    @mysqli_query($conn, "ALTER TABLE pages ADD COLUMN meta_title VARCHAR(255) DEFAULT '' AFTER title");
+}
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6 flex justify-between items-center">
@@ -55,9 +61,10 @@ $pages = mysqli_query($conn, "SELECT * FROM pages ORDER BY title ASC");
         <?= csrfField() ?>
         <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo $edit['id']; ?>"><?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label><input type="text" name="title" value="<?php echo $edit ? htmlspecialchars($edit['title']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Page Title (display)</label><input type="text" name="title" value="<?php echo $edit ? htmlspecialchars($edit['title']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Title (SEO)</label><input type="text" name="meta_title" value="<?php echo $edit ? htmlspecialchars($edit['meta_title'] ?? '') : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Leave empty to use Page Title + Site Name"></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label><input type="text" name="slug" value="<?php echo $edit ? htmlspecialchars($edit['slug']) : ''; ?>" required class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="e.g. about-us"></div>
-            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><input type="text" name="meta_description" value="<?php echo $edit ? htmlspecialchars($edit['meta_description']) : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><textarea name="meta_description" rows="2" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"><?php echo $edit ? htmlspecialchars($edit['meta_description']) : ''; ?></textarea></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo $edit ? htmlspecialchars($edit['meta_keywords']) : ''; ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></div>
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Content (HTML)</label>
