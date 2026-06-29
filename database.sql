@@ -156,6 +156,7 @@ INSERT INTO categories (name, slug, description, image, sort_order) VALUES
 CREATE TABLE pages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
+    meta_title VARCHAR(255) DEFAULT '',
     slug VARCHAR(200) NOT NULL UNIQUE,
     content LONGTEXT,
     meta_description VARCHAR(500),
@@ -182,6 +183,9 @@ CREATE TABLE blog_categories (
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
+    meta_title VARCHAR(255) DEFAULT '',
+    meta_description TEXT,
+    meta_keywords VARCHAR(500),
     sort_order INT DEFAULT 0,
     status BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
