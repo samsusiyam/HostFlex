@@ -1,32 +1,89 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 
 $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : '';
-$category = getCategoryBySlug($slug);
 
-if (!$category) {
+$blog_cat = null;
+$r = @$conn->query("SELECT * FROM blog_categories WHERE slug = '" . mysqli_real_escape_string($conn, $slug) . "' AND status = 1 LIMIT 1");
+if ($r && mysqli_num_rows($r) > 0) {
+    $blog_cat = mysqli_fetch_assoc($r);
+}
+
+$hosting_cat = getCategoryBySlug($slug);
+
+if (!$blog_cat && !$hosting_cat) {
     header('HTTP/1.0 404 Not Found');
     include __DIR__ . '/404.php';
     exit;
+}
+
+if ($blog_cat) {
+    $page_title = $blog_cat['name'] . ' - Blog';
+    $post_count_q = @$conn->query("SELECT COUNT(*) as c FROM blog_posts WHERE status = 1 AND (category_id = {$blog_cat['id']} OR EXISTS (SELECT 1 FROM blog_post_categories WHERE post_id = blog_posts.id AND category_id = {$blog_cat['id']}))");
+    $post_count = ($post_count_q && $row = mysqli_fetch_assoc($post_count_q)) ? $row['c'] : 0;
+
+    $posts_q = @$conn->query("SELECT DISTINCT p.* FROM blog_posts p LEFT JOIN blog_post_categories bpc ON p.id = bpc.post_id WHERE p.status = 1 AND (p.category_id = {$blog_cat['id']} OR bpc.category_id = {$blog_cat['id']}) ORDER BY p.created_at DESC");
+    $posts = [];
+    if ($posts_q) { while ($row = mysqli_fetch_assoc($posts_q)) { $posts[] = $row; } }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($category['name']); ?> - <?php echo escSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($blog_cat ? $blog_cat['name'] : $hosting_cat['name']); ?> - <?php echo escSetting('site_name'); ?></title>
 </head>
 <body>
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
-<div class="-z-50" style="background-image: url('img/7ee6a14d8e2-shutterstock_1394052911-scaled.html'); background-size: cover; background-position: center;">
+
+<?php if ($blog_cat): ?>
+<div class="bg-blue-600 bg-opacity-90 py-16">
+<div class="content">
+    <?php $breadcrumbs = [['label' => 'Blog', 'url' => '/blogs.php'], ['label' => $blog_cat['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
+    <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($blog_cat['name']); ?></h2>
+    <?php if ($blog_cat['description']): ?>
+    <p class="text-lg text-gray-200"><?php echo htmlspecialchars($blog_cat['description']); ?></p>
+    <?php endif; ?>
+    <p class="text-gray-300 mt-2"><?php echo $post_count; ?> <?php echo $post_count === 1 ? 'post' : 'posts'; ?></p>
+</div>
+</div>
+
+<section class="section_gap">
+<div class="content">
+<?php if (!empty($posts)): ?>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<?php foreach ($posts as $post): ?>
+<a href="/blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
+    <?php if ($post['image']): ?>
+    <img src="../<?php echo htmlspecialchars($post['image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+    <?php else: ?>
+    <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center"><i class="fa fa-blog text-white text-4xl opacity-50"></i></div>
+    <?php endif; ?>
+    <div class="p-5">
+        <h3 class="font-bold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-blue-600 transition"><?php echo htmlspecialchars($post['title']); ?></h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2"><?php echo htmlspecialchars($post['excerpt'] ?: strip_tags(substr($post['content'], 0, 150))); ?></p>
+        <div class="flex items-center justify-between mt-4 text-xs text-gray-400">
+            <?php if ($post['author']): ?><span><i class="fa fa-user mr-1"></i><?php echo htmlspecialchars($post['author']); ?></span><?php endif; ?>
+            <span><?php echo date('d M Y', strtotime($post['created_at'])); ?></span>
+        </div>
+    </div>
+</a>
+<?php endforeach; ?>
+</div>
+<?php else: ?>
+<div class="text-center py-16"><p class="text-gray-400 text-lg">No posts in this category yet.</p></div>
+<?php endif; ?>
+</div>
+</section>
+
+<?php else: ?>
 <div class="bg-blue-600 bg-opacity-70">
 <div class="space-y-16 content mx-auto py-16 lg:pt-20 lg:pb-20">
-<?php $breadcrumbs = [['label' => $category['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
+<?php $breadcrumbs = [['label' => $hosting_cat['name']]]; include __DIR__ . '/breadcrumb.php'; ?>
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
-<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h2>
-<p class="text-lg md:text-xl font-medium text-gray-200"><?php echo htmlspecialchars($category['description']); ?></p>
-</div>
+<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($hosting_cat['name']); ?></h2>
+<p class="text-lg md:text-xl font-medium text-gray-200"><?php echo htmlspecialchars($hosting_cat['description']); ?></p>
 </div>
 </div>
 </div>
@@ -39,10 +96,9 @@ if (!$category) {
 <h2 class="text-black">Choose the best plan</h2>
 <p>Honest and affordable pricing model to help you get started easily.</p>
 </div>
-
 <?php $sym = htmlspecialchars(getSetting('currency_symbol') ?: 'TK.', ENT_QUOTES, 'UTF-8'); ?>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-<?php $plans = getPlans($category['slug']); ?>
+<?php $plans = getPlans($hosting_cat['slug']); ?>
 <?php if (mysqli_num_rows($plans) > 0): ?>
 <?php while ($plan = mysqli_fetch_assoc($plans)):
     $features = json_decode($plan['features'], true);
@@ -102,33 +158,21 @@ function toggleBilling(el, period) {
     var labelSpan = card.querySelector('.priceFor');
     var labels = card.querySelectorAll('.billingLabel');
     var input = card.querySelector('.billingCheck');
-
-    if (!period) {
-        period = input.checked ? 'yearly' : 'monthly';
-    }
-
+    if (!period) { period = input.checked ? 'yearly' : 'monthly'; }
     labels.forEach(function(l) {
         l.classList.remove('text-blue-700', 'text-gray-400');
-        if (l.getAttribute('data-period') === period) {
-            l.classList.add('text-blue-700');
-        } else {
-            l.classList.add('text-gray-400');
-        }
+        if (l.getAttribute('data-period') === period) { l.classList.add('text-blue-700'); }
+        else { l.classList.add('text-gray-400'); }
     });
-
-    if (period === 'yearly') {
-        input.checked = true;
-    } else {
-        input.checked = false;
-    }
-
+    if (period === 'yearly') { input.checked = true; } else { input.checked = false; }
     priceSpan.textContent = priceSpan.getAttribute('data-' + period);
     labelSpan.textContent = period === 'monthly' ? '/month' : '/year';
 }
 </script>
 </div>
 </section>
+<?php endif; ?>
+
 <?php include "footer.php"; ?>
 </body>
 </html>
-

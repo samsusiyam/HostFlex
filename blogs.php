@@ -26,7 +26,7 @@ $where = "WHERE p.status = 1";
 $params = [];
 if ($cat_slug) {
     $cat_slug_esc = mysqli_real_escape_string($conn, $cat_slug);
-    $where .= " AND c.slug = '$cat_slug_esc'";
+    $where .= " AND EXISTS (SELECT 1 FROM blog_post_categories bpc JOIN blog_categories bc ON bpc.category_id = bc.id WHERE bpc.post_id = p.id AND bc.slug = '$cat_slug_esc')";
 }
 if ($search_q) {
     $search_esc = mysqli_real_escape_string($conn, $search_q);
@@ -55,8 +55,18 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
                 </a>
                 <?php endif; ?>
                 <div class="p-5">
-                    <?php if ($post['category_name']): ?>
-                    <a href="category.php?slug=<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+                    <?php
+                    $cat_q = mysqli_query($conn, "SELECT bc.name, bc.slug FROM blog_post_categories bpc JOIN blog_categories bc ON bpc.category_id = bc.id WHERE bpc.post_id = {$post['id']}");
+                    $post_cats = [];
+                    if ($cat_q) { while ($cr = mysqli_fetch_assoc($cat_q)) { $post_cats[] = $cr; } }
+                    if (empty($post_cats) && $post['category_name']) { $post_cats[] = ['name' => $post['category_name'], 'slug' => $post['category_slug']]; }
+                    if (!empty($post_cats)):
+                    ?>
+                    <div class="flex flex-wrap gap-1 mb-2">
+                        <?php foreach ($post_cats as $pc): ?>
+                        <a href="/category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($pc['name']); ?></a>
+                        <?php endforeach; ?>
+                    </div>
                     <?php endif; ?>
                     <h3 class="text-lg font-bold mt-1 mb-2"><a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($post['title']); ?></a></h3>
                     <p class="text-sm text-gray-500 mb-3"><?php echo htmlspecialchars($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 150) . '...'); ?></p>
@@ -88,7 +98,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <div class="space-y-2">
                 <a href="blogs.php" class="block text-sm <?php echo !$cat_slug ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">All Categories</a>
                 <?php while ($cat = mysqli_fetch_assoc($categories)):
-                    $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE category_id = {$cat['id']} AND status = 1"));
+                    $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_post_categories WHERE category_id = {$cat['id']}"));
                 ?>
                 <a href="/category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
                     <?php echo htmlspecialchars($cat['name']); ?> (<?php echo $count['c']; ?>)

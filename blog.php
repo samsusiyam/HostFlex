@@ -32,8 +32,18 @@ $meta_kw = $post['meta_keywords'] ?? '';
 <div class="content max-w-4xl mx-auto">
     <?php $breadcrumbs = [['label' => 'Blog', 'url' => '/blogs.php'], ['label' => $post['title']]]; include __DIR__ . '/breadcrumb.php'; ?>
     <div class="mb-6">
-        <?php if ($post['category_name']): ?>
-        <a href="/category.php?slug=<?php echo htmlspecialchars($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+        <?php
+        $cat_q = @$conn->query("SELECT bc.name, bc.slug FROM blog_post_categories bpc JOIN blog_categories bc ON bpc.category_id = bc.id WHERE bpc.post_id = {$post['id']}");
+        $post_cats = [];
+        if ($cat_q) { while ($cr = mysqli_fetch_assoc($cat_q)) { $post_cats[] = $cr; } }
+        if (empty($post_cats) && $post['category_name']) { $post_cats[] = ['name' => $post['category_name'], 'slug' => $post['category_slug']]; }
+        if (!empty($post_cats)):
+        ?>
+        <div class="flex flex-wrap gap-2 mb-2">
+            <?php foreach ($post_cats as $pc): ?>
+            <a href="/category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded"><?php echo htmlspecialchars($pc['name']); ?></a>
+            <?php endforeach; ?>
+        </div>
         <?php endif; ?>
         <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-3"><?php echo htmlspecialchars($post['title']); ?></h1>
         <div class="text-sm text-gray-500 flex items-center gap-3">

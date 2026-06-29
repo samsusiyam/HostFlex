@@ -87,13 +87,14 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
             </thead>
             <tbody class="divide-y dark:divide-gray-600">
                 <?php while ($cat = mysqli_fetch_assoc($categories)):
-                    $post_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE category_id = {$cat['id']}"));
+                    $post_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_post_categories WHERE category_id = {$cat['id']}"));
                 ?>
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td class="px-4 py-3 text-sm font-medium"><?php echo htmlspecialchars($cat['name']); ?></td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($cat['slug']); ?></td>
                     <td class="px-4 py-3 text-sm"><?php echo $post_count['c']; ?></td>
                     <td class="px-4 py-3 text-right">
+                        <a href="../category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 mr-2" title="View"><i class="fa fa-eye"></i></a>
                         <button onclick="editCat(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['slug'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['description'] ?? '', ENT_QUOTES); ?>')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2"><i class="fa fa-edit"></i></button>
                         <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category? Related posts will become uncategorized.')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                     </td>

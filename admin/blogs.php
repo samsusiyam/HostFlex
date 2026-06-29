@@ -5,6 +5,15 @@ require_once '../includes/functions.php';
 checkAdminLogin();
 checkPermission('blog', 'view');
 
+if (!tableExists('blog_post_categories')) {
+    @mysqli_query($conn, "CREATE TABLE blog_post_categories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        post_id INT NOT NULL,
+        category_id INT NOT NULL,
+        UNIQUE KEY unique_post_cat (post_id, category_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+}
+
 $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT username FROM users WHERE id = " . (int)$_SESSION['admin_id']));
 $admin_username = $admin['username'] ?? 'Admin';
 
@@ -64,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
     $content = $_POST['content'] ?? '';
     $excerpt = sanitize($_POST['excerpt'] ?? '');
     $category_id = (int)($_POST['category_id'] ?? 0);
+    $category_ids = $_POST['category_ids'] ?? [];
     $author = sanitize($_POST['author'] ?? $admin_username);
     $status = isset($_POST['status']) ? 1 : 0;
     $meta_description = sanitize($_POST['meta_description'] ?? '');
@@ -97,12 +107,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
                 $image = $old['image'];
             }
             mysqli_query($conn, "UPDATE blog_posts SET title='$title', slug='$slug', content='$content_esc', excerpt='$excerpt', image='$image', category_id=$cat_sql, author='$author', status=$status, meta_description='$meta_description', meta_keywords='$meta_keywords' WHERE id=$edit_id");
+            @mysqli_query($conn, "DELETE FROM blog_post_categories WHERE post_id = $edit_id");
+            $ins_cat = $category_id > 0 ? $category_id : 0;
+            if ($ins_cat) { @mysqli_query($conn, "INSERT IGNORE INTO blog_post_categories (post_id, category_id) VALUES ($edit_id, $ins_cat)"); }
+            foreach ($category_ids as $cid) {
+                $cid = (int)$cid;
+                if ($cid > 0) { @mysqli_query($conn, "INSERT IGNORE INTO blog_post_categories (post_id, category_id) VALUES ($edit_id, $cid)"); }
+            }
             logActivity('Updated Post', $title . ' (ID: ' . $edit_id . ')');
             header('Location: blogs.php?msg=updated');
             exit;
         } else {
             checkPermission('blog', 'create');
             mysqli_query($conn, "INSERT INTO blog_posts (title, slug, content, excerpt, image, category_id, author, status, meta_description, meta_keywords) VALUES ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, '$meta_description', '$meta_keywords')");
+            $new_id = mysqli_insert_id($conn);
+            $ins_cat = $category_id > 0 ? $category_id : 0;
+            if ($ins_cat) { @mysqli_query($conn, "INSERT IGNORE INTO blog_post_categories (post_id, category_id) VALUES ($new_id, $ins_cat)"); }
+            foreach ($category_ids as $cid) {
+                $cid = (int)$cid;
+                if ($cid > 0) { @mysqli_query($conn, "INSERT IGNORE INTO blog_post_categories (post_id, category_id) VALUES ($new_id, $cid)"); }
+            }
             logActivity('Created Post', $title);
             header('Location: blogs.php?msg=added');
             exit;
@@ -113,6 +137,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
 $edit_post = null;
 if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     $edit_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM blog_posts WHERE id = " . (int)$_GET['edit']));
+    if ($edit_post) {
+        $existing_cats = [];
+        $pcr = @mysqli_query($conn, "SELECT category_id FROM blog_post_categories WHERE post_id = {$edit_post['id']}");
+        if ($pcr) { while ($pcr_row = mysqli_fetch_assoc($pcr)) { $existing_cats[] = (int)$pcr_row['category_id']; } }
+        if (empty($existing_cats) && $edit_post['category_id']) { $existing_cats[] = (int)$edit_post['category_id']; }
+    }
 }
 
 $search = trim($_GET['search'] ?? '');
@@ -131,6 +161,18 @@ $posts = mysqli_query($conn, "SELECT p.*, c.name as category_name FROM blog_post
 $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 1 ORDER BY name");
 $all_cats = [];
 while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
+
+$post_cat_map = [];
+if ($total > 0) {
+    $all_post_ids = [];
+    $temp_q = mysqli_query($conn, "SELECT p.id FROM blog_posts p $where ORDER BY p.created_at DESC LIMIT $per_page OFFSET $offset");
+    if ($temp_q) { while ($temp_row = mysqli_fetch_assoc($temp_q)) { $all_post_ids[] = $temp_row['id']; } }
+    if (!empty($all_post_ids)) {
+        $ids_str = implode(',', $all_post_ids);
+        $bpc_q = mysqli_query($conn, "SELECT bpc.post_id, bc.name FROM blog_post_categories bpc JOIN blog_categories bc ON bpc.category_id = bc.id WHERE bpc.post_id IN ($ids_str)");
+        if ($bpc_q) { while ($bpc_row = mysqli_fetch_assoc($bpc_q)) { $post_cat_map[$bpc_row['post_id']][] = $bpc_row['name']; } }
+    }
+}
 ?>
 <?php include 'header.php'; ?>
 <div class="mb-6 flex items-center justify-between">
@@ -144,7 +186,9 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
 <?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
 
 <?php if ($edit_post !== null || isset($_GET['edit'])): ?>
-<?php $ep = $edit_post; $is_new = !$ep && isset($_GET['edit']) && $_GET['edit'] == 0; $ep = $ep ?: ['id'=>0,'title'=>'','slug'=>'','content'=>'','excerpt'=>'','image'=>'','category_id'=>0,'author'=>$admin_username,'status'=>1,'meta_description'=>'','meta_keywords'=>'']; ?>
+<?php $ep = $edit_post; $is_new = !$ep && isset($_GET['edit']) && $_GET['edit'] == 0; $ep = $ep ?: ['id'=>0,'title'=>'','slug'=>'','content'=>'','excerpt'=>'','image'=>'','category_id'=>0,'author'=>$admin_username,'status'=>1,'meta_description'=>'','meta_keywords'=>''];
+if (!isset($existing_cats)) { $existing_cats = $ep['category_id'] ? [(int)$ep['category_id']] : []; }
+?>
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
     <h2 class="text-lg font-semibold mb-4"><?php echo $is_new ? 'New Post' : 'Edit Post'; ?></h2>
     <form method="POST" enctype="multipart/form-data">
@@ -162,25 +206,31 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category</label>
-                    <div class="flex gap-2">
-                        <select name="category_id" id="catSelect" class="flex-1 border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
-                            <option value="">None</option>
-                            <?php foreach ($all_cats as $c): ?>
-                            <option value="<?php echo $c['id']; ?>" <?php echo $ep['category_id'] == $c['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($c['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Categories</label>
+                    <div class="flex gap-2 mb-2">
                         <button type="button" onclick="showCatForm()" class="bg-green-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-green-600" title="Add Category"><i class="fa fa-plus"></i></button>
                         <button type="button" onclick="editCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-blue-600" title="Edit Category"><i class="fa fa-pencil-alt"></i></button>
                         <button type="button" onclick="deleteCat()" class="bg-red-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-red-600" title="Delete Category"><i class="fa fa-trash"></i></button>
                     </div>
+                    <div class="space-y-1 max-h-40 overflow-y-auto border dark:border-gray-600 rounded p-2">
+                        <?php foreach ($all_cats as $c): ?>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 px-2 py-1 rounded">
+                            <input type="checkbox" name="category_ids[]" value="<?php echo $c['id']; ?>" <?php echo in_array($c['id'], $existing_cats) ? 'checked' : ''; ?> class="h-4 w-4 text-blue-600 dark:text-blue-400 border dark:border-gray-600 rounded">
+                            <span class="text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars($c['name']); ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                        <?php if (empty($all_cats)): ?>
+                        <p class="text-xs text-gray-400 dark:text-gray-500">No categories yet</p>
+                        <?php endif; ?>
+                    </div>
+                    <input type="hidden" name="category_id" id="catSelectHidden" value="<?php echo $ep['category_id']; ?>">
                     <div id="catForm" class="hidden mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600 flex gap-2 items-center">
                         <input type="text" id="catName" placeholder="Category name" class="flex-1 border rounded px-3 py-2 text-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
                         <input type="hidden" id="catEditId" value="">
                         <button type="button" onclick="saveCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm dark:hover:bg-blue-600">Save</button>
                         <button type="button" onclick="hideCatForm()" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
                     </div>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Manage categories inline</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Select multiple categories for this post</p>
                 </div>
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Author</label>
                     <input type="text" name="author" value="<?php echo htmlspecialchars($ep['author']); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
@@ -237,7 +287,13 @@ while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
                     <?php if ($post['image']): ?><img src="../<?php echo htmlspecialchars($post['image']); ?>" class="w-8 h-8 object-cover rounded inline mr-2"><?php endif; ?>
                     <?php echo htmlspecialchars($post['title']); ?>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($post['category_name'] ?? 'Uncategorized'); ?></td>
+                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    <?php
+                    $cats_for_post = $post_cat_map[$post['id']] ?? [];
+                    if (!empty($cats_for_post)) { echo htmlspecialchars(implode(', ', $cats_for_post)); }
+                    else { echo htmlspecialchars($post['category_name'] ?? 'Uncategorized'); }
+                    ?>
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($post['author'] ?: '-'); ?></td>
                 <td class="px-4 py-3">
                     <span class="text-xs px-2 py-1 rounded-full <?php echo $post['status'] ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'; ?>"><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
@@ -307,18 +363,21 @@ function saveCat() {
     $.post('', data, function() { location.reload(); });
 }
 function editCat() {
-    var sel = document.getElementById('catSelect');
-    if (!sel.value) return alert('Select a category first');
-    var text = sel.options[sel.selectedIndex].text;
+    var checked = document.querySelectorAll('input[name="category_ids[]"]:checked');
+    if (checked.length === 0) return alert('Select a category first');
+    var id = checked[0].value;
+    var label = checked[0].closest('label').querySelector('span').textContent;
     $('#catForm').removeClass('hidden');
-    $('#catEditId').val(sel.value);
-    $('#catName').val(text).focus();
+    $('#catEditId').val(id);
+    $('#catName').val(label).focus();
 }
 function deleteCat() {
-    var sel = document.getElementById('catSelect');
-    if (!sel.value) return alert('Select a category first');
-    if (!confirm('Delete category "' + sel.options[sel.selectedIndex].text + '"?')) return;
-    $.post('', 'inline_cat=delete&id=' + sel.value, function() { location.reload(); });
+    var checked = document.querySelectorAll('input[name="category_ids[]"]:checked');
+    if (checked.length === 0) return alert('Select a category first');
+    var id = checked[0].value;
+    var label = checked[0].closest('label').querySelector('span').textContent;
+    if (!confirm('Delete category "' + label + '"?')) return;
+    $.post('', 'inline_cat=delete&id=' + id, function() { location.reload(); });
 }
 </script>
 <?php include 'footer.php'; ?>
