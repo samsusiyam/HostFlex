@@ -24,6 +24,7 @@ $post_count = ($post_count_q && $row = mysqli_fetch_assoc($post_count_q)) ? $row
 $posts_q = @$conn->query("SELECT DISTINCT p.* FROM blog_posts p LEFT JOIN blog_post_categories bpc ON p.id = bpc.post_id WHERE p.status = 1 AND (p.category_id = {$blog_cat['id']} OR bpc.category_id = {$blog_cat['id']}) ORDER BY p.created_at DESC");
 $posts = [];
 if ($posts_q) { while ($row = mysqli_fetch_assoc($posts_q)) { $posts[] = $row; } }
+$skip_default_meta = true;
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -11,6 +11,7 @@ if (!$post) { header('Location: blogs.php'); exit; }
 $page_title = $post['title'];
 $meta_desc = $post['meta_description'] ?: ($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 160));
 $meta_kw = $post['meta_keywords'] ?? '';
+$skip_default_meta = true;
 ?>
 <!DOCTYPE html>
 <html lang="en">

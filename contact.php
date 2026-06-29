@@ -97,16 +97,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<?php include "cdnjs.php"; ?>
 <?php
 $site_name = escSetting('site_name') ?: 'HostNibo';
 $contact_title = getSetting('contact_page_title') ?: "Contact Us - $site_name Web Hosting Support";
 $contact_meta = getSetting('contact_meta_description') ?: "Get in touch with $site_name support team. We provide 24/7 web hosting support, domain registration help, and technical assistance for all your hosting needs.";
 $contact_kw = getSetting('contact_meta_keywords') ?: getSetting('meta_keywords') ?: 'contact, support, web hosting help, customer service, domain support';
+$skip_default_meta = true;
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<?php include "cdnjs.php"; ?>
 <title><?php echo htmlspecialchars($contact_title); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($contact_meta); ?>">
 <meta name="keywords" content="<?php echo htmlspecialchars($contact_kw); ?>">

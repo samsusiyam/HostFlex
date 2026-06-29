@@ -1,12 +1,14 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 $page_title = 'Blog';
+$skip_default_meta = true;
+$blogs_desc = 'Read our latest blog posts about web hosting, technology tips, domain guides and hosting industry news from HostNibo.';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
 <title>Blog - <?php echo escSetting('site_name'); ?></title>
-<meta name="description" content="Read our latest blog posts about web hosting, technology and more">
+<meta name="description" content="<?php echo htmlspecialchars($blogs_desc); ?>">
 </head>
 <body>
 <?php include "header.php"; ?>

@@ -1,7 +1,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="<?php echo htmlspecialchars(escSetting('site_description') ?: 'Premium web hosting solutions with exceptional performance, reliability, and 24/7 support.'); ?>">
+<?php if (empty($skip_default_meta)): ?><meta name="description" content="<?php echo htmlspecialchars(escSetting('site_description') ?: 'Premium web hosting solutions with exceptional performance, reliability, and 24/7 support.'); ?>"><?php endif; ?>
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="shortcut icon" href="<?php echo escSetting('favicon') ?: 'images/favicon.ico'; ?>" type="image/x-icon" />
 <?php
