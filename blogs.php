@@ -64,7 +64,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
                     ?>
                     <div class="flex flex-wrap gap-1 mb-2">
                         <?php foreach ($post_cats as $pc): ?>
-                        <a href="/category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($pc['name']); ?></a>
+                        <a href="/blog-category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($pc['name']); ?></a>
                         <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
@@ -100,7 +100,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
                 <?php while ($cat = mysqli_fetch_assoc($categories)):
                     $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_post_categories WHERE category_id = {$cat['id']}"));
                 ?>
-                <a href="/category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
+                <a href="/blog-category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
                     <?php echo htmlspecialchars($cat['name']); ?> (<?php echo $count['c']; ?>)
                 </a>
                 <?php endwhile; ?>

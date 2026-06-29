@@ -27,6 +27,7 @@ if ($r) { while ($row = $r->fetch_assoc()) {
 $all_links = [];
 $broken_links = [];
 $checked_urls = [];
+$link_sources = [];
 
 foreach ($pages_to_check as $page) {
     $full_url = $base_url . $page['url'];
@@ -63,50 +64,70 @@ foreach ($pages_to_check as $page) {
         }
 
         $all_links[] = $check_url;
+        $link_sources[$check_url][] = ['page' => $page['name'], 'source_url' => $page['url'], 'href' => $href];
 
-        if (isset($checked_urls[$check_url])) {
-            if ($checked_urls[$check_url] !== true) {
-                $broken_links[] = [
-                    'source_page' => $page['name'],
-                    'source_url' => $page['url'],
-                    'link_url' => $check_url,
-                    'link_text' => $href,
-                    'status' => $checked_urls[$check_url],
-                    'http_code' => 0,
-                ];
-            }
-            continue;
+        if (!isset($checked_urls[$check_url])) {
+            $checked_urls[$check_url] = null;
         }
+    }
+}
 
-        $ch = curl_init($check_url);
+$unchecked = array_keys(array_filter($checked_urls, fn($v) => $v === null));
+$batch_size = 20;
+
+for ($i = 0; $i < count($unchecked); $i += $batch_size) {
+    $batch = array_slice($unchecked, $i, $batch_size);
+    $mh = curl_multi_init();
+    $handles = [];
+
+    foreach ($batch as $url) {
+        $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 10,
-            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 8,
+            CURLOPT_CONNECTTIMEOUT => 4,
             CURLOPT_NOBODY => true,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 5,
+            CURLOPT_MAXREDIRS => 3,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_USERAGENT => 'HostNibo Link Checker/1.0',
         ]);
-        curl_exec($ch);
+        curl_multi_add_handle($mh, $ch);
+        $handles[$url] = $ch;
+    }
+
+    do {
+        $status = curl_multi_exec($mh, $active);
+        if ($active) curl_multi_select($mh, 0.5);
+    } while ($active && $status === CURLM_OK);
+
+    foreach ($handles as $url => $ch) {
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
+        curl_multi_remove_handle($mh, $ch);
         curl_close($ch);
 
         if ($http_code >= 400 || $http_code === 0) {
             $status = $error ?: ($http_code >= 400 ? "HTTP $http_code" : "Connection Failed");
-            $checked_urls[$check_url] = $status;
-            $broken_links[] = [
-                'source_page' => $page['name'],
-                'source_url' => $page['url'],
-                'link_url' => $check_url,
-                'link_text' => $href,
-                'status' => $status,
-                'http_code' => $http_code,
-            ];
+            $checked_urls[$url] = $status;
         } else {
-            $checked_urls[$check_url] = true;
+            $checked_urls[$url] = true;
+        }
+    }
+    curl_multi_close($mh);
+}
+
+foreach ($link_sources as $url => $sources) {
+    if ($checked_urls[$url] !== true) {
+        foreach ($sources as $src) {
+            $broken_links[] = [
+                'source_page' => $src['page'],
+                'source_url' => $src['source_url'],
+                'link_url' => $url,
+                'link_text' => $src['href'],
+                'status' => $checked_urls[$url],
+                'http_code' => 0,
+            ];
         }
     }
 }

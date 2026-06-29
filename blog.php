@@ -41,7 +41,7 @@ $meta_kw = $post['meta_keywords'] ?? '';
         ?>
         <div class="flex flex-wrap gap-2 mb-2">
             <?php foreach ($post_cats as $pc): ?>
-            <a href="/category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded"><?php echo htmlspecialchars($pc['name']); ?></a>
+            <a href="/blog-category.php?slug=<?php echo htmlspecialchars($pc['slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded"><?php echo htmlspecialchars($pc['name']); ?></a>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
