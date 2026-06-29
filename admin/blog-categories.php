@@ -14,6 +14,14 @@ $has_meta_title = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blo
 if (!$has_meta_title) {
     @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_title VARCHAR(255) DEFAULT '' AFTER description");
 }
+$has_meta_desc = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blog_categories LIKE 'meta_description'"));
+if (!$has_meta_desc) {
+    @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_description TEXT AFTER meta_title");
+}
+$has_meta_kw = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blog_categories LIKE 'meta_keywords'"));
+if (!$has_meta_kw) {
+    @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_keywords VARCHAR(500) DEFAULT '' AFTER meta_description");
+}
 
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     checkPermission('blog', 'delete');
