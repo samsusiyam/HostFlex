@@ -3,6 +3,7 @@ require_once 'config/database.php';
 require_once 'includes/functions.php';
 checkMaintenance();
 $site_name = escSetting('site_name') ?: 'HostNibo';
+$offers_title = getSetting('offers_page_title') ?: "Hosting Offers & Deals - $site_name Exclusive Discounts";
 $offers_meta = getSetting('offers_meta_description') ?: "Check out our latest hosting offers and deals at $site_name. Save big on web hosting, domain registration, VPS, and dedicated server plans with exclusive discounts.";
 $offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, web hosting sale, domain offers, VPS deals';
 $skip_default_meta = true;
@@ -11,7 +12,7 @@ $skip_default_meta = true;
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Hosting Offers & Deals - <?php echo $site_name; ?> Exclusive Discounts</title>
+<title><?php echo htmlspecialchars($offers_title); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($offers_meta); ?>">
 <meta name="keywords" content="<?php echo htmlspecialchars($offers_kw); ?>">
 </head>

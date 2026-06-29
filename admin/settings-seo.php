@@ -56,14 +56,16 @@ $s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-tags text-orange-600 dark:text-orange-400"></i> Offers Page SEO</h2>
         <div class="grid grid-cols-1 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Offers Page Title</label><input type="text" name="offers_page_title" value="<?php echo htmlspecialchars($s['offers_page_title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Hosting Offers & Deals - HostNibo Exclusive Discounts"></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Offers Meta Description</label><textarea name="offers_meta_description" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Check out our latest hosting offers and deals..."><?php echo htmlspecialchars($s['offers_meta_description'] ?? ''); ?></textarea></div>
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fa fa-newspaper text-blue-600 dark:text-blue-400"></i> Blog SEO</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Individual blog post SEO can be set when creating/editing each post. Blog listing page meta description is set in code default.</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Individual blog post SEO can be set when creating/editing each post.</p>
         <div class="grid grid-cols-1 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Blog Listing Title</label><input type="text" name="blog_listing_title" value="<?php echo htmlspecialchars($s['blog_listing_title'] ?? ''); ?>" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Web Hosting Blog, Tips & Tutorials - HostNibo"></div>
             <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Blog Listing Meta Description</label><textarea name="blog_listing_meta_description" rows="3" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Read our latest blog posts about web hosting, technology..."><?php echo htmlspecialchars($s['blog_listing_meta_description'] ?? ''); ?></textarea></div>
         </div>
     </div>
