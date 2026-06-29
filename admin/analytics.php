@@ -15,9 +15,16 @@ if (!tableExists('page_views')) {
         referrer VARCHAR(500) DEFAULT '',
         ip_address VARCHAR(45) DEFAULT '',
         user_agent VARCHAR(500) DEFAULT '',
+        visitor_id VARCHAR(64) DEFAULT '',
         country VARCHAR(100) DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_visitor_date (visitor_id, created_at),
+        INDEX idx_url_date (page_url, created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+} else {
+    @mysqli_query($conn, "ALTER TABLE page_views ADD COLUMN visitor_id VARCHAR(64) DEFAULT '' AFTER user_agent");
+    @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_visitor_date (visitor_id, created_at)");
+    @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_url_date (page_url, created_at)");
 }
 
 $period = $_GET['period'] ?? '30';
@@ -27,12 +34,18 @@ $date_from = date('Y-m-d', strtotime("-{$period} days"));
 $total_views = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM page_views"))['c'];
 $views_today = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM page_views WHERE DATE(created_at) = CURDATE()"))['c'];
 $views_week = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM page_views WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"))['c'];
-$unique_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ip_address) as c FROM page_views WHERE created_at >= '$date_from'"))['c'];
-$prev_period_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ip_address) as c FROM page_views WHERE created_at >= DATE_SUB('$date_from', INTERVAL $period DAY) AND created_at < '$date_from'"))['c'];
+$unique_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT visitor_id) as c FROM page_views WHERE visitor_id != '' AND created_at >= '$date_from'"))['c'];
+if ($unique_ips == 0) {
+    $unique_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ip_address) as c FROM page_views WHERE created_at >= '$date_from'"))['c'];
+}
+$prev_period_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT visitor_id) as c FROM page_views WHERE visitor_id != '' AND created_at >= DATE_SUB('$date_from', INTERVAL $period DAY) AND created_at < '$date_from'"))['c'];
+if ($prev_period_ips == 0) {
+    $prev_period_ips = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT ip_address) as c FROM page_views WHERE created_at >= DATE_SUB('$date_from', INTERVAL $period DAY) AND created_at < '$date_from'"))['c'];
+}
 $visitor_change = $prev_period_ips > 0 ? round((($unique_ips - $prev_period_ips) / $prev_period_ips) * 100) : ($unique_ips > 0 ? 100 : 0);
 
 $chart_data = [];
-$r = mysqli_query($conn, "SELECT DATE(created_at) as day, COUNT(*) as views, COUNT(DISTINCT ip_address) as visitors FROM page_views WHERE created_at >= '$date_from' GROUP BY DATE(created_at) ORDER BY day ASC");
+$r = mysqli_query($conn, "SELECT DATE(created_at) as day, COUNT(*) as views, COUNT(DISTINCT CASE WHEN visitor_id != '' THEN visitor_id ELSE ip_address END) as visitors FROM page_views WHERE created_at >= '$date_from' GROUP BY DATE(created_at) ORDER BY day ASC");
 while ($row = mysqli_fetch_assoc($r)) { $chart_data[] = $row; }
 
 $chart_labels = array_map(fn($d) => date('M d', strtotime($d['day'])), $chart_data);

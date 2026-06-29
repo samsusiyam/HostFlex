@@ -49,6 +49,7 @@ foreach ($pages_to_check as $page) {
 
     foreach ($matches[1] as $href) {
         $href = trim($href);
+        $href = html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         if (empty($href) || $href === '#' || strpos($href, 'mailto:') === 0 || strpos($href, 'tel:') === 0 || strpos($href, 'javascript:') === 0) continue;
         if (preg_match('/\.(jpg|jpeg|png|gif|webp|svg|css|js|ico|woff|woff2|ttf|eot|map)(\?|$)/i', $href)) continue;
 
@@ -60,7 +61,7 @@ foreach ($pages_to_check as $page) {
             $check_url = $base_url . $href;
         } else {
             $dir = dirname(parse_url($full_url, PHP_URL_PATH) ?: '/');
-            $check_url = $base_url . $dir . $href;
+            $check_url = $base_url . $dir . '/' . ltrim($href, '/');
         }
 
         $all_links[] = $check_url;
