@@ -1,7 +1,7 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 $page_title = 'Blog';
 $skip_default_meta = true;
-$blogs_desc = 'Read our latest blog posts about web hosting, technology tips, domain guides and hosting industry news from HostNibo.';
+$blogs_desc = getSetting('blog_listing_meta_description') ?: 'Read our latest blog posts about web hosting, technology tips, domain guides and hosting industry news from HostNibo.';
 ?>
 <!DOCTYPE html>
 <html lang="en">

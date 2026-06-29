@@ -3,7 +3,7 @@ require_once 'config/database.php';
 require_once 'includes/functions.php';
 checkMaintenance();
 $site_name = escSetting('site_name') ?: 'HostNibo';
-$offers_meta = getSetting('meta_description') ?: "Check out our latest hosting offers and deals at $site_name. Save big on web hosting, domain registration, VPS, and dedicated server plans with exclusive discounts.";
+$offers_meta = getSetting('offers_meta_description') ?: "Check out our latest hosting offers and deals at $site_name. Save big on web hosting, domain registration, VPS, and dedicated server plans with exclusive discounts.";
 $offers_kw = getSetting('meta_keywords') ?: 'hosting offers, deals, discounts, web hosting sale, domain offers, VPS deals';
 $skip_default_meta = true;
 ?>
