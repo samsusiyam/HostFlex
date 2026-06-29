@@ -16,8 +16,15 @@ if (!tableExists('page_views')) {
         user_agent VARCHAR(500) DEFAULT '',
         visitor_id VARCHAR(64) DEFAULT '',
         country VARCHAR(100) DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_visitor_date (visitor_id, created_at),
+        INDEX idx_url_date (page_url, created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+} else {
+    $has_vid = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM page_views LIKE 'visitor_id'"));
+    if (!$has_vid) {
+        @mysqli_query($conn, "ALTER TABLE page_views ADD COLUMN visitor_id VARCHAR(64) DEFAULT '' AFTER user_agent");
+    }
 }
 
 $url = substr($_POST['url'] ?? '/', 0, 500);

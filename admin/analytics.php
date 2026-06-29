@@ -22,9 +22,18 @@ if (!tableExists('page_views')) {
         INDEX idx_url_date (page_url, created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 } else {
-    @mysqli_query($conn, "ALTER TABLE page_views ADD COLUMN visitor_id VARCHAR(64) DEFAULT '' AFTER user_agent");
-    @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_visitor_date (visitor_id, created_at)");
-    @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_url_date (page_url, created_at)");
+    $has_vid = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM page_views LIKE 'visitor_id'"));
+    if (!$has_vid) {
+        @mysqli_query($conn, "ALTER TABLE page_views ADD COLUMN visitor_id VARCHAR(64) DEFAULT '' AFTER user_agent");
+    }
+    $has_idx1 = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW INDEX FROM page_views WHERE Key_name = 'idx_visitor_date'"));
+    if (!$has_idx1) {
+        @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_visitor_date (visitor_id, created_at)");
+    }
+    $has_idx2 = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW INDEX FROM page_views WHERE Key_name = 'idx_url_date'"));
+    if (!$has_idx2) {
+        @mysqli_query($conn, "ALTER TABLE page_views ADD INDEX idx_url_date (page_url, created_at)");
+    }
 }
 
 $period = $_GET['period'] ?? '30';
