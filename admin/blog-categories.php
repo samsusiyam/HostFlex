@@ -8,6 +8,11 @@ checkPermission('blog', 'view');
 $msg = '';
 $error = '';
 
+$has_meta_title = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blog_categories LIKE 'meta_title'"));
+if (!$has_meta_title) {
+    @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_title VARCHAR(255) DEFAULT '' AFTER description");
+}
+
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     checkPermission('blog', 'delete');
     $id = (int)$_GET['delete'];
@@ -52,11 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-}
-
-$has_meta_title = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blog_categories LIKE 'meta_title'"));
-if (!$has_meta_title) {
-    @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_title VARCHAR(255) DEFAULT '' AFTER description");
 }
 
 $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_order ASC, name ASC");
