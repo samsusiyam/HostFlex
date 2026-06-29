@@ -1,13 +1,15 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 $page_title = 'Blog';
 $skip_default_meta = true;
-$blogs_desc = getSetting('blog_listing_meta_description') ?: 'Read our latest blog posts about web hosting, technology tips, domain guides and hosting industry news from HostNibo.';
+$site_name = escSetting('site_name') ?: 'HostNibo';
+$blogs_title = getSetting('blog_listing_title') ?: "Web Hosting Blog, Tips & Tutorials - $site_name";
+$blogs_desc = getSetting('blog_listing_meta_description') ?: "Read the latest blog posts about web hosting, domain registration, WordPress tips, server management and technology news from $site_name experts.";
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Blog - <?php echo escSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars($blogs_title); ?></title>
 <meta name="description" content="<?php echo htmlspecialchars($blogs_desc); ?>">
 </head>
 <body>
