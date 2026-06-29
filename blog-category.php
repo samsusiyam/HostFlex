@@ -15,6 +15,7 @@ if (!$blog_cat) {
 }
 
 $page_title = $blog_cat['name'];
+$meta_title = $blog_cat['meta_title'] ?? '';
 $meta_desc = $blog_cat['meta_description'] ?? ($blog_cat['description'] ?: '');
 $meta_kw = $blog_cat['meta_keywords'] ?? '';
 
@@ -30,7 +31,7 @@ $skip_default_meta = true;
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($blog_cat['name']); ?> - <?php echo escSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars(!empty($meta_title) ? $meta_title : $blog_cat['name'] . ' - ' . escSetting('site_name')); ?></title>
 <?php if ($meta_desc): ?><meta name="description" content="<?php echo htmlspecialchars($meta_desc); ?>"><?php endif; ?>
 <?php if ($meta_kw): ?><meta name="keywords" content="<?php echo htmlspecialchars($meta_kw); ?>"><?php endif; ?>
 <meta property="og:title" content="<?php echo htmlspecialchars($blog_cat['name'] . ' - ' . escSetting('site_name')); ?>">

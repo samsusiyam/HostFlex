@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = sanitize($_POST['name'] ?? '');
     $slug = sanitize($_POST['slug'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
+    $meta_title = sanitize($_POST['meta_title'] ?? '');
     $meta_description = sanitize($_POST['meta_description'] ?? '');
     $meta_keywords = sanitize($_POST['meta_keywords'] ?? '');
     $edit_id = (int)($_POST['edit_id'] ?? 0);
@@ -41,16 +42,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Slug already exists!';
         } elseif ($edit_id) {
             checkPermission('blog', 'edit');
-            mysqli_query($conn, "UPDATE blog_categories SET name='$name', slug='$slug', description='$description', meta_description='$meta_description', meta_keywords='$meta_keywords' WHERE id=$edit_id");
+            mysqli_query($conn, "UPDATE blog_categories SET name='$name', slug='$slug', description='$description', meta_title='$meta_title', meta_description='$meta_description', meta_keywords='$meta_keywords' WHERE id=$edit_id");
             header('Location: blog-categories.php?msg=updated');
             exit;
         } else {
             checkPermission('blog', 'create');
-            mysqli_query($conn, "INSERT INTO blog_categories (name, slug, description, meta_description, meta_keywords) VALUES ('$name', '$slug', '$description', '$meta_description', '$meta_keywords')");
+            mysqli_query($conn, "INSERT INTO blog_categories (name, slug, description, meta_title, meta_description, meta_keywords) VALUES ('$name', '$slug', '$description', '$meta_title', '$meta_description', '$meta_keywords')");
             header('Location: blog-categories.php?msg=added');
             exit;
         }
     }
+}
+
+$has_meta_title = @mysqli_fetch_assoc(mysqli_query($conn, "SHOW COLUMNS FROM blog_categories LIKE 'meta_title'"));
+if (!$has_meta_title) {
+    @mysqli_query($conn, "ALTER TABLE blog_categories ADD COLUMN meta_title VARCHAR(255) DEFAULT '' AFTER description");
 }
 
 $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_order ASC, name ASC");
@@ -75,6 +81,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label><textarea name="description" id="catDesc" rows="2" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"></textarea></div>
                 <hr class="dark:border-gray-600">
                 <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">SEO</p>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Title (SEO)</label><input type="text" name="meta_title" id="catMetaTitle" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="Leave empty to use Category Name + Site Name"></div>
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description</label><textarea name="meta_description" id="catMetaDesc" rows="2" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="SEO description for this category"></textarea></div>
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" id="catMetaKw" class="w-full border rounded px-3 py-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600" placeholder="keyword1, keyword2"></div>
                 <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600"><i class="fa fa-plus mr-1"></i> Add Category</button>
@@ -111,7 +118,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
                     <td class="px-4 py-3 text-sm"><?php echo $post_count['c']; ?></td>
                     <td class="px-4 py-3 text-right">
                         <a href="../blog-category.php?slug=<?php echo htmlspecialchars($cat['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 mr-2" title="View"><i class="fa fa-eye"></i></a>
-                        <button onclick="editCat(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['slug'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['meta_description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['meta_keywords'] ?? '', ENT_QUOTES); ?>')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2"><i class="fa fa-edit"></i></button>
+                        <button onclick="editCat(<?php echo $cat['id']; ?>, '<?php echo htmlspecialchars($cat['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['slug'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['meta_title'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['meta_description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cat['meta_keywords'] ?? '', ENT_QUOTES); ?>')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2"><i class="fa fa-edit"></i></button>
                         <a href="?delete=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category? Related posts will become uncategorized.')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
@@ -121,11 +128,12 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY sort_o
     </div>
 </div>
 <script>
-function editCat(id, name, slug, desc, metaDesc, metaKw) {
+function editCat(id, name, slug, desc, metaTitle, metaDesc, metaKw) {
     document.getElementById('editId').value = id;
     document.getElementById('catName').value = name;
     document.getElementById('catSlug').value = slug;
     document.getElementById('catDesc').value = desc;
+    document.getElementById('catMetaTitle').value = metaTitle;
     document.getElementById('catMetaDesc').value = metaDesc;
     document.getElementById('catMetaKw').value = metaKw;
     document.getElementById('submitBtn').innerHTML = '<i class="fa fa-save mr-1"></i> Update Category';
@@ -136,6 +144,7 @@ function resetForm() {
     document.getElementById('catName').value = '';
     document.getElementById('catSlug').value = '';
     document.getElementById('catDesc').value = '';
+    document.getElementById('catMetaTitle').value = '';
     document.getElementById('catMetaDesc').value = '';
     document.getElementById('catMetaKw').value = '';
     document.getElementById('submitBtn').innerHTML = '<i class="fa fa-plus mr-1"></i> Add Category';
