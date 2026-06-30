@@ -27,7 +27,7 @@ if (empty(headers_sent())) {
         "img-src 'self' data: https:",
         "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com https://cdn.jsdelivr.net",
         "connect-src 'self' https://embed.tawk.to wss://embed.tawk.to https://chatwoot.siyam.eu.cc wss://chatwoot.siyam.eu.cc",
-        "frame-src https://embed.tawk.to https://www.youtube.com https://www.google.com",
+        "frame-src https://embed.tawk.to https://www.youtube.com https://www.google.com https://chatwoot.siyam.eu.cc",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'"
