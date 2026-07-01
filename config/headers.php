@@ -22,12 +22,12 @@ if (empty(headers_sent())) {
 
     $csp = implode('; ', [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://embed.tawk.to https://chatwoot.siyam.eu.cc",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://embed.tawk.to https://*.siyam.eu.cc",
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.tailwindcss.com",
         "img-src 'self' data: https:",
         "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com https://cdn.jsdelivr.net",
-        "connect-src 'self' https://embed.tawk.to wss://embed.tawk.to https://chatwoot.siyam.eu.cc wss://chatwoot.siyam.eu.cc",
-        "frame-src https://embed.tawk.to https://www.youtube.com https://www.google.com https://chatwoot.siyam.eu.cc",
+        "connect-src 'self' https://embed.tawk.to wss://embed.tawk.to wss://*.siyam.eu.cc https://*.siyam.eu.cc",
+        "frame-src https://embed.tawk.to https://www.youtube.com https://www.google.com https://www.recaptcha.net https://*.siyam.eu.cc",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'"
