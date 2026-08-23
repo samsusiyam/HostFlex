@@ -204,6 +204,7 @@ CREATE TABLE blog_posts (
     status BOOLEAN DEFAULT TRUE,
     meta_description VARCHAR(500) DEFAULT '',
     meta_keywords VARCHAR(500) DEFAULT '',
+    show_featured_image TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES blog_categories(id) ON DELETE SET NULL
 );

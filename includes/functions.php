@@ -25,6 +25,45 @@ function ensure2FASchema() {
     }
 }
 
+function ensureBlogSchema() {
+    global $conn;
+    static $blog_checked = false;
+    if ($blog_checked || !$conn) return;
+    $blog_checked = true;
+    
+    $res = mysqli_query($conn, "SHOW COLUMNS FROM blog_posts LIKE 'show_featured_image'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN show_featured_image TINYINT(1) DEFAULT 1");
+    }
+}
+
+function getReadingTime($content) {
+    $word_count = str_word_count(strip_tags((string)$content));
+    $minutes = ceil($word_count / 200);
+    return max(1, (int)$minutes);
+}
+
+function generateBlogTOC(&$content) {
+    $toc = [];
+    $index = 1;
+    $content = preg_replace_callback('/<h([23])([^>]*)>(.*?)<\/h\1>/i', function($matches) use (&$toc, &$index) {
+        $level = (int)$matches[1];
+        $attrs = $matches[2];
+        $title = strip_tags($matches[3]);
+        $id = 'section-' . $index . '-' . preg_replace('/[^a-z0-9]+/i', '-', strtolower($title));
+        $id = trim($id, '-');
+        $toc[] = [
+            'level' => $level,
+            'title' => $title,
+            'id' => $id
+        ];
+        $index++;
+        return "<h{$level}{$attrs} id=\"{$id}\">{$matches[3]}</h{$level}>";
+    }, (string)$content);
+    
+    return $toc;
+}
+
 function checkAdminAccessSlug() {
     $custom_slug = trim(getSetting('admin_access_slug') ?: '');
     if (empty($custom_slug)) {

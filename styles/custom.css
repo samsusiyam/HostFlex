@@ -123,26 +123,77 @@
 
 /* Single Blog Featured Image Container */
 .blog-featured-image-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f8fafc;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    padding: 12px;
+    display: block;
+    width: 100%;
     margin-bottom: 2rem;
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 .blog-featured-img {
-    max-width: 100%;
-    max-height: 400px;
-    width: auto;
+    width: 100%;
+    max-height: 480px;
     height: auto;
-    object-fit: contain;
-    border-radius: 12px;
+    object-fit: cover;
     display: block;
-    margin: 0 auto;
 }
+
+/* Blog Table of Contents */
+.blog-toc-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #2563eb;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 1.75rem 0;
+}
+.blog-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+.blog-toc-item {
+    margin: 6px 0;
+}
+.blog-toc-item.level-3 {
+    padding-left: 18px;
+}
+.blog-toc-link {
+    color: #334155;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.blog-toc-link:hover {
+    color: #2563eb;
+}
+
+/* Social Share Bar */
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 14px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    text-decoration: none;
+}
+.share-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.92;
+}
+.share-facebook { background: #1877f2; }
+.share-twitter { background: #0f1419; }
+.share-whatsapp { background: #25d366; }
+.share-linkedin { background: #0a66c2; }
+.share-copy { background: #64748b; }
 
 /* Mobile Menu UI/UX Overhaul */
 .mobile-nav-drawer {

@@ -3,6 +3,8 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
+ensureBlogSchema();
+
 $admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT username FROM users WHERE id = " . (int)$_SESSION['admin_id']));
 $admin_username = $admin['username'] ?? 'Admin';
 
@@ -49,6 +51,7 @@ $post = [
     'category_id' => 0,
     'author' => $admin_username,
     'status' => 1,
+    'show_featured_image' => 1,
     'meta_description' => '',
     'meta_keywords' => '',
     'created_at' => date('Y-m-d H:i:s')
@@ -73,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
     $category_id = (int)($_POST['category_id'] ?? 0);
     $author = sanitize($_POST['author'] ?? $admin_username);
     $status = (int)($_POST['status'] ?? 1);
+    $show_featured_image = isset($_POST['show_featured_image']) ? 1 : 0;
     $meta_description = sanitize($_POST['meta_description'] ?? '');
     $meta_keywords = sanitize($_POST['meta_keywords'] ?? '');
 
@@ -133,6 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
                 category_id = $cat_sql,
                 author = '$author',
                 status = $status,
+                show_featured_image = $show_featured_image,
                 meta_description = '$meta_description',
                 meta_keywords = '$meta_keywords'
                 WHERE id = $post_id";
@@ -146,9 +151,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
             }
         } else {
             $insert_sql = "INSERT INTO blog_posts 
-                (title, slug, content, excerpt, image, category_id, author, status, meta_description, meta_keywords) 
+                (title, slug, content, excerpt, image, category_id, author, status, show_featured_image, meta_description, meta_keywords) 
                 VALUES 
-                ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, '$meta_description', '$meta_keywords')";
+                ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, $show_featured_image, '$meta_description', '$meta_keywords')";
             
             if (mysqli_query($conn, $insert_sql)) {
                 $new_id = mysqli_insert_id($conn);
@@ -471,6 +476,16 @@ $site_url = getSiteUrl();
                     </div>
 
                     <input type="file" name="image" id="featuredImageInput" accept="image/*" class="hidden" onchange="handleImageSelect(this)">
+                    
+                    <div class="mt-4 pt-3 border-t text-left">
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="show_featured_image" value="1" <?php echo ($post['show_featured_image'] ?? 1) ? 'checked' : ''; ?> class="rounded text-blue-600 focus:ring-blue-500 mt-0.5">
+                            <div>
+                                <span class="text-xs text-gray-800 font-semibold block">Show featured image on post</span>
+                                <span class="text-[11px] text-gray-500 block leading-tight">If unchecked, image only appears in blog listing & social share</span>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
