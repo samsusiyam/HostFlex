@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'Dashboard'; ?> - Host Nibo Admin</title>
+    <title><?php echo $page_title ?? 'Dashboard'; ?> - <?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?> Admin</title>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <link rel="shortcut icon" href="/<?php echo ltrim(getSetting('favicon') ?: 'images/favicon.ico', '/'); ?>" type="image/x-icon" />
+    <link rel="icon" href="/<?php echo ltrim(getSetting('favicon') ?: 'images/favicon.ico', '/'); ?>" type="image/x-icon" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -33,12 +36,12 @@
             <div class="flex items-center">
                 <button onclick="toggleSidebar()" class="md:hidden mr-3 text-gray-500 hover:text-blue-600"><i class="fa fa-bars text-xl"></i></button>
                 <a href="dashboard.php" class="flex items-center space-x-3">
-                    <img src="../images/bg.png" class="h-8" alt="Host Nibo">
+                    <img src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" class="h-8 object-contain" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>">
                     <span class="font-semibold text-gray-700 hidden sm:inline">Admin Panel</span>
                 </a>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="../index.php" target="_blank" class="text-gray-500 hover:text-blue-600 hidden sm:inline"><i class="fa fa-external-link-alt"></i> View Site</a>
+                <a href="/" target="_blank" class="text-gray-500 hover:text-blue-600 hidden sm:inline"><i class="fa fa-external-link-alt"></i> View Site</a>
                 <a href="logout.php" class="text-gray-500 hover:text-red-600"><i class="fa fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span></a>
             </div>
         </div>
@@ -110,6 +113,7 @@
                     <a href="settings-footer.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-footer') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-shoe-prints w-4"></i><span>Footer</span></a>
                     <a href="settings-integrations.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-integrations') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-puzzle-piece w-4"></i><span>Integrations</span></a>
                     <a href="settings-maintenance.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-maintenance') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-shield-alt w-4"></i><span>Maintenance</span></a>
+                    <a href="settings-security.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-security') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-user-shield w-4"></i><span>Security & Admin URL</span></a>
                 </div>
             </div>
             <div>
@@ -123,11 +127,12 @@
                 </div>
             </div>
             <div>
-                <a href="javascript:void(0)" onclick="toggleSecurity()" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 text-gray-700 hover:text-blue-600 <?php echo preg_match('/users|roles|activity-logs|login-logs|database-backup/', $_SERVER['PHP_SELF']) ? 'bg-blue-50 text-blue-600' : ''; ?>">
+                <a href="javascript:void(0)" onclick="toggleSecurity()" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 text-gray-700 hover:text-blue-600 <?php echo preg_match('/users|roles|activity-logs|login-logs|database-backup|settings-security/', $_SERVER['PHP_SELF']) ? 'bg-blue-50 text-blue-600' : ''; ?>">
                     <i class="fa fa-lock w-5"></i><span>Security</span>
                     <i class="fa fa-chevron-down ml-auto text-xs transition-transform" id="securityArrow"></i>
                 </a>
                 <div class="settings-sub ml-2 border-l-2 border-blue-200 pl-3 space-y-0.5" id="securitySub">
+                    <a href="settings-security.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-security') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-user-shield w-4"></i><span>Security & Admin URL</span></a>
                     <a href="users.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'users') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-users-cog w-4"></i><span>Admin Users</span></a>
                     <a href="roles.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'roles') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-user-tag w-4"></i><span>Roles & Permissions</span></a>
                     <a href="activity-logs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'activity-logs') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-history w-4"></i><span>Activity Logs</span></a>

@@ -2,5 +2,6 @@ User-agent: *
 Disallow: /admin/
 Disallow: /config/
 Disallow: /includes/
+Allow: /
 
-Sitemap: sitemap.xml
+Sitemap: https://hostnibo.com/sitemap.xml

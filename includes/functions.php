@@ -10,6 +10,49 @@ function checkAdminLogin() {
     }
 }
 
+function ensure2FASchema() {
+    global $conn;
+    static $checked = false;
+    if ($checked || !$conn) return;
+    $checked = true;
+    
+    $res = mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'two_factor_enabled'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($conn, "ALTER TABLE users 
+            ADD COLUMN two_factor_enabled TINYINT(1) DEFAULT 0,
+            ADD COLUMN two_factor_secret VARCHAR(100) NULL,
+            ADD COLUMN two_factor_backup_codes TEXT NULL");
+    }
+}
+
+function checkAdminAccessSlug() {
+    $custom_slug = trim(getSetting('admin_access_slug') ?: '');
+    if (empty($custom_slug)) {
+        return true;
+    }
+    
+    if (isAdminLoggedIn()) {
+        return true;
+    }
+    
+    if (isset($_GET['access']) && $_GET['access'] === $custom_slug) {
+        $_SESSION['admin_access_unlocked'] = $custom_slug;
+        return true;
+    }
+    
+    if (isset($_SESSION['admin_access_unlocked']) && $_SESSION['admin_access_unlocked'] === $custom_slug) {
+        return true;
+    }
+    
+    http_response_code(404);
+    if (file_exists(__DIR__ . '/../404.php')) {
+        include __DIR__ . '/../404.php';
+    } else {
+        header('Location: /');
+    }
+    exit;
+}
+
 function getAdminRole() {
     return $_SESSION['admin_role'] ?? 'admin';
 }

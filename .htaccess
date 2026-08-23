@@ -50,10 +50,16 @@ RewriteEngine On
 # Custom Error Pages
 ErrorDocument 404 /404.php
 
-# Security headers
+# Security & SEO headers
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  
+  <FilesMatch ".*">
+    <If "%{REQUEST_URI} =~ m#^/admin#">
+      Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+    </If>
+  </FilesMatch>
 </IfModule>

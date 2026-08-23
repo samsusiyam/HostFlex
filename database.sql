@@ -6,6 +6,11 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin',
+    status TINYINT(1) DEFAULT 1,
+    two_factor_enabled TINYINT(1) DEFAULT 0,
+    two_factor_secret VARCHAR(100) NULL,
+    two_factor_backup_codes TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
