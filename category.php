@@ -66,16 +66,14 @@ $product_schema = [
 <p class="text-gray-600 mt-1">Honest and affordable pricing model to help you get started easily.</p>
 </div>
 
-<!-- Pricing Switcher -->
-<div class="flex items-center gap-3 bg-gray-100 p-1.5 rounded-full border w-fit">
-    <span class="text-sm font-semibold text-gray-700 ml-3">Monthly</span>
-    <label class="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" id="pricingSwitch" class="sr-only peer">
-        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-    </label>
-    <span class="text-sm font-semibold text-gray-700 mr-2 flex items-center gap-1.5">
-        Yearly <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">Save 20%</span>
-    </span>
+<!-- Modern Pricing Switcher -->
+<div class="billing-switcher-container">
+    <button type="button" class="billing-tab active" data-cycle="monthly" onclick="switchBilling('monthly')">
+        Monthly
+    </button>
+    <button type="button" class="billing-tab" data-cycle="yearly" onclick="switchBilling('yearly')">
+        Yearly <span class="billing-save-badge">Save 20%</span>
+    </button>
 </div>
 </div>
 
