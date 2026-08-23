@@ -149,8 +149,9 @@
                     <i class="fa fa-chevron-down ml-auto text-xs transition-transform" id="blogArrow"></i>
                 </a>
                 <div class="settings-sub ml-2 border-l-2 border-blue-200 pl-3 space-y-0.5" id="blogSub">
-                    <a href="blog-categories.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'blog-categories') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-tags w-4"></i><span>Blog Categories</span></a>
-                    <a href="blogs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'blogs.php') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-list w-4"></i><span>All Blogs</span></a>
+                    <a href="blogs.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'blogs.php') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-list w-4"></i><span>All Posts</span></a>
+                    <a href="blog-edit.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'blog-edit.php') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-plus-circle w-4"></i><span>Add New Post</span></a>
+                    <a href="blog-categories.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'blog-categories') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-tags w-4"></i><span>Categories</span></a>
                 </div>
             </div>
             <?php endif; ?>

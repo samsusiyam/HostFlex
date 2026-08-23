@@ -4,314 +4,285 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$admin = mysqli_fetch_assoc(mysqli_query($conn, "SELECT username FROM users WHERE id = " . (int)$_SESSION['admin_id']));
-$admin_username = $admin['username'] ?? 'Admin';
-
 $msg = '';
 $error = '';
 
+// Handle Delete Post
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image, title FROM blog_posts WHERE id = $id"));
     if ($post && $post['image'] && file_exists('../' . $post['image'])) {
-        unlink('../' . $post['image']);
+        @unlink('../' . $post['image']);
     }
     mysqli_query($conn, "DELETE FROM blog_posts WHERE id = $id");
     logActivity('Deleted Post', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
     header('Location: blogs.php?msg=deleted');
     exit;
 }
+
 if (isset($_GET['msg'])) {
-    if ($_GET['msg'] == 'deleted') $msg = 'Post deleted!';
-    elseif ($_GET['msg'] == 'added') $msg = 'Post created!';
-    elseif ($_GET['msg'] == 'updated') $msg = 'Post updated!';
+    if ($_GET['msg'] === 'deleted') $msg = 'Post permanently moved to Trash / deleted.';
+    elseif ($_GET['msg'] === 'added') $msg = 'Post created successfully!';
+    elseif ($_GET['msg'] === 'updated') $msg = 'Post updated successfully!';
+    elseif ($_GET['msg'] === 'not_found') $error = 'Post not found.';
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inline_cat'])) {
-    $action = $_POST['inline_cat'];
-    if ($action === 'add' || $action === 'edit') {
-        $name = sanitize($_POST['name'] ?? '');
-        $edit_id = (int)($_POST['edit_id'] ?? 0);
-        if ($name) {
-            $slug = preg_replace('/[^a-z0-9-]/', '', strtolower(str_replace(' ', '-', $name)));
-            if (!mysqli_num_rows(mysqli_query($conn, "SELECT id FROM blog_categories WHERE slug='$slug'" . ($edit_id ? " AND id!=$edit_id" : "")))) {
-                if ($edit_id) {
-                    mysqli_query($conn, "UPDATE blog_categories SET name='$name', slug='$slug' WHERE id=$edit_id");
-                } else {
-                    mysqli_query($conn, "INSERT INTO blog_categories (name, slug) VALUES ('$name', '$slug')");
-                }
-            }
-        }
-    } elseif ($action === 'delete') {
-        $id = (int)($_POST['id'] ?? 0);
-        if ($id) {
-            mysqli_query($conn, "UPDATE blog_posts SET category_id = NULL WHERE category_id = $id");
-            mysqli_query($conn, "DELETE FROM blog_categories WHERE id = $id");
-        }
-    }
-    header('Content-Type: application/json');
-    echo json_encode(['ok' => true]);
-    exit;
-}
+// Counts for WordPress Status Tabs
+$total_all = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts"))['c'] ?? 0;
+$total_pub = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 1"))['c'] ?? 0;
+$total_draft = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 0"))['c'] ?? 0;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
-    $title = sanitize($_POST['title'] ?? '');
-    $slug = sanitize($_POST['slug'] ?? '');
-    $content = $_POST['content'] ?? '';
-    $excerpt = sanitize($_POST['excerpt'] ?? '');
-    $category_id = (int)($_POST['category_id'] ?? 0);
-    $author = sanitize($_POST['author'] ?? $admin_username);
-    $status = isset($_POST['status']) ? 1 : 0;
-    $meta_description = sanitize($_POST['meta_description'] ?? '');
-    $meta_keywords = sanitize($_POST['meta_keywords'] ?? '');
-    $edit_id = (int)($_POST['edit_id'] ?? 0);
-
-    if (!$title || !$slug) {
-        $error = 'Title and slug are required!';
-    } else {
-        $slug = preg_replace('/[^a-z0-9-]/', '', strtolower(str_replace(' ', '-', $slug)));
-        $content_esc = mysqli_real_escape_string($conn, $content);
-        $cat_sql = $category_id > 0 ? $category_id : 'NULL';
-
-        $image = '';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg','jpeg','png','gif','webp'];
-            if (in_array($ext, $allowed)) {
-                $upload_dir = '../uploads/blog/';
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                $fname = 'blog_' . time() . '_' . rand(100,999) . '.' . $ext;
-                move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $fname);
-                $image = 'uploads/blog/' . $fname;
-            }
-        }
-
-        if ($edit_id) {
-            if (!$image) {
-                $old = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image FROM blog_posts WHERE id = $edit_id"));
-                $image = $old['image'];
-            }
-            mysqli_query($conn, "UPDATE blog_posts SET title='$title', slug='$slug', content='$content_esc', excerpt='$excerpt', image='$image', category_id=$cat_sql, author='$author', status=$status, meta_description='$meta_description', meta_keywords='$meta_keywords' WHERE id=$edit_id");
-            logActivity('Updated Post', $title . ' (ID: ' . $edit_id . ')');
-            header('Location: blogs.php?msg=updated');
-            exit;
-        } else {
-            mysqli_query($conn, "INSERT INTO blog_posts (title, slug, content, excerpt, image, category_id, author, status, meta_description, meta_keywords) VALUES ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, '$meta_description', '$meta_keywords')");
-            logActivity('Created Post', $title);
-            header('Location: blogs.php?msg=added');
-            exit;
-        }
-    }
-}
-
-$edit_post = null;
-if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
-    $edit_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM blog_posts WHERE id = " . (int)$_GET['edit']));
-}
-
+// Filter criteria
+$status_filter = isset($_GET['status']) ? (string)$_GET['status'] : 'all';
+$category_filter = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
 $search = trim($_GET['search'] ?? '');
-$where = '';
-if ($search) {
-    $search_esc = mysqli_real_escape_string($conn, $search);
-    $where = "WHERE p.title LIKE '%$search_esc%'";
+
+$where_clauses = [];
+if ($status_filter === 'published') {
+    $where_clauses[] = "p.status = 1";
+} elseif ($status_filter === 'draft') {
+    $where_clauses[] = "p.status = 0";
 }
+
+if ($category_filter > 0) {
+    $where_clauses[] = "p.category_id = $category_filter";
+}
+
+if (!empty($search)) {
+    $search_esc = mysqli_real_escape_string($conn, $search);
+    $where_clauses[] = "(p.title LIKE '%$search_esc%' OR p.slug LIKE '%$search_esc%' OR p.content LIKE '%$search_esc%')";
+}
+
+$where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses) : "";
+
+// Pagination
 $page = max(1, (int)($_GET['p'] ?? 1));
 $per_page = 15;
 $offset = ($page - 1) * $per_page;
-$total = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts p $where"))['c'];
-$pages = ceil($total / $per_page);
 
-$posts = mysqli_query($conn, "SELECT p.*, c.name as category_name FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id $where ORDER BY p.created_at DESC LIMIT $per_page OFFSET $offset");
-$categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 1 ORDER BY name");
+$count_query = mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts p $where_sql");
+$total_filtered = mysqli_fetch_assoc($count_query)['c'] ?? 0;
+$pages = ceil($total_filtered / $per_page);
+
+$posts_query = "SELECT p.*, c.name as category_name, c.slug as category_slug 
+                FROM blog_posts p 
+                LEFT JOIN blog_categories c ON p.category_id = c.id 
+                $where_sql 
+                ORDER BY p.created_at DESC 
+                LIMIT $per_page OFFSET $offset";
+$posts = mysqli_query($conn, $posts_query);
+
+// Fetch all categories for filter dropdown
+$categories_res = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 1 ORDER BY name ASC");
 $all_cats = [];
-while ($c = mysqli_fetch_assoc($categories)) $all_cats[] = $c;
+while ($c = mysqli_fetch_assoc($categories_res)) {
+    $all_cats[] = $c;
+}
 ?>
 <?php include 'header.php'; ?>
-<div class="mb-6 flex items-center justify-between">
+
+<!-- Top Heading & Actions -->
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">Blog Posts</h1>
-        <p class="text-gray-500">Create and manage blog posts</p>
-    </div>
-    <a href="?edit=0" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm <?php echo $edit_post !== null ? 'hidden' : ''; ?>"><i class="fa fa-plus mr-1"></i> New Post</a>
-</div>
-<?php if ($msg): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $msg; ?></div><?php endif; ?>
-<?php if ($error): ?><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"><?php echo $error; ?></div><?php endif; ?>
-
-<?php if ($edit_post !== null || isset($_GET['edit'])): ?>
-<?php $ep = $edit_post; $is_new = !$ep && isset($_GET['edit']) && $_GET['edit'] == 0; $ep = $ep ?: ['id'=>0,'title'=>'','slug'=>'','content'=>'','excerpt'=>'','image'=>'','category_id'=>0,'author'=>$admin_username,'status'=>1,'meta_description'=>'','meta_keywords'=>'']; ?>
-<div class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-lg font-semibold mb-4"><?php echo $is_new ? 'New Post' : 'Edit Post'; ?></h2>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="edit_id" value="<?php echo $ep['id']; ?>">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="md:col-span-2">
-                <div class="space-y-4">
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Title</label><input type="text" name="title" value="<?php echo htmlspecialchars($ep['title']); ?>" required class="w-full border rounded px-3 py-2"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Slug</label><input type="text" name="slug" value="<?php echo htmlspecialchars($ep['slug']); ?>" required class="w-full border rounded px-3 py-2" placeholder="my-post-title"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                        <textarea name="content" id="blogContent" rows="16" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($ep['content']); ?></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <div class="flex gap-2">
-                        <select name="category_id" id="catSelect" class="flex-1 border rounded px-3 py-2">
-                            <option value="">None</option>
-                            <?php foreach ($all_cats as $c): ?>
-                            <option value="<?php echo $c['id']; ?>" <?php echo $ep['category_id'] == $c['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($c['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="button" onclick="showCatForm()" class="bg-green-600 text-white px-3 py-2 rounded text-sm" title="Add Category"><i class="fa fa-plus"></i></button>
-                        <button type="button" onclick="editCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm" title="Edit Category"><i class="fa fa-pencil-alt"></i></button>
-                        <button type="button" onclick="deleteCat()" class="bg-red-600 text-white px-3 py-2 rounded text-sm" title="Delete Category"><i class="fa fa-trash"></i></button>
-                    </div>
-                    <div id="catForm" class="hidden mt-2 p-2 bg-gray-50 rounded border flex gap-2 items-center">
-                        <input type="text" id="catName" placeholder="Category name" class="flex-1 border rounded px-3 py-2 text-sm">
-                        <input type="hidden" id="catEditId" value="">
-                        <button type="button" onclick="saveCat()" class="bg-blue-600 text-white px-3 py-2 rounded text-sm">Save</button>
-                        <button type="button" onclick="hideCatForm()" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm">Cancel</button>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1">Manage categories inline</p>
-                </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                    <input type="text" name="author" value="<?php echo htmlspecialchars($ep['author']); ?>" class="w-full border rounded px-3 py-2">
-                    <p class="text-xs text-gray-400 mt-1">Auto-filled with your username</p>
-                </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
-                    <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2 text-sm" onchange="document.getElementById('blogImgPreview').src=window.URL.createObjectURL(this.files[0]);document.getElementById('blogImgPreview').classList.remove('hidden')">
-                    <?php if ($ep['image']): ?>
-                    <img id="blogImgPreview" src="../<?php echo htmlspecialchars($ep['image']); ?>" class="mt-2 max-h-32 rounded border">
-                    <?php else: ?>
-                    <img id="blogImgPreview" class="mt-2 max-h-32 rounded border hidden">
-                    <?php endif; ?>
-                </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Excerpt</label><textarea name="excerpt" rows="2" class="w-full border rounded px-3 py-2 text-sm"><?php echo htmlspecialchars($ep['excerpt']); ?></textarea></div>
-                <hr>
-                <p class="text-sm font-semibold text-gray-700">SEO</p>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label><textarea name="meta_description" rows="2" class="w-full border rounded px-3 py-2 text-sm"><?php echo htmlspecialchars($ep['meta_description']); ?></textarea></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label><input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($ep['meta_keywords']); ?>" class="w-full border rounded px-3 py-2 text-sm"></div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" name="status" value="1" id="postStatus" <?php echo $ep['status'] ? 'checked' : ''; ?> class="h-5 w-5 text-blue-600 border rounded">
-                    <label for="postStatus" class="text-sm font-medium text-gray-700">Published</label>
-                </div>
-                <button type="submit" name="save_post" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 w-full"><i class="fa fa-save mr-1"></i> <?php echo $is_new ? 'Create Post' : 'Update Post'; ?></button>
-            </div>
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-gray-900">Blog Posts</h1>
+            <a href="blog-edit.php" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs md:text-sm shadow-sm transition inline-flex items-center gap-1.5">
+                <i class="fa fa-plus text-xs"></i> Add New Post
+            </a>
         </div>
-    </form>
+        <p class="text-gray-500 text-xs md:text-sm mt-1">Manage, write, and optimize your blog publications</p>
+    </div>
+</div>
+
+<?php if ($msg): ?>
+<div class="bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2 shadow-sm">
+    <i class="fa fa-check-circle text-green-500"></i>
+    <span><?php echo $msg; ?></span>
 </div>
 <?php endif; ?>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <div class="p-4 border-b flex items-center justify-between">
-        <form method="GET" class="flex gap-2">
-            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search posts..." class="border rounded px-3 py-2 text-sm">
-            <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded text-sm"><i class="fa fa-search"></i></button>
-            <?php if ($search): ?><a href="blogs.php" class="bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm">Clear</a><?php endif; ?>
-        </form>
-        <span class="text-sm text-gray-500"><?php echo $total; ?> total</span>
-    </div>
-    <table class="w-full">
-        <thead class="bg-gray-50 border-b">
-            <tr>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Title</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Category</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Author</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
-                <th class="text-left px-4 py-3 text-sm font-semibold text-gray-600">Date</th>
-                <th class="text-right px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y">
-            <?php if (mysqli_num_rows($posts) > 0): while ($post = mysqli_fetch_assoc($posts)): ?>
-            <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium">
-                    <?php if ($post['image']): ?><img src="../<?php echo htmlspecialchars($post['image']); ?>" class="w-8 h-8 object-cover rounded inline mr-2"><?php endif; ?>
-                    <?php echo htmlspecialchars($post['title']); ?>
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($post['category_name'] ?? 'Uncategorized'); ?></td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo htmlspecialchars($post['author'] ?: '-'); ?></td>
-                <td class="px-4 py-3">
-                    <span class="text-xs px-2 py-1 rounded-full <?php echo $post['status'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'; ?>"><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-500"><?php echo date('d M Y', strtotime($post['created_at'])); ?></td>
-                <td class="px-4 py-3 text-right">
-                    <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-green-600 hover:text-green-800 mr-2" title="View"><i class="fa fa-eye"></i></a>
-                    <a href="?edit=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 mr-2" title="Edit"><i class="fa fa-edit"></i></a>
-                    <a href="?delete=<?php echo $post['id']; ?>" onclick="return confirm('Delete this post?')" class="text-red-600 hover:text-red-800" title="Delete"><i class="fa fa-trash"></i></a>
-                </td>
-            </tr>
-            <?php endwhile; else: ?>
-            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No posts yet.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</div>
-<?php if ($pages > 1): ?>
-<div class="flex justify-center mt-4 gap-1">
-    <?php for ($i = 1; $i <= $pages; $i++): ?>
-    <a href="?p=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="px-3 py-1 rounded text-sm <?php echo $i == $page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
-    <?php endfor; ?>
+<?php if ($error): ?>
+<div class="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg text-sm mb-6 flex items-center gap-2 shadow-sm">
+    <i class="fa fa-circle-exclamation text-red-500"></i>
+    <span><?php echo $error; ?></span>
 </div>
 <?php endif; ?>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.10.9/tinymce.min.js"></script>
-<script>
-tinymce.init({
-    selector: '#blogContent',
-    height: 500,
-    menubar: true,
-    plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table code help wordcount',
-    toolbar: 'undo redo | formatselect | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image link media table | code fullscreen help',
-    images_upload_handler: function (blobInfo, success, failure) {
-        var formData = new FormData();
-        formData.append('file', blobInfo.blob(), blobInfo.filename());
-        formData.append('upload', 'tinymce');
-        fetch('upload.php', { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(d => { if (d.location) success(d.location); else failure('Upload failed'); })
-            .catch(() => failure('Upload error'));
-    },
-    setup: function (editor) {
-        editor.on('submit', function (e) {
-            tinymce.triggerSave();
-        });
-    }
-});
-$('form').on('submit', function() {
-    tinymce.triggerSave();
-});
-function showCatForm() {
-    $('#catForm').removeClass('hidden');
-    $('#catEditId').val('');
-    $('#catName').val('').focus();
-}
-function hideCatForm() {
-    $('#catForm').addClass('hidden');
-    $('#catName').val('');
-    $('#catEditId').val('');
-}
-function saveCat() {
-    var name = $('#catName').val().trim();
-    if (!name) return alert('Enter a category name');
-    var id = $('#catEditId').val();
-    var data = 'inline_cat=' + (id ? 'edit' : 'add') + '&name=' + encodeURIComponent(name);
-    if (id) data += '&edit_id=' + id;
-    $.post('', data, function() { location.reload(); });
-}
-function editCat() {
-    var sel = document.getElementById('catSelect');
-    if (!sel.value) return alert('Select a category first');
-    var text = sel.options[sel.selectedIndex].text;
-    $('#catForm').removeClass('hidden');
-    $('#catEditId').val(sel.value);
-    $('#catName').val(text).focus();
-}
-function deleteCat() {
-    var sel = document.getElementById('catSelect');
-    if (!sel.value) return alert('Select a category first');
-    if (!confirm('Delete category "' + sel.options[sel.selectedIndex].text + '"?')) return;
-    $.post('', 'inline_cat=delete&id=' + sel.value, function() { location.reload(); });
-}
-</script>
+
+<!-- WordPress Status Filter Tabs -->
+<div class="flex flex-wrap items-center gap-2 text-xs md:text-sm font-medium mb-4 text-gray-600 border-b pb-3">
+    <a href="blogs.php<?php echo $search ? '?search=' . urlencode($search) : ''; ?>" 
+       class="px-3 py-1 rounded-md <?php echo $status_filter === 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:text-blue-600'; ?>">
+        All <span class="text-xs text-gray-400 font-normal">(<?php echo $total_all; ?>)</span>
+    </a>
+    <span class="text-gray-300">|</span>
+    <a href="blogs.php?status=published<?php echo $search ? '&search=' . urlencode($search) : ''; ?>" 
+       class="px-3 py-1 rounded-md <?php echo $status_filter === 'published' ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:text-blue-600'; ?>">
+        Published <span class="text-xs text-gray-400 font-normal">(<?php echo $total_pub; ?>)</span>
+    </a>
+    <span class="text-gray-300">|</span>
+    <a href="blogs.php?status=draft<?php echo $search ? '&search=' . urlencode($search) : ''; ?>" 
+       class="px-3 py-1 rounded-md <?php echo $status_filter === 'draft' ? 'bg-blue-50 text-blue-700 font-bold' : 'hover:text-blue-600'; ?>">
+        Drafts <span class="text-xs text-gray-400 font-normal">(<?php echo $total_draft; ?>)</span>
+    </a>
+</div>
+
+<!-- Filter Bar -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <form method="GET" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <?php if ($status_filter !== 'all'): ?>
+            <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>">
+        <?php endif; ?>
+        
+        <!-- Category Filter -->
+        <select name="cat" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-xs focus:border-blue-600 focus:outline-none bg-white">
+            <option value="0">All Categories</option>
+            <?php foreach ($all_cats as $c): ?>
+            <option value="<?php echo $c['id']; ?>" <?php echo $category_filter == $c['id'] ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($c['name']); ?>
+            </option>
+            <?php endforeach; ?>
+        </select>
+
+        <!-- Search Bar -->
+        <div class="relative flex-1 sm:w-64">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search posts..." 
+                   class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-xs focus:border-blue-600 focus:outline-none">
+            <i class="fa fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
+            Filter
+        </button>
+
+        <?php if ($search || $category_filter > 0 || $status_filter !== 'all'): ?>
+        <a href="blogs.php" class="text-xs text-red-600 hover:underline">
+            <i class="fa fa-times mr-1"></i> Reset Filters
+        </a>
+        <?php endif; ?>
+    </form>
+
+    <div class="text-xs text-gray-500 font-medium whitespace-nowrap">
+        Showing <?php echo mysqli_num_rows($posts); ?> of <?php echo $total_filtered; ?> items
+    </div>
+</div>
+
+<!-- Posts Table (WordPress Style) -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-gray-50/75 border-b border-gray-200 text-xs uppercase font-bold text-gray-500 tracking-wider">
+                <tr>
+                    <th scope="col" class="py-3.5 px-4 w-12 text-center">Image</th>
+                    <th scope="col" class="py-3.5 px-4">Title</th>
+                    <th scope="col" class="py-3.5 px-4">Author</th>
+                    <th scope="col" class="py-3.5 px-4">Categories</th>
+                    <th scope="col" class="py-3.5 px-4">Status</th>
+                    <th scope="col" class="py-3.5 px-4">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <?php if (mysqli_num_rows($posts) > 0): ?>
+                    <?php while ($post = mysqli_fetch_assoc($posts)): ?>
+                    <tr class="hover:bg-blue-50/30 transition group">
+                        <!-- Featured Image Thumbnail -->
+                        <td class="py-3 px-4 text-center">
+                            <?php if (!empty($post['image'])): ?>
+                                <img src="/<?php echo ltrim($post['image'], '/'); ?>" alt="" class="w-10 h-10 object-cover rounded-lg border border-gray-200 shadow-xs inline-block">
+                            <?php else: ?>
+                                <div class="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs inline-block">
+                                    <i class="fa fa-image"></i>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Title + WordPress Quick Action Links -->
+                        <td class="py-3 px-4">
+                            <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="font-bold text-gray-900 hover:text-blue-600 text-sm block">
+                                <?php echo htmlspecialchars($post['title']); ?>
+                            </a>
+                            
+                            <!-- Hover Quick Action Row (WordPress Style) -->
+                            <div class="flex items-center gap-2 mt-1 text-xs opacity-80 group-hover:opacity-100 transition">
+                                <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium">View</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="blogs.php?delete=<?php echo $post['id']; ?>" onclick="return confirm('Are you sure you want to delete this post?')" class="text-red-600 hover:text-red-800 font-medium">Trash</a>
+                            </div>
+                        </td>
+
+                        <!-- Author -->
+                        <td class="py-3 px-4 text-xs font-medium text-gray-700">
+                            <?php echo htmlspecialchars($post['author'] ?: 'Admin'); ?>
+                        </td>
+
+                        <!-- Categories -->
+                        <td class="py-3 px-4 text-xs">
+                            <?php if (!empty($post['category_name'])): ?>
+                                <a href="blogs.php?cat=<?php echo $post['category_id']; ?>" class="inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-medium transition">
+                                    <?php echo htmlspecialchars($post['category_name']); ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="text-gray-400 italic">Uncategorized</span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Status Badge -->
+                        <td class="py-3 px-4">
+                            <?php if ($post['status']): ?>
+                                <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Published
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-gray-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Draft
+                                </span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Date -->
+                        <td class="py-3 px-4 text-xs text-gray-500 whitespace-nowrap">
+                            <div class="font-medium text-gray-800"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></div>
+                            <div class="text-[11px] text-gray-400"><?php echo date('h:i A', strtotime($post['created_at'])); ?></div>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-gray-400">
+                            <i class="fa fa-newspaper text-4xl mb-3 block text-gray-300"></i>
+                            <p class="text-base font-semibold text-gray-700">No blog posts found</p>
+                            <p class="text-xs text-gray-500 mt-1">Get started by creating your very first article!</p>
+                            <a href="blog-edit.php" class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg mt-4 shadow-sm hover:bg-blue-700 transition">
+                                <i class="fa fa-plus"></i> Create Post
+                            </a>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <?php if ($pages > 1): ?>
+    <div class="p-4 border-t border-gray-200 flex items-center justify-between bg-gray-50/50">
+        <span class="text-xs text-gray-500">
+            Page <?php echo $page; ?> of <?php echo $pages; ?>
+        </span>
+        <div class="flex items-center gap-1">
+            <?php for ($i = 1; $i <= $pages; $i++): ?>
+                <?php 
+                $query_params = $_GET;
+                $query_params['p'] = $i;
+                $page_url = 'blogs.php?' . http_build_query($query_params);
+                ?>
+                <a href="<?php echo $page_url; ?>" class="px-3 py-1.5 rounded-lg text-xs font-semibold <?php echo $i == $page ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'; ?>">
+                    <?php echo $i; ?>
+                </a>
+            <?php endfor; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
+
 <?php include 'footer.php'; ?>

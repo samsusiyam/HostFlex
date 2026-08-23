@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
         if ($ext === 'svg') {
             sanitizeSvgFile($target);
         }
-        echo json_encode(['location' => 'uploads/content/' . $fname]);
+        echo json_encode(['location' => '/uploads/content/' . $fname]);
         exit;
     }
 }
