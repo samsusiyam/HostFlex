@@ -248,3 +248,86 @@ function renderMenu($items, $is_mobile = false) {
     }
     return $html;
 }
+
+function getSiteUrl() {
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    return $proto . '://' . $host . ($dir ? $dir : '') . '/';
+}
+
+function getCanonicalUrl() {
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $uri = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
+    return $proto . '://' . $host . $uri;
+}
+
+function renderSeoTags($options = []) {
+    $site_name = getSetting('site_name') ?: 'Host Nibo';
+    $title = !empty($options['title']) ? $options['title'] : ($site_name . ' - ' . (getSetting('site_tagline') ?: 'Fast & Reliable Web Hosting'));
+    $description = !empty($options['description']) ? $options['description'] : (getSetting('site_description') ?: 'Fast and affordable web hosting solutions for personal and business websites.');
+    $keywords = !empty($options['keywords']) ? $options['keywords'] : getSetting('site_keywords');
+    $canonical = !empty($options['canonical']) ? $options['canonical'] : getCanonicalUrl();
+    $type = !empty($options['type']) ? $options['type'] : 'website';
+    $image = !empty($options['image']) ? $options['image'] : (getSiteUrl() . (getSetting('header_logo') ?: 'images/bg.png'));
+    if (!filter_var($image, FILTER_VALIDATE_URL)) {
+        $image = getSiteUrl() . ltrim($image, '/');
+    }
+
+    $html = "\n";
+    if ($description) $html .= '<meta name="description" content="' . htmlspecialchars($description) . '" />' . "\n";
+    if ($keywords) $html .= '<meta name="keywords" content="' . htmlspecialchars($keywords) . '" />' . "\n";
+    $html .= '<link rel="canonical" href="' . htmlspecialchars($canonical) . '" />' . "\n";
+    
+    // Open Graph
+    $html .= '<meta property="og:locale" content="en_US" />' . "\n";
+    $html .= '<meta property="og:type" content="' . htmlspecialchars($type) . '" />' . "\n";
+    $html .= '<meta property="og:site_name" content="' . htmlspecialchars($site_name) . '" />' . "\n";
+    $html .= '<meta property="og:title" content="' . htmlspecialchars($title) . '" />' . "\n";
+    $html .= '<meta property="og:description" content="' . htmlspecialchars($description) . '" />' . "\n";
+    $html .= '<meta property="og:url" content="' . htmlspecialchars($canonical) . '" />' . "\n";
+    $html .= '<meta property="og:image" content="' . htmlspecialchars($image) . '" />' . "\n";
+
+    // Twitter Cards
+    $html .= '<meta name="twitter:card" content="summary_large_image" />' . "\n";
+    $html .= '<meta name="twitter:title" content="' . htmlspecialchars($title) . '" />' . "\n";
+    $html .= '<meta name="twitter:description" content="' . htmlspecialchars($description) . '" />' . "\n";
+    $html .= '<meta name="twitter:image" content="' . htmlspecialchars($image) . '" />' . "\n";
+
+    // JSON-LD Schemas
+    $schemas = [];
+    
+    // Base Organization Schema
+    $schemas[] = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $site_name,
+        'url' => getSiteUrl(),
+        'logo' => getSiteUrl() . (getSetting('header_logo') ?: 'images/bg.png')
+    ];
+
+    // Base WebSite Schema
+    $schemas[] = [
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => $site_name,
+        'url' => getSiteUrl(),
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => getSiteUrl() . 'blogs.php?search={search_term_string}',
+            'query-input' => 'required name=search_term_string'
+        ]
+    ];
+
+    // Custom Schema (if provided, e.g. Product, BlogPosting, FAQPage)
+    if (!empty($options['schema']) && is_array($options['schema'])) {
+        $schemas[] = $options['schema'];
+    }
+
+    foreach ($schemas as $schema) {
+        $html .= '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+    }
+
+    return $html;
+}

@@ -1,19 +1,23 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance(); ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Offers - <?php echo getSetting('site_name'); ?></title>
+<title>Special Hosting Offers & Deals - <?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?></title>
+<?php echo renderSeoTags([
+    'title' => 'Special Hosting Offers & Deals - ' . (getSetting('site_name') ?: 'Host Nibo'),
+    'description' => 'Save big on web hosting, cloud servers, and domain names with our exclusive limited-time promo deals.'
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
-<div class="-z-50" style="background-image: url('img/7ee6a14d8e2-shutterstock_1394052911-scaled.html'); background-size: cover; background-position: center;">
-<div class="bg-blue-600 bg-opacity-70">
+<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
 <div class="space-y-16 content mx-auto py-16 lg:pt-20 lg:pb-20">
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
-<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white">Hot Deals &amp; Offers</h2>
-<p class="text-lg md:text-xl font-medium text-gray-200">Unlock more possibilities at a fraction of the cost with our best deals</p>
+<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-white">Hot Deals &amp; Offers</h1>
+<p class="text-lg md:text-xl font-medium text-blue-100">Unlock more possibilities at a fraction of the cost with our best deals</p>
 </div>
 </div>
 </div>

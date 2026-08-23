@@ -4,15 +4,37 @@ $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : '';
 $category = getCategoryBySlug($slug);
 
 if (!$category) {
-    header('HTTP/1.0 404 Not Found');
-    echo '<h1>404 - Category Not Found</h1>';
+    include '404.php';
     exit;
 }
+
+$site_name = getSetting('site_name') ?: 'Host Nibo';
+$cat_title = htmlspecialchars($category['name']) . ' - ' . $site_name;
+$cat_desc = $category['description'] ?: ('High performance ' . $category['name'] . ' hosting plans with 99.9% uptime guarantee.');
+
+$product_schema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Product',
+    'name' => $category['name'] . ' Hosting',
+    'description' => $cat_desc,
+    'offers' => [
+        '@type' => 'AggregateOffer',
+        'priceCurrency' => 'BDT',
+        'offerCount' => 4,
+        'availability' => 'https://schema.org/InStock'
+    ]
+];
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($category['name']); ?> - <?php echo getSetting('site_name'); ?></title>
+<title><?php echo $cat_title; ?></title>
+<?php echo renderSeoTags([
+    'title' => $cat_title,
+    'description' => $cat_desc,
+    'schema' => $product_schema
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>
@@ -21,7 +43,7 @@ if (!$category) {
 <div class="space-y-16 content mx-auto py-16 lg:pt-20 lg:pb-20">
 <div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
 <div class="sm:w-2/3 text-left">
-<h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h2>
+<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-white"><?php echo htmlspecialchars($category['name']); ?></h1>
 <p class="text-lg md:text-xl font-medium text-blue-100"><?php echo htmlspecialchars($category['description']); ?></p>
 </div>
 </div>
@@ -30,10 +52,24 @@ if (!$category) {
 
 <section class="section_gap">
 <div class="content">
-<div class="mb-12 flex flex-col gap-2">
-<h5 class="text-blue-600">PRICING PLANS</h5>
-<h2 class="text-black">Choose the best plan</h2>
-<p>Honest and affordable pricing model to help you get started easily.</p>
+<div class="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+<div>
+<h5 class="text-blue-600 font-semibold tracking-wider uppercase text-sm">PRICING PLANS</h5>
+<h2 class="text-3xl font-bold text-gray-900 mt-1">Choose the best plan</h2>
+<p class="text-gray-600 mt-1">Honest and affordable pricing model to help you get started easily.</p>
+</div>
+
+<!-- Pricing Switcher -->
+<div class="flex items-center gap-3 bg-gray-100 p-1.5 rounded-full border w-fit">
+    <span class="text-sm font-semibold text-gray-700 ml-3">Monthly</span>
+    <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="pricingSwitch" class="sr-only peer">
+        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+    </label>
+    <span class="text-sm font-semibold text-gray-700 mr-2 flex items-center gap-1.5">
+        Yearly <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">Save 20%</span>
+    </span>
+</div>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">

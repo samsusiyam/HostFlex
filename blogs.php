@@ -1,11 +1,15 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 $page_title = 'Blog';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Blog - <?php echo getSetting('site_name'); ?></title>
-<meta name="description" content="Read our latest blog posts about web hosting, technology and more">
+<title>Blog - <?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?></title>
+<?php echo renderSeoTags([
+    'title' => 'Blog - ' . (getSetting('site_name') ?: 'Host Nibo'),
+    'description' => 'Read our latest blog posts about web hosting, WordPress, cloud servers, tips and updates.'
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>

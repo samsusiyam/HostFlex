@@ -11,18 +11,44 @@ if (!$post) { header('Location: blogs.php'); exit; }
 $page_title = $post['title'];
 $meta_desc = $post['meta_description'] ?: ($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 160));
 $meta_kw = $post['meta_keywords'] ?? '';
+$site_name = getSetting('site_name') ?: 'Host Nibo';
+
+$blog_schema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BlogPosting',
+    'headline' => $post['title'],
+    'description' => $meta_desc,
+    'datePublished' => date('c', strtotime($post['created_at'])),
+    'author' => [
+        '@type' => 'Person',
+        'name' => $post['author'] ?: $site_name
+    ],
+    'publisher' => [
+        '@type' => 'Organization',
+        'name' => $site_name,
+        'logo' => [
+            '@type' => 'ImageObject',
+            'url' => getSiteUrl() . (getSetting('header_logo') ?: 'images/bg.png')
+        ]
+    ]
+];
+if (!empty($post['image'])) {
+    $blog_schema['image'] = getSiteUrl() . ltrim($post['image'], '/');
+}
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($post['title']); ?> - <?php echo getSetting('site_name'); ?></title>
-<meta name="description" content="<?php echo htmlspecialchars($meta_desc); ?>">
-<?php if ($meta_kw): ?><meta name="keywords" content="<?php echo htmlspecialchars($meta_kw); ?>"><?php endif; ?>
-<meta property="og:title" content="<?php echo htmlspecialchars($post['title']); ?>">
-<meta property="og:description" content="<?php echo htmlspecialchars($meta_desc); ?>">
-<?php if ($post['image']): ?>
-<meta property="og:image" content="<?php echo htmlspecialchars($post['image']); ?>">
-<?php endif; ?>
+<title><?php echo htmlspecialchars($post['title']); ?> - <?php echo $site_name; ?></title>
+<?php echo renderSeoTags([
+    'title' => htmlspecialchars($post['title']) . ' - ' . $site_name,
+    'description' => $meta_desc,
+    'keywords' => $meta_kw,
+    'type' => 'article',
+    'image' => $post['image'] ?? '',
+    'schema' => $blog_schema
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>

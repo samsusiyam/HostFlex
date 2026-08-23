@@ -53,10 +53,16 @@ usort($homepage_sections, function($a, $b) {
 $currency_symbol = getSetting('currency_symbol') ?: 'TK.';
 $pricing_url = getSetting('whmcs_domain_pricing_url');
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo getSetting('site_name'); ?></title>
+<title><?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?> - <?php echo htmlspecialchars(getSetting('site_tagline') ?: 'Fast & Reliable Web Hosting'); ?></title>
+<?php echo renderSeoTags([
+    'title' => (getSetting('site_name') ?: 'Host Nibo') . ' - ' . (getSetting('site_tagline') ?: 'Fast & Reliable Web Hosting'),
+    'description' => getSetting('site_description') ?: 'Experience ultra-fast, secure, and reliable web hosting with 99.9% uptime guarantee.',
+    'keywords' => getSetting('site_keywords')
+]); ?>
 </head>
 <body>
 
@@ -88,7 +94,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt></div>
+<div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="Cloud Web Hosting" class="rounded-xl shadow-lg" loading="lazy"></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>

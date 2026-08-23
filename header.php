@@ -46,26 +46,28 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
-<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow border xl:hidden flex flex-col gap-3 p-10 font-normal transition-all transform origin-top" style="transform: scaleY(0);">
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow-xl border xl:hidden flex flex-col gap-3 p-6 font-normal transition-all transform origin-top max-h-[80vh] overflow-y-auto" style="transform: scaleY(0);">
 <?php foreach ($tree as $item):
     $has_children = isset($item['children']) && !empty($item['children']);
     $url = htmlspecialchars($item['url']);
     $label = htmlspecialchars($item['label']);
     if ($has_children):
 ?>
-<div class="group h-[40px] relative flex cursor-pointer items-center gap-1">
-<span class="font-medium hover:text-blue-600"><?php echo $label; ?></span>
-<small class="text-xs ml-1"><i class="fa fa-chevron-down"></i></small>
-<div class="absolute !z-[100] top-full hidden flex-col border-t-transparent bg-gray-100 text-sm shadow group-hover:flex">
-<?php foreach ($item['children'] as $child): ?>
-<a href="<?php echo htmlspecialchars($child['url']); ?>" class="whitespace-nowrap border-b px-6 py-3 hover:text-blue-600"><?php echo htmlspecialchars($child['label']); ?></a>
-<?php endforeach; ?>
-</div>
+<div class="mobile-dropdown py-2 border-b">
+    <div class="flex items-center justify-between cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron-icon').classList.toggle('rotate-180');">
+        <span class="font-medium text-gray-800 hover:text-blue-600"><?php echo $label; ?></span>
+        <i class="chevron-icon fa fa-chevron-down text-xs text-gray-500 transition-transform duration-200"></i>
+    </div>
+    <div class="hidden pl-4 pt-2 flex flex-col space-y-2">
+        <?php foreach ($item['children'] as $child): ?>
+        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="text-sm text-gray-600 hover:text-blue-600 py-1 border-b border-gray-100 last:border-none"><?php echo htmlspecialchars($child['label']); ?></a>
+        <?php endforeach; ?>
+    </div>
 </div>
 <?php else: ?>
-<a href="<?php echo $url; ?>" class="font-medium hover:text-blue-600"><?php echo $label; ?></a>
+<a href="<?php echo $url; ?>" class="font-medium text-gray-800 hover:text-blue-600 py-2 border-b"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
-<div class="w-fit"><a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
+<div class="pt-2"><a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full text-center" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a></div>
 </div>
 <div class="xl:hidden w-fit ml-auto">
 <button data-ripple-dark="true" id="mobile-nav-toggle" class="btn bg-gray-200 border text-blue-600 text-xl"><i class="fa fa-bars"></i></button>

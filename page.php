@@ -4,17 +4,23 @@ $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : '';
 $page = getPageBySlug($slug);
 
 if (!$page) {
-    header('HTTP/1.0 404 Not Found');
-    echo '<h1>404 - Page Not Found</h1>';
+    include '404.php';
     exit;
 }
+
+$site_name = getSetting('site_name') ?: 'Host Nibo';
+$page_title = htmlspecialchars($page['title']) . ' - ' . $site_name;
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title><?php echo htmlspecialchars($page['title']); ?> - <?php echo getSetting('site_name'); ?></title>
-<meta name="description" content="<?php echo htmlspecialchars($page['meta_description']); ?>">
-<meta name="keywords" content="<?php echo htmlspecialchars($page['meta_keywords']); ?>">
+<title><?php echo $page_title; ?></title>
+<?php echo renderSeoTags([
+    'title' => $page_title,
+    'description' => $page['meta_description'],
+    'keywords' => $page['meta_keywords']
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>

@@ -65,10 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <?php include "cdnjs.php"; ?>
-<title>Contact - <?php echo getSetting('site_name'); ?></title>
+<title>Contact Us - <?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?></title>
+<?php echo renderSeoTags([
+    'title' => 'Contact Us - ' . (getSetting('site_name') ?: 'Host Nibo'),
+    'description' => getSetting('contact_page_subheading') ?: 'Get in touch with our 24/7 web hosting support and sales team.'
+]); ?>
 </head>
 <body>
 <?php include "header.php"; ?>

@@ -55,18 +55,40 @@ foreach ($footer_tree as $parent):
 <script>
 function subscribeNewsletter(e) {
     e.preventDefault();
-    var email = document.getElementById('newsletterEmail').value.trim();
+    var emailInput = document.getElementById('newsletterEmail');
+    var email = emailInput.value.trim();
     var msgDiv = document.getElementById('newsletterMsg');
-    if (!email) { msgDiv.innerHTML = '<span class="text-red-400">Please enter your email</span>'; return false; }
+    var form = document.getElementById('newsletterForm');
+    var btn = form.querySelector('button[type="submit"]');
+    
+    if (!email) { 
+        msgDiv.innerHTML = '<span class="text-red-400">Please enter your email</span>'; 
+        return false; 
+    }
+    
+    var originalBtn = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+    msgDiv.innerHTML = '';
+
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'subscribe.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
+        btn.disabled = false;
+        btn.innerHTML = originalBtn;
         try {
             var res = JSON.parse(xhr.responseText);
-            msgDiv.innerHTML = res.success ? '<span class="text-green-400">' + res.message + '</span>' : '<span class="text-red-400">' + res.message + '</span>';
-            if (res.success) { document.getElementById('newsletterEmail').value = ''; }
-        } catch(e) { msgDiv.innerHTML = '<span class="text-red-400">Something went wrong</span>'; }
+            msgDiv.innerHTML = res.success ? '<span class="text-green-400 font-medium">' + res.message + '</span>' : '<span class="text-red-400 font-medium">' + res.message + '</span>';
+            if (res.success) { emailInput.value = ''; }
+        } catch(e) { 
+            msgDiv.innerHTML = '<span class="text-red-400">Something went wrong</span>'; 
+        }
+    };
+    xhr.onerror = function() {
+        btn.disabled = false;
+        btn.innerHTML = originalBtn;
+        msgDiv.innerHTML = '<span class="text-red-400">Connection error</span>';
     };
     xhr.send('email=' + encodeURIComponent(email));
     return false;
