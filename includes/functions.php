@@ -1,0 +1,250 @@
+<?php
+function isAdminLoggedIn() {
+    return isset($_SESSION['admin_id']);
+}
+
+function checkAdminLogin() {
+    if (!isAdminLoggedIn()) {
+        header('Location: index.php');
+        exit;
+    }
+}
+
+function getAdminRole() {
+    return $_SESSION['admin_role'] ?? 'admin';
+}
+
+function hasRole($roles) {
+    if (!isAdminLoggedIn()) return false;
+    $currentRole = getAdminRole();
+    if (is_string($roles)) {
+        $roles = [$roles];
+    }
+    return in_array($currentRole, $roles);
+}
+
+function checkAdminRole($allowed_roles) {
+    checkAdminLogin();
+    if (!hasRole($allowed_roles)) {
+        http_response_code(403);
+        die('<!DOCTYPE html><html><head><title>403 Forbidden</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-gray-100 flex items-center justify-center min-h-screen"><div class="bg-white p-8 rounded-lg shadow text-center max-w-md"><h1 class="text-3xl font-bold text-red-600 mb-2">403 Access Denied</h1><p class="text-gray-600 mb-4">You do not have permission to access this page.</p><a href="dashboard.php" class="bg-blue-600 text-white px-4 py-2 rounded">Back to Dashboard</a></div></body></html>');
+    }
+}
+
+function generateCsrfToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verifyCsrfToken($token) {
+    if (empty($_SESSION['csrf_token']) || empty($token)) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function getSetting($key) {
+    global $conn;
+    $stmt = mysqli_prepare($conn, "SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $key);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
+            mysqli_stmt_close($stmt);
+            return $row['setting_value'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+    return '';
+}
+
+function getPlans($category = null) {
+    global $conn;
+    if ($category) {
+        $stmt = mysqli_prepare($conn, "SELECT * FROM hosting_plans WHERE status = 1 AND category = ? ORDER BY sort_order ASC");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $category);
+            mysqli_stmt_execute($stmt);
+            return mysqli_stmt_get_result($stmt);
+        }
+    }
+    $query = "SELECT * FROM hosting_plans WHERE status = 1 ORDER BY sort_order ASC";
+    return mysqli_query($conn, $query);
+}
+
+function getActiveOffers() {
+    global $conn;
+    $query = "SELECT * FROM offers WHERE status = 1 ORDER BY sort_order ASC";
+    return mysqli_query($conn, $query);
+}
+
+function getUnreadContacts() {
+    global $conn;
+    $query = "SELECT COUNT(*) as count FROM contacts WHERE is_read = 0";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['count'] ?? 0;
+}
+
+function sanitize($data) {
+    global $conn;
+    if (is_array($data)) {
+        return array_map('sanitize', $data);
+    }
+    return mysqli_real_escape_string($conn, trim(strip_tags((string)$data)));
+}
+
+function timeAgo($timestamp) {
+    $time = strtotime($timestamp);
+    $diff = time() - $time;
+    
+    if ($diff < 60) return 'Just now';
+    if ($diff < 3600) return floor($diff / 60) . ' minutes ago';
+    if ($diff < 86400) return floor($diff / 3600) . ' hours ago';
+    if ($diff < 2592000) return floor($diff / 86400) . ' days ago';
+    return date('d M Y', $time);
+}
+
+function getCategories($status = true) {
+    global $conn;
+    $where = $status ? "WHERE status = 1" : "";
+    $query = "SELECT * FROM categories $where ORDER BY sort_order ASC";
+    return mysqli_query($conn, $query);
+}
+
+function getCategoryBySlug($slug) {
+    global $conn;
+    $stmt = mysqli_prepare($conn, "SELECT * FROM categories WHERE slug = ? AND status = 1 LIMIT 1");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $slug);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($res);
+        mysqli_stmt_close($stmt);
+        return $row;
+    }
+    return null;
+}
+
+function getPageBySlug($slug) {
+    global $conn;
+    $stmt = mysqli_prepare($conn, "SELECT * FROM pages WHERE slug = ? AND status = 1 LIMIT 1");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $slug);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($res);
+        mysqli_stmt_close($stmt);
+        return $row;
+    }
+    return null;
+}
+
+function getMenuItems($location = 'header') {
+    global $conn;
+    $loc_esc = mysqli_real_escape_string($conn, $location);
+    $query = "SELECT * FROM menu_items WHERE status = 1 AND (location = '$loc_esc' OR location = 'both') ORDER BY sort_order ASC";
+    $result = mysqli_query($conn, $query);
+    $items = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $items[] = $row;
+    }
+    return $items;
+}
+
+function buildMenuTree($items, $parent_id = 0) {
+    $tree = [];
+    foreach ($items as $item) {
+        if ($item['parent_id'] == $parent_id) {
+            $children = buildMenuTree($items, $item['id']);
+            if ($children) {
+                $item['children'] = $children;
+            }
+            $tree[] = $item;
+        }
+    }
+    return $tree;
+}
+
+function getClientIP() {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $candidate = trim($ips[0]);
+        if (filter_var($candidate, FILTER_VALIDATE_IP)) {
+            $ip = $candidate;
+        }
+    } elseif (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        $candidate = trim($_SERVER['HTTP_X_REAL_IP']);
+        if (filter_var($candidate, FILTER_VALIDATE_IP)) {
+            $ip = $candidate;
+        }
+    }
+    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
+}
+
+function tableExists($table) {
+    global $conn;
+    $table_esc = mysqli_real_escape_string($conn, $table);
+    $r = mysqli_query($conn, "SHOW TABLES LIKE '$table_esc'");
+    return mysqli_num_rows($r) > 0;
+}
+
+function logActivity($action, $details = '') {
+    global $conn;
+    if (!tableExists('activity_logs')) return;
+    $user_id = (int)($_SESSION['admin_id'] ?? 0);
+    $username = $_SESSION['admin_username'] ?? 'System';
+    $ip = getClientIP();
+    $stmt = mysqli_prepare($conn, "INSERT INTO activity_logs (user_id, username, action, details, ip_address) VALUES (?, ?, ?, ?, ?)");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "issss", $user_id, $username, $action, $details, $ip);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+}
+
+function isMaintenanceMode() {
+    $mode = getSetting('maintenance_mode');
+    return $mode === '1';
+}
+
+function checkMaintenance() {
+    if (isMaintenanceMode() && !isset($_SESSION['admin_id'])) {
+        while (ob_get_level()) ob_end_clean();
+        $title = getSetting('maintenance_title') ?: 'Under Maintenance';
+        $heading = getSetting('maintenance_heading') ?: "We'll be back soon!";
+        $message = getSetting('maintenance_message') ?: 'Our website is currently undergoing scheduled maintenance. Please check back later.';
+        http_response_code(503);
+        ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title><?php echo htmlspecialchars($title); ?></title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"></head><body class="bg-gray-100 min-h-screen flex items-center justify-center"><div class="text-center max-w-lg mx-auto p-8"><div class="text-6xl text-yellow-500 mb-6"><i class="fas fa-tools"></i></div><h1 class="text-3xl font-bold text-gray-800 mb-4"><?php echo htmlspecialchars($heading); ?></h1><p class="text-gray-600 text-lg"><?php echo htmlspecialchars($message); ?></p></div></body></html><?php
+        exit;
+    }
+}
+
+function renderMenu($items, $is_mobile = false) {
+    $html = '';
+    foreach ($items as $item) {
+        $has_children = isset($item['children']) && !empty($item['children']);
+        $url = htmlspecialchars($item['url']);
+        $label = htmlspecialchars($item['label']);
+        
+        if ($has_children) {
+            $html .= '<div class="group relative z-50 flex h-[80px] cursor-pointer items-center gap-1">';
+            $html .= '<span class="font-medium hover:text-blue-600">' . $label . '</span>';
+            $html .= '<small class="text-xs ml-1"><i class="fa fa-chevron-down"></i></small>';
+            $html .= '<div class="absolute top-full hidden flex-col border-t-transparent bg-white text-sm shadow group-hover:flex">';
+            foreach ($item['children'] as $child) {
+                $child_url = htmlspecialchars($child['url']);
+                $child_label = htmlspecialchars($child['label']);
+                $html .= '<a href="' . $child_url . '" class="whitespace-nowrap border-b px-4 py-2 hover:text-blue-600">' . $child_label . '</a>';
+            }
+            $html .= '</div></div>';
+        } else {
+            $html .= '<a href="' . $url . '" class="font-medium hover:text-blue-600">' . $label . '</a>';
+        }
+    }
+    return $html;
+}
