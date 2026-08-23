@@ -35,12 +35,8 @@ function checkAdminAccessSlug() {
         return true;
     }
     
-    if (isset($_GET['access']) && $_GET['access'] === $custom_slug) {
-        $_SESSION['admin_access_unlocked'] = $custom_slug;
-        return true;
-    }
-    
-    if (isset($_SESSION['admin_access_unlocked']) && $_SESSION['admin_access_unlocked'] === $custom_slug) {
+    $given_access = $_GET['access'] ?? ($_POST['access'] ?? '');
+    if (!empty($given_access) && hash_equals($custom_slug, (string)$given_access)) {
         return true;
     }
     

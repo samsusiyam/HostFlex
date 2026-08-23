@@ -19,8 +19,8 @@
     <i class="fa fa-tools mr-1"></i> Maintenance Mode is ACTIVE. Visitors see a maintenance page.
 </div>
 <?php endif; ?>
-<header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
-<div class="content flex items-center justify-between">
+<header class="w-full h-[90px] flex items-center bg-white dark:bg-gray-900 sticky border-b top-0 left-0 right-0 z-[99999]">
+<div class="content flex items-center justify-between w-full">
 <a href="/"><img class="h-[50px]" src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>" /></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
 <?php

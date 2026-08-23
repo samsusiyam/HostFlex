@@ -83,6 +83,13 @@ $logo = getSetting('header_logo') ?: 'images/bg.png';
             <p class="text-gray-500 text-sm mt-1"><?php echo htmlspecialchars($site_name); ?> Management Panel</p>
         </div>
         
+        <?php if (isset($_GET['logged_out'])): ?>
+            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded text-sm mb-5 flex items-center gap-2">
+                <i class="fa fa-check-circle text-green-500"></i>
+                <span>You have been safely logged out.</span>
+            </div>
+        <?php endif; ?>
+
         <?php if ($error): ?>
             <div class="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded text-sm mb-5 flex items-center gap-2">
                 <i class="fa fa-circle-exclamation text-red-500"></i>
@@ -91,6 +98,9 @@ $logo = getSetting('header_logo') ?: 'images/bg.png';
         <?php endif; ?>
 
         <form method="POST">
+            <?php if (!empty($_GET['access']) || !empty($_POST['access'])): ?>
+            <input type="hidden" name="access" value="<?php echo htmlspecialchars($_GET['access'] ?? ($_POST['access'] ?? '')); ?>">
+            <?php endif; ?>
             <div class="mb-4">
                 <label class="block text-gray-700 text-xs font-bold uppercase tracking-wider mb-2">Username</label>
                 <div class="relative">

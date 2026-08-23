@@ -217,26 +217,41 @@
 }
 .mobile-sub-menu {
     display: none;
-    padding: 2px 0 6px 16px;
-    border-left: 2px solid #cbd5e1;
-    margin: 2px 0 6px 18px;
+    padding: 4px 6px 8px 16px;
+    margin: 2px 0 6px 0;
 }
 .mobile-sub-menu.open {
     display: block;
 }
 .mobile-sub-link {
-    display: block;
-    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #475569;
+    color: #4b5563;
     text-decoration: none;
-    border-radius: 6px;
+    border-bottom: 1px dashed #e2e8f0;
     transition: all 0.2s ease;
+}
+.mobile-sub-link:last-child {
+    border-bottom: none;
+}
+.mobile-sub-link::before {
+    content: "•";
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1;
+    transition: color 0.2s ease;
 }
 .mobile-sub-link:hover {
     color: #2563eb;
-    background: #f1f5f9;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+.mobile-sub-link:hover::before {
+    color: #2563eb;
 }
 
 /* 404 Error Page Styling */

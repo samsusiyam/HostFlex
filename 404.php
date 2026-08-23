@@ -12,7 +12,7 @@ $site_name = getSetting('site_name') ?: 'Host Nibo';
 <meta name="robots" content="noindex, follow" />
 <?php echo renderSeoTags(['title' => "404 - Page Not Found | $site_name", 'description' => 'The page you are looking for does not exist or has been moved.']); ?>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body>
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
 
