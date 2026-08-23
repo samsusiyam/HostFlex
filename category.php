@@ -124,10 +124,9 @@ $product_schema = [
 <script type="module" src="https://unpkg.com/@material-tailwind/html@2.0.0/scripts/popover.js"></script>
 <script src="https://unpkg.com/@material-tailwind/html@2.0.0/scripts/tabs.js"></script>
 <script type="module" src="https://unpkg.com/@material-tailwind/html@2.0.0/scripts/tooltip.js"></script>
-<script src="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
-<script src="js/scroll.js"></script>
-<script src="js/ns.js"></script>
-<script src="js/ns-jquery.js"></script>
+<script src="/js/scroll.js"></script>
+<script src="/js/ns.js"></script>
+<script src="/js/ns-jquery.js"></script>
 </body>
 </html>
 
