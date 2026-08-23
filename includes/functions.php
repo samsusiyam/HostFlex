@@ -46,19 +46,32 @@ function getReadingTime($content) {
 function generateBlogTOC(&$content) {
     $toc = [];
     $index = 1;
-    $content = preg_replace_callback('/<h([23])([^>]*)>(.*?)<\/h\1>/i', function($matches) use (&$toc, &$index) {
+    $content = preg_replace_callback('/<h([23])([^>]*)>(.*?)<\/h\1>/is', function($matches) use (&$toc, &$index) {
         $level = (int)$matches[1];
         $attrs = $matches[2];
-        $title = strip_tags($matches[3]);
+        $raw_title = html_entity_decode(strip_tags($matches[3]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $title = trim(preg_replace('/\s+/', ' ', $raw_title));
+        
+        // Skip empty or trivial headings
+        if (empty($title) || strlen($title) < 2) {
+            return $matches[0];
+        }
+        
         $id = 'section-' . $index . '-' . preg_replace('/[^a-z0-9]+/i', '-', strtolower($title));
         $id = trim($id, '-');
+        if (empty($id)) {
+            $id = 'section-' . $index;
+        }
+        
         $toc[] = [
             'level' => $level,
             'title' => $title,
             'id' => $id
         ];
         $index++;
-        return "<h{$level}{$attrs} id=\"{$id}\">{$matches[3]}</h{$level}>";
+        
+        $clean_attrs = preg_replace('/\bid=[\'"][^\'"]*[\'"]/i', '', $attrs);
+        return "<h{$level}{$clean_attrs} id=\"{$id}\">{$matches[3]}</h{$level}>";
     }, (string)$content);
     
     return $toc;
