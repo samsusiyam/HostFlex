@@ -205,7 +205,7 @@ while ($c = mysqli_fetch_assoc($categories_res)) {
                             <div class="flex items-center gap-2 mt-1 text-xs opacity-80 group-hover:opacity-100 transition">
                                 <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
                                 <span class="text-gray-300">|</span>
-                                <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium">View</a>
+                                <a href="<?php echo getBlogPostUrl($post); ?>" target="_blank" class="text-emerald-600 hover:text-emerald-800 font-medium">View</a>
                                 <span class="text-gray-300">|</span>
                                 <a href="blogs.php?delete=<?php echo $post['id']; ?>" onclick="return confirm('Are you sure you want to delete this post?')" class="text-red-600 hover:text-red-800 font-medium">Trash</a>
                             </div>

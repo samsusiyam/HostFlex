@@ -114,6 +114,7 @@
                     <a href="settings-integrations.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-integrations') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-puzzle-piece w-4"></i><span>Integrations</span></a>
                     <a href="settings-maintenance.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-maintenance') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-shield-alt w-4"></i><span>Maintenance</span></a>
                     <a href="settings-security.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-security') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-user-shield w-4"></i><span>Security & Admin URL</span></a>
+                    <a href="settings-permalinks.php" class="flex items-center space-x-2 px-4 py-2 text-sm rounded hover:bg-blue-50 text-gray-600 hover:text-blue-600 <?php echo strpos($_SERVER['PHP_SELF'], 'settings-permalinks') !== false ? 'bg-blue-50 text-blue-600 font-medium' : ''; ?>"><i class="fa fa-link w-4"></i><span>Permalinks</span></a>
                 </div>
             </div>
             <div>

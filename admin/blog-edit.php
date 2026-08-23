@@ -209,7 +209,7 @@ $site_url = getSiteUrl();
     
     <?php if ($is_edit && !empty($post['slug'])): ?>
     <div class="flex items-center gap-2">
-        <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" target="_blank" class="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs md:text-sm font-medium px-3.5 py-2 rounded-lg shadow-sm transition">
+        <a href="<?php echo getBlogPostUrl($post); ?>" target="_blank" class="inline-flex items-center gap-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs md:text-sm font-medium px-3.5 py-2 rounded-lg shadow-sm transition">
             <i class="fa fa-external-link-alt text-blue-600"></i> View Post
         </a>
     </div>

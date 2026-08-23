@@ -9,7 +9,7 @@ define('SITE_URL', $protocol . '://' . $host . $dir . '/');
 
 header('Content-Type: application/xml; charset=utf-8');
 
-$blogPosts = $conn->query("SELECT slug, created_at FROM blog_posts WHERE status = 1");
+$blogPosts = $conn->query("SELECT p.id, p.slug, p.created_at, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1");
 $pages = $conn->query("SELECT slug FROM pages WHERE status = 1");
 $categories = $conn->query("SELECT slug FROM categories WHERE status = 1");
 $blogCategories = $conn->query("SELECT slug FROM blog_categories WHERE status = 1");
@@ -38,7 +38,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     </url>
 <?php if ($blogPosts): while ($blog = $blogPosts->fetch_assoc()): ?>
     <url>
-        <loc><?= SITE_URL ?>blog/<?= htmlspecialchars($blog['slug']) ?></loc>
+        <loc><?= rtrim(SITE_URL, '/') . getBlogPostUrl($blog) ?></loc>
         <lastmod><?= date('c', strtotime($blog['created_at'])) ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

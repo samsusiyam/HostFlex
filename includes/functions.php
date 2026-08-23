@@ -371,6 +371,31 @@ function getSiteUrl() {
     return $proto . '://' . $host . ($dir ? $dir : '') . '/';
 }
 
+function getBlogPostUrl($post) {
+    if (is_numeric($post)) {
+        global $conn;
+        $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.id = " . (int)$post));
+    }
+    if (!$post) return '/blog';
+    
+    $structure = getSetting('blog_permalink_structure') ?: 'post_name';
+    $cat_slug = !empty($post['category_slug']) ? $post['category_slug'] : 'uncategorized';
+    $post_slug = $post['slug'] ?? '';
+    $post_id = $post['id'] ?? 0;
+    
+    switch ($structure) {
+        case 'category_post_name':
+            return "/blog/{$cat_slug}/{$post_slug}";
+        case 'category_post_id':
+            return "/blog/{$cat_slug}/{$post_id}";
+        case 'post_id':
+            return "/blog/{$post_id}";
+        case 'post_name':
+        default:
+            return "/blog/{$post_slug}";
+    }
+}
+
 function getCanonicalUrl() {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';

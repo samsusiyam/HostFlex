@@ -53,7 +53,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition duration-200 flex flex-col justify-between">
                 <div>
                     <?php if ($post['image']): ?>
-                    <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="block overflow-hidden h-48 bg-gray-100">
+                    <a href="<?php echo getBlogPostUrl($post); ?>" class="block overflow-hidden h-48 bg-gray-100">
                         <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full h-full object-cover hover:scale-105 transition duration-300" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
                     </a>
                     <?php endif; ?>
@@ -66,13 +66,13 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
                             <?php endif; ?>
                             <span class="text-[11px] text-gray-400 font-medium"><i class="fa fa-clock mr-1 text-[10px]"></i><?php echo getReadingTime($post['content']); ?> min</span>
                         </div>
-                        <h3 class="text-base md:text-lg font-bold mb-2 leading-snug"><a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600 transition line-clamp-2"><?php echo htmlspecialchars($post['title']); ?></a></h3>
+                        <h3 class="text-base md:text-lg font-bold mb-2 leading-snug"><a href="<?php echo getBlogPostUrl($post); ?>" class="text-gray-900 hover:text-blue-600 transition line-clamp-2"><?php echo htmlspecialchars($post['title']); ?></a></h3>
                         <p class="text-xs text-gray-500 line-clamp-3 leading-relaxed"><?php echo htmlspecialchars($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 150) . '...'); ?></p>
                     </div>
                 </div>
                 <div class="px-5 pb-5 pt-2 flex items-center justify-between text-xs text-gray-400 border-t border-gray-100">
                     <span class="font-medium text-gray-500"><?php echo date('d M Y', strtotime($post['created_at'])); ?></span>
-                    <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">Read More &rarr;</a>
+                    <a href="<?php echo getBlogPostUrl($post); ?>" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">Read More &rarr;</a>
                 </div>
             </div>
             <?php endwhile; ?>

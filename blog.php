@@ -14,7 +14,11 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', 'blog.php') !== false && !empty($slug)
 }
 
 $slug_esc = mysqli_real_escape_string($conn, $slug);
-$post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.slug = '$slug_esc' AND p.status = 1"));
+if (is_numeric($slug)) {
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE (p.id = " . (int)$slug . " OR p.slug = '$slug_esc') AND p.status = 1"));
+} else {
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.slug = '$slug_esc' AND p.status = 1"));
+}
 
 if (!$post) { include '404.php'; exit; }
 
@@ -22,7 +26,8 @@ $page_title = $post['title'];
 $meta_desc = $post['meta_description'] ?: ($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 160));
 $meta_kw = $post['meta_keywords'] ?? '';
 $site_name = getSetting('site_name') ?: 'Host Nibo';
-$current_url = getSiteUrl() . 'blog/' . urlencode($post['slug']);
+$canonical_path = getBlogPostUrl($post);
+$current_url = rtrim(getSiteUrl(), '/') . $canonical_path;
 
 // Reading Time Calculation
 $reading_time = getReadingTime($post['content']);
@@ -45,8 +50,8 @@ while ($rp = mysqli_fetch_assoc($related_posts_res)) {
 }
 
 // Prev and Next posts
-$prev_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title, slug FROM blog_posts WHERE status = 1 AND id < $curr_id ORDER BY id DESC LIMIT 1"));
-$next_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title, slug FROM blog_posts WHERE status = 1 AND id > $curr_id ORDER BY id ASC LIMIT 1"));
+$prev_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id < $curr_id ORDER BY p.id DESC LIMIT 1"));
+$next_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id > $curr_id ORDER BY p.id ASC LIMIT 1"));
 
 $blog_schema = [
     '@context' => 'https://schema.org',
@@ -221,7 +226,7 @@ if (!empty($post['image'])) {
     <?php if ($prev_post || $next_post): ?>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-14 pt-4 border-t border-gray-200">
         <?php if ($prev_post): ?>
-        <a href="/blog/<?php echo htmlspecialchars($prev_post['slug']); ?>" class="p-4 bg-white hover:bg-blue-50/50 rounded-xl border border-gray-200 transition group flex flex-col justify-center">
+        <a href="<?php echo getBlogPostUrl($prev_post); ?>" class="p-4 bg-white hover:bg-blue-50/50 rounded-xl border border-gray-200 transition group flex flex-col justify-center">
             <span class="text-xs font-semibold text-gray-400 group-hover:text-blue-600 flex items-center gap-1 mb-1">
                 <i class="fa fa-arrow-left text-[10px]"></i> Previous Article
             </span>
@@ -232,7 +237,7 @@ if (!empty($post['image'])) {
         <?php else: ?><div></div><?php endif; ?>
 
         <?php if ($next_post): ?>
-        <a href="/blog/<?php echo htmlspecialchars($next_post['slug']); ?>" class="p-4 bg-white hover:bg-blue-50/50 rounded-xl border border-gray-200 transition group flex flex-col justify-center text-right sm:text-right">
+        <a href="<?php echo getBlogPostUrl($next_post); ?>" class="p-4 bg-white hover:bg-blue-50/50 rounded-xl border border-gray-200 transition group flex flex-col justify-center text-right sm:text-right">
             <span class="text-xs font-semibold text-gray-400 group-hover:text-blue-600 flex items-center justify-end gap-1 mb-1">
                 Next Article <i class="fa fa-arrow-right text-[10px]"></i>
             </span>
@@ -257,7 +262,7 @@ if (!empty($post['image'])) {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <?php foreach ($related_posts as $rp): ?>
-            <a href="/blog/<?php echo htmlspecialchars($rp['slug']); ?>" class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition group flex flex-col">
+            <a href="<?php echo getBlogPostUrl($rp); ?>" class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition group flex flex-col">
                 <?php if (!empty($rp['image'])): ?>
                 <div class="h-36 overflow-hidden bg-gray-100">
                     <img src="<?php echo htmlspecialchars(getImageUrl($rp['image'])); ?>" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
