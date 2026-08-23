@@ -38,52 +38,67 @@
     margin: auto !important;
 }
 
-/* Modern Billing Toggle Switcher */
-.billing-switcher-container {
+/* Custom Pricing Toggle Box matching reference */
+.pricing-toggle-box {
     display: inline-flex;
     align-items: center;
-    background: #f1f5f9;
-    padding: 4px;
-    border-radius: 9999px;
-    border: 1px solid #e2e8f0;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
-}
-.billing-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #475569;
-    border-radius: 9999px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    line-height: 1.2;
-}
-.billing-tab:hover {
-    color: #1e40af;
-}
-.billing-tab.active {
-    background: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
-}
-.billing-save-badge {
-    background: #10b981;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 9999px;
-    letter-spacing: 0.2px;
-}
-.billing-tab.active .billing-save-badge {
+    gap: 14px;
     background: #ffffff;
-    color: #059669;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 8px 18px;
+    user-select: none;
+}
+.toggle-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e3a8a;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+.custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    cursor: pointer;
+    margin: 0;
+}
+.custom-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.custom-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e2e8f0;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+}
+.custom-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+.custom-switch input:checked + .slider {
+    background-color: #2563eb;
+}
+.custom-switch input:checked + .slider:before {
+    transform: translateX(20px);
 }
 
 /* Page Hero Banner (Category, Offers, Sub-pages) */

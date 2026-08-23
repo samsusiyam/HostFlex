@@ -64,14 +64,14 @@ $product_schema = [
 <p class="text-gray-600 mt-1">Honest and affordable pricing model to help you get started easily.</p>
 </div>
 
-<!-- Modern Pricing Switcher -->
-<div class="billing-switcher-container">
-    <button type="button" class="billing-tab active" data-cycle="monthly" onclick="switchBilling('monthly')">
-        Monthly
-    </button>
-    <button type="button" class="billing-tab" data-cycle="yearly" onclick="switchBilling('yearly')">
-        Yearly <span class="billing-save-badge">Save 20%</span>
-    </button>
+<!-- Pricing Switcher Box matching reference -->
+<div class="pricing-toggle-box">
+    <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=false; toggleBillingSwitch(false);">Monthly</span>
+    <label class="custom-switch">
+        <input type="checkbox" id="pricingSwitch" onchange="toggleBillingSwitch(this.checked)">
+        <span class="slider"></span>
+    </label>
+    <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=true; toggleBillingSwitch(true);">Annually</span>
 </div>
 </div>
 
