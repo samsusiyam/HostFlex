@@ -63,7 +63,7 @@ if (!empty($post['image'])) {
 <div class="content max-w-4xl mx-auto">
     <div class="mb-6">
         <?php if ($post['category_name']): ?>
-        <a href="blogs.php?category=<?php echo urlencode($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+        <a href="/blog/category/<?php echo urlencode($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
         <?php endif; ?>
         <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-3"><?php echo htmlspecialchars($post['title']); ?></h1>
         <div class="text-sm text-gray-500 flex items-center gap-3">
@@ -72,7 +72,9 @@ if (!empty($post['image'])) {
         </div>
     </div>
     <?php if ($post['image']): ?>
-    <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full max-h-[400px] object-cover rounded-xl mb-8" alt="<?php echo htmlspecialchars($post['title']); ?>">
+    <div class="blog-featured-image-wrapper">
+        <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="blog-featured-img" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
+    </div>
     <?php endif; ?>
     <div class="prose max-w-none text-gray-800 leading-relaxed">
         <?php echo $post['content']; ?>
