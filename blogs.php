@@ -100,13 +100,14 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
 
     <!-- Active Filter Notice -->
     <?php if ($search_q || $cat_slug): ?>
-    <div class="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5 mb-6 text-xs text-blue-900 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5 mb-6 text-xs text-blue-900">
         <div class="flex items-center gap-2 flex-wrap">
             <i class="fa-solid fa-filter text-blue-600"></i>
             <span>
                 Showing posts 
                 <?php if ($current_cat): ?>in <strong><?php echo htmlspecialchars($current_cat['name']); ?></strong><?php endif; ?>
                 <?php if ($search_q): ?>for <strong>"<?php echo htmlspecialchars($search_q); ?>"</strong><?php endif; ?>
+                (<?php echo $total; ?> found)
             </span>
         </div>
         <a href="/blog" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 hover:underline ml-2">
@@ -114,6 +115,22 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
         </a>
     </div>
     <?php endif; ?>
+
+    <!-- Mobile Top Search Widget (Visible on Mobile only) -->
+    <div class="block lg:hidden mb-6">
+        <div class="bg-white border border-gray-200 rounded-2xl p-3.5 shadow-xs">
+            <form method="GET" action="/blog" class="blog-search-form">
+                <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
+                <div class="blog-search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass blog-search-icon"></i>
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="blog-search-input" autocomplete="off">
+                </div>
+                <button type="submit" class="blog-search-submit">
+                    <span>Search</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Main Content & Sidebar Grid -->
     <div class="flex flex-col lg:flex-row gap-8">
@@ -212,22 +229,20 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
         <!-- Sidebar (Right) -->
         <div class="w-full lg:w-80 space-y-6">
             
-            <!-- Modern Search Widget -->
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
+            <!-- Desktop Search Widget (Hidden on Mobile) -->
+            <div class="hidden lg:block bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
                 <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-magnifying-glass text-blue-600 text-xs"></i> Search Blog
                 </h3>
-                <form method="GET" action="/blog">
+                <form method="GET" action="/blog" class="blog-search-form">
                     <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
-                    <div class="flex gap-2">
-                        <div class="relative flex-1">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-                            <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-xs md:text-sm text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition bg-white">
-                        </div>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2 rounded-lg text-xs md:text-sm transition flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer">
-                            <span>Search</span>
-                        </button>
+                    <div class="blog-search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass blog-search-icon"></i>
+                        <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="blog-search-input" autocomplete="off">
                     </div>
+                    <button type="submit" class="blog-search-submit">
+                        <span>Search</span>
+                    </button>
                 </form>
             </div>
 
