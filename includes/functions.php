@@ -155,8 +155,17 @@ function formatCleanUrl($url) {
     if (preg_match('/^blogs\.php\?category=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
         return '/blog/category/' . $m[1];
     }
-    if ($trimmed === 'blogs.php' || $trimmed === 'blogs') {
+    if ($trimmed === 'blogs.php' || $trimmed === '/blogs.php' || $trimmed === 'blogs') {
         return '/blog';
+    }
+    if ($trimmed === 'contact.php' || $trimmed === '/contact.php' || $trimmed === 'contact') {
+        return '/contact';
+    }
+    if ($trimmed === 'offers.php' || $trimmed === '/offers.php' || $trimmed === 'offers') {
+        return '/offers';
+    }
+    if ($trimmed === 'index.php' || $trimmed === '/index.php') {
+        return '/';
     }
     if (preg_match('/^page\.php\?slug=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
         return '/page/' . $m[1];
@@ -298,6 +307,8 @@ function getCanonicalUrl() {
     $clean_uri = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
     if ($clean_uri === '/index.php') $clean_uri = '/';
     if ($clean_uri === '/blogs.php') $clean_uri = '/blog';
+    if ($clean_uri === '/contact.php') $clean_uri = '/contact';
+    if ($clean_uri === '/offers.php') $clean_uri = '/offers';
     return $proto . '://' . $host . $clean_uri;
 }
 

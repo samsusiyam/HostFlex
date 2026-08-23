@@ -1,4 +1,10 @@
-<?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance(); ?>
+<?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
+if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'offers.php') !== false) {
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: /offers");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

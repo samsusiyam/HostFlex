@@ -27,6 +27,12 @@ RewriteEngine On
   RewriteCond %{THE_REQUEST} \s/+page\.php\?slug=([a-zA-Z0-9_-]+)\s [NC]
   RewriteRule ^page\.php$ /page/%1? [R=301,L]
 
+  RewriteCond %{THE_REQUEST} \s/+contact\.php(?:\s|\?) [NC]
+  RewriteRule ^contact\.php$ /contact? [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+offers\.php(?:\s|\?) [NC]
+  RewriteRule ^offers\.php$ /offers? [R=301,L]
+
   # Clean URLs Routing
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
@@ -37,6 +43,8 @@ RewriteEngine On
   RewriteRule ^page/([a-zA-Z0-9_-]+)/?$ page.php?slug=$1 [L,QSA]
   RewriteRule ^category/([a-zA-Z0-9_-]+)/?$ category.php?slug=$1 [L,QSA]
   RewriteRule ^blog/?$ blogs.php [L,QSA]
+  RewriteRule ^contact/?$ contact.php [L,QSA]
+  RewriteRule ^offers/?$ offers.php [L,QSA]
 </IfModule>
 
 # Custom Error Pages

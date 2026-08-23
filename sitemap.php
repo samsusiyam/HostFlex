@@ -27,14 +27,14 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <priority>0.8</priority>
     </url>
     <url>
-        <loc><?= SITE_URL ?>contact.php</loc>
+        <loc><?= SITE_URL ?>contact</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.6</priority>
     </url>
     <url>
-        <loc><?= SITE_URL ?>offers.php</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <loc><?= SITE_URL ?>offers</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
     </url>
 <?php if ($blogPosts): while ($blog = $blogPosts->fetch_assoc()): ?>
     <url>

@@ -214,7 +214,7 @@ if (empty($cards)) {
 <p>Unlock more possibilities at a fraction of the cost with our best deals</p>
 </div>
 <div class="w-fit pt-6 ml-auto">
-<a href="offers.php" data-ripple-light="true" class="btn btn-blue">View More <span class="pl-2 transition-all group-hover:-mr-1"><i class="fa-solid fa-arrow-right"></i></span></a>
+<a href="/offers" data-ripple-light="true" class="btn btn-blue">View More <span class="pl-2 transition-all group-hover:-mr-1"><i class="fa-solid fa-arrow-right"></i></span></a>
 </div>
 </div>
 <div class="grid grid-cols-1 gap-4 xsm:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -247,11 +247,11 @@ if (empty($cards)) {
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <div class="flex justify-center px-4 py-5"><img src="/images/svg/EmailSupport.svg" alt class="w-12 h-14"></div>
-<a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-purple-600 py-3 px-4 font-semibold">Email Support</h1></a>
+<a href="/contact"><h1 class="text-md text-gray-100 text-center bg-purple-600 py-3 px-4 font-semibold">Email Support</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <div class="flex justify-center px-4 py-5"><img src="/images/svg/Helpdesk.svg" alt class="w-12 h-14"></div>
-<a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-indigo-600 py-3 px-4 font-semibold">24x7 Helpdesk</h1></a>
+<a href="/contact"><h1 class="text-md text-gray-100 text-center bg-indigo-600 py-3 px-4 font-semibold">24x7 Helpdesk</h1></a>
 </div>
 </div>
 </div>

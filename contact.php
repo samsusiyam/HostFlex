@@ -1,5 +1,11 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; require_once 'includes/mail.php'; checkMaintenance();
 
+if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'contact.php') !== false) {
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: /contact");
+    exit;
+}
+
 $success = '';
 $error = '';
 $recaptcha_enabled = getSetting('recaptcha_enabled') === '1';

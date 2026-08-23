@@ -254,8 +254,8 @@ INSERT INTO menu_items (label, url, parent_id, location, sort_order) VALUES
 ('VPS', '#', 0, 'header', 7),
 ('KVM VPS', '/category/kvm', 7, 'header', 8),
 ('BDIX VPS', '/category/vps', 7, 'header', 9),
-('Offers', '/offers.php', 0, 'both', 10),
-('Contact', '/contact.php', 0, 'both', 11),
+('Offers', '/offers', 0, 'both', 10),
+('Contact', '/contact', 0, 'both', 11),
 ('Terms of Service', '/page/terms', 0, 'footer', 12),
 ('Privacy Policy', '/page/privacy', 0, 'footer', 13),
 ('About Us', '/page/about', 0, 'footer', 14);

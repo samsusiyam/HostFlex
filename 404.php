@@ -27,13 +27,13 @@ $site_name = getSetting('site_name') ?: 'Host Nibo';
             Oops! The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
         </p>
         <div class="flex flex-wrap gap-4 justify-center">
-            <a href="index.php" class="btn btn-blue px-6 py-3 rounded-lg font-medium shadow hover:shadow-lg transition">
+            <a href="/" class="btn btn-blue px-6 py-3 rounded-lg font-medium shadow hover:shadow-lg transition">
                 <i class="fa fa-home mr-2"></i> Return Home
             </a>
-            <a href="blogs.php" class="btn bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+            <a href="/blog" class="btn bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
                 <i class="fa fa-newspaper mr-2"></i> Visit Blog
             </a>
-            <a href="contact.php" class="btn bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
+            <a href="/contact" class="btn bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
                 <i class="fa fa-headset mr-2"></i> Contact Support
             </a>
         </div>
