@@ -53,7 +53,7 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
                 <?php if ($post['image']): ?>
                 <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>">
-                    <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
+                    <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
                 </a>
                 <?php endif; ?>
                 <div class="p-5">

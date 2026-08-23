@@ -291,7 +291,7 @@ if (mysqli_num_rows($blog_posts) > 0):
     <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
         <?php if ($bpost['image']): ?>
         <a href="/blog/<?php echo htmlspecialchars($bpost['slug']); ?>">
-                    <img alt="<?php echo htmlspecialchars($bpost['title']); ?>" class="h-[200px] w-full object-cover" src="<?php echo htmlspecialchars($bpost['image']); ?>">
+                    <img alt="<?php echo htmlspecialchars($bpost['title']); ?>" class="h-[200px] w-full object-cover" src="<?php echo htmlspecialchars(getImageUrl($bpost['image'])); ?>" loading="lazy">
                 </a>
                 <?php endif; ?>
                 <div class="p-5">
@@ -306,7 +306,7 @@ if (mysqli_num_rows($blog_posts) > 0):
     <?php endwhile; ?>
 </div>
 <div class="text-center mt-8">
-    <a href="blogs.php" class="btn btn-blue">View All Posts</a>
+    <a href="/blog" class="btn btn-blue">View All Posts</a>
 </div>
 </div>
 </section>

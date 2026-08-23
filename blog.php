@@ -72,13 +72,13 @@ if (!empty($post['image'])) {
         </div>
     </div>
     <?php if ($post['image']): ?>
-    <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full max-h-[400px] object-cover rounded-xl mb-8" alt="<?php echo htmlspecialchars($post['title']); ?>">
+    <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full max-h-[400px] object-cover rounded-xl mb-8" alt="<?php echo htmlspecialchars($post['title']); ?>">
     <?php endif; ?>
     <div class="prose max-w-none text-gray-800 leading-relaxed">
         <?php echo $post['content']; ?>
     </div>
     <div class="mt-10 pt-6 border-t">
-        <a href="blogs.php" class="text-blue-600 hover:underline"><i class="fa fa-arrow-left mr-1"></i> Back to Blog</a>
+        <a href="/blog" class="text-blue-600 hover:underline"><i class="fa fa-arrow-left mr-1"></i> Back to Blog</a>
     </div>
 </div>
 </section>

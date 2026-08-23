@@ -280,6 +280,15 @@ function renderMenu($items, $is_mobile = false) {
     return $html;
 }
 
+function getImageUrl($path) {
+    if (empty($path)) return '';
+    $path = trim($path);
+    if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0 || strpos($path, '//') === 0) {
+        return $path;
+    }
+    return '/' . ltrim($path, '/');
+}
+
 function getSiteUrl() {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
