@@ -61,22 +61,22 @@ $users_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total,
             <div class="space-y-4 mb-6">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Secret Access Slug</label>
-                    <div class="flex items-center">
-                        <span class="bg-gray-100 border border-r-0 border-gray-300 rounded-l px-3 py-2 text-gray-500 text-sm font-mono">
+                    <div class="flex flex-col sm:flex-row sm:items-center">
+                        <span class="bg-gray-100 border border-b-0 sm:border-b sm:border-r-0 border-gray-300 rounded-t sm:rounded-l sm:rounded-tr-none px-3 py-2 text-gray-600 text-xs sm:text-sm font-mono break-all">
                             <?php echo htmlspecialchars($site_url); ?>admin/?access=
                         </span>
-                        <input type="text" name="admin_access_slug" value="<?php echo htmlspecialchars($current_slug); ?>" placeholder="e.g. my-secret-portal" class="flex-1 border border-gray-300 rounded-r px-3 py-2 text-sm font-mono focus:border-blue-600 focus:outline-none">
+                        <input type="text" name="admin_access_slug" value="<?php echo htmlspecialchars($current_slug); ?>" placeholder="e.g. my-secret-portal" class="w-full sm:flex-1 border border-gray-300 rounded-b sm:rounded-r sm:rounded-bl-none px-3 py-2 text-sm font-mono focus:border-blue-600 focus:outline-none">
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Leave empty to allow direct access to <code>/admin/</code> without secret key.</p>
                 </div>
 
                 <?php if ($current_slug): ?>
-                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                     <span class="text-xs font-bold text-blue-900 uppercase block mb-1">Your Secret Admin Login URL:</span>
-                    <div class="flex items-center gap-2">
-                        <input type="text" readonly id="adminLoginUrl" value="<?php echo htmlspecialchars($site_url . 'admin/?access=' . $current_slug); ?>" class="w-full bg-white border rounded px-3 py-1.5 text-xs font-mono text-blue-800 font-bold select-all">
-                        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('adminLoginUrl').value); alert('Copied to clipboard!');" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap hover:bg-blue-700">
-                            <i class="fa fa-copy"></i> Copy
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <input type="text" readonly id="adminLoginUrl" value="<?php echo htmlspecialchars($site_url . 'admin/?access=' . $current_slug); ?>" class="w-full bg-white border rounded-lg px-3 py-2 text-xs font-mono text-blue-800 font-bold select-all">
+                        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('adminLoginUrl').value); alert('Copied to clipboard!');" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap hover:bg-blue-700 flex items-center justify-center gap-1">
+                            <i class="fa fa-copy"></i> Copy Link
                         </button>
                     </div>
                     <p class="text-[11px] text-blue-700 mt-2">

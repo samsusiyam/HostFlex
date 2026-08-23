@@ -26,8 +26,8 @@ if (session_status() === PHP_SESSION_ACTIVE) {
 // Check if custom access slug is set
 $slug = trim(getSetting('admin_access_slug') ?: '');
 if (!empty($slug)) {
-    header('Location: index.php?access=' . urlencode($slug) . '&logged_out=1');
+    header('Location: /admin/index.php?access=' . urlencode($slug) . '&logged_out=1');
 } else {
-    header('Location: index.php?logged_out=1');
+    header('Location: /admin/index.php?logged_out=1');
 }
 exit;

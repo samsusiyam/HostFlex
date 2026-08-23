@@ -40,12 +40,8 @@ function checkAdminAccessSlug() {
         return true;
     }
     
-    http_response_code(404);
-    if (file_exists(__DIR__ . '/../404.php')) {
-        include __DIR__ . '/../404.php';
-    } else {
-        header('Location: /');
-    }
+    // Redirect unauthorized access directly to homepage without loops
+    header('Location: /');
     exit;
 }
 
