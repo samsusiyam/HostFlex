@@ -242,20 +242,20 @@ if (empty($cards)) {
 <p class="mt-10 text-lg pr-0 sm:pr-8 dark:text-gray-400"><?php echo $c['description'] ?? ''; ?></p>
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-6 py-10">
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/LiveChat.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="/images/svg/LiveChat.svg" alt class="w-12 h-14"></div>
 <a href="javascript:void(Tawk_API.toggle())"><h1 class="text-md text-gray-100 text-center bg-blue-600 py-3 px-4 font-semibold">Live Chat</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/EmailSupport.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="/images/svg/EmailSupport.svg" alt class="w-12 h-14"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-purple-600 py-3 px-4 font-semibold">Email Support</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-<div class="flex justify-center px-4 py-5"><img src="images/svg/Helpdesk.svg" alt class="w-12 h-14"></div>
+<div class="flex justify-center px-4 py-5"><img src="/images/svg/Helpdesk.svg" alt class="w-12 h-14"></div>
 <a href="contact.php"><h1 class="text-md text-gray-100 text-center bg-indigo-600 py-3 px-4 font-semibold">24x7 Helpdesk</h1></a>
 </div>
 </div>
 </div>
-<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/tp.png'); ?>" class="h-full mt-12 sm:mt-0"></div>
+<div class="flex md:w-5/12 justify-end items-center max-lg:hidden"><img src="/<?php echo ltrim(htmlspecialchars($c['image'] ?? 'images/tp.png'), '/'); ?>" class="h-full mt-12 sm:mt-0"></div>
 </div>
 </div>
 </div>
