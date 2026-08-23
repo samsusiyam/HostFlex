@@ -52,9 +52,13 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <?php while ($post = mysqli_fetch_assoc($posts)): ?>
             <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition duration-200 flex flex-col justify-between">
                 <div>
-                    <?php if ($post['image']): ?>
+                    <?php if (!empty($post['image'])): ?>
                     <a href="<?php echo getBlogPostUrl($post); ?>" class="block overflow-hidden h-48 bg-gray-100">
                         <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full h-full object-cover hover:scale-105 transition duration-300" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
+                    </a>
+                    <?php else: ?>
+                    <a href="<?php echo getBlogPostUrl($post); ?>" class="block overflow-hidden h-48 blog-thumb-placeholder">
+                        <i class="fa-solid fa-newspaper opacity-75"></i>
                     </a>
                     <?php endif; ?>
                     <div class="p-5">

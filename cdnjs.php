@@ -18,7 +18,6 @@
 
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
-<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 
 <link rel="stylesheet" href="/styles/styles.css" type="text/css" />
 <link rel="stylesheet" href="/styles/custom.css" type="text/css" />
