@@ -12,14 +12,11 @@
 <body>
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
-<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
-<div class="space-y-16 content mx-auto py-16 lg:pt-20 lg:pb-20">
-<div class="flex flex-col lg:flex-row items-center space-y-12 lg:space-y-0">
-<div class="sm:w-2/3 text-left">
-<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-white">Hot Deals &amp; Offers</h1>
-<p class="text-lg md:text-xl font-medium text-blue-100">Unlock more possibilities at a fraction of the cost with our best deals</p>
-</div>
-</div>
+<div class="page-hero">
+<div class="content mx-auto">
+<div class="sm:w-3/4 text-left">
+<h1>Hot Deals &amp; Offers</h1>
+<p>Unlock more possibilities at a fraction of the cost with our best deals</p>
 </div>
 </div>
 </div>

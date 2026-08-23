@@ -85,3 +85,23 @@
     background: #ffffff;
     color: #059669;
 }
+
+/* Page Hero Banner (Category, Offers, Sub-pages) */
+.page-hero {
+    background: linear-gradient(135deg, #0718c4 0%, #1e40af 50%, #1d4ed8 100%) !important;
+    padding: 50px 0 !important;
+    color: #ffffff !important;
+}
+.page-hero h1, .page-hero h2 {
+    color: #ffffff !important;
+    font-size: 2.25rem !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    margin-bottom: 0.75rem !important;
+}
+.page-hero p {
+    color: #dbeafe !important;
+    font-size: 1.125rem !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+}
