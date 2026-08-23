@@ -205,6 +205,8 @@ CREATE TABLE blog_posts (
     meta_description VARCHAR(500) DEFAULT '',
     meta_keywords VARCHAR(500) DEFAULT '',
     show_featured_image TINYINT(1) DEFAULT 1,
+    show_toc TINYINT(1) DEFAULT 1,
+    show_author TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES blog_categories(id) ON DELETE SET NULL
 );

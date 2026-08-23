@@ -128,6 +128,7 @@ if (!empty($post['image'])) {
 
         <!-- Author & Metadata Bar -->
         <div class="flex flex-wrap items-center gap-4 text-xs md:text-sm text-gray-500 py-3 border-y border-gray-100">
+            <?php if (($post['show_author'] ?? 1) == 1): ?>
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-xs">
                     <?php echo strtoupper(substr($post['author'] ?: 'A', 0, 1)); ?>
@@ -135,6 +136,7 @@ if (!empty($post['image'])) {
                 <span class="font-semibold text-gray-900"><?php echo htmlspecialchars($post['author'] ?: 'Admin'); ?></span>
             </div>
             <span class="text-gray-300">•</span>
+            <?php endif; ?>
             <span class="flex items-center gap-1.5">
                 <i class="fa-regular fa-calendar text-gray-400"></i>
                 <?php echo date('F d, Y', strtotime($post['created_at'])); ?>
@@ -154,8 +156,8 @@ if (!empty($post['image'])) {
     </div>
     <?php endif; ?>
 
-    <!-- Table of Contents (If article has 2+ valid headings) -->
-    <?php if (count($toc) >= 2): ?>
+    <!-- Table of Contents (If enabled and article has 2+ valid headings) -->
+    <?php if (($post['show_toc'] ?? 1) == 1 && count($toc) >= 2): ?>
     <div class="blog-toc-box">
         <div class="flex items-center justify-between cursor-pointer" onclick="$('#tocContent').slideToggle(200)">
             <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 m-0">
@@ -208,7 +210,8 @@ if (!empty($post['image'])) {
         </div>
     </div>
 
-    <!-- Author Profile Box -->
+    <!-- Author Profile Box (If enabled) -->
+    <?php if (($post['show_author'] ?? 1) == 1): ?>
     <div class="blog-author-box">
         <div class="blog-author-avatar">
             <?php echo strtoupper(substr($post['author'] ?: 'A', 0, 1)); ?>
@@ -221,6 +224,7 @@ if (!empty($post['image'])) {
             </p>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Previous / Next Navigation -->
     <?php if ($prev_post || $next_post): ?>

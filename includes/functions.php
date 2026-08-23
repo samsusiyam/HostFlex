@@ -35,6 +35,14 @@ function ensureBlogSchema() {
     if ($res && mysqli_num_rows($res) === 0) {
         mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN show_featured_image TINYINT(1) DEFAULT 1");
     }
+    $res = mysqli_query($conn, "SHOW COLUMNS FROM blog_posts LIKE 'show_toc'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN show_toc TINYINT(1) DEFAULT 1");
+    }
+    $res = mysqli_query($conn, "SHOW COLUMNS FROM blog_posts LIKE 'show_author'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN show_author TINYINT(1) DEFAULT 1");
+    }
 }
 
 function getReadingTime($content) {

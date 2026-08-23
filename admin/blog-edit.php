@@ -52,6 +52,8 @@ $post = [
     'author' => $admin_username,
     'status' => 1,
     'show_featured_image' => 1,
+    'show_toc' => 1,
+    'show_author' => 1,
     'meta_description' => '',
     'meta_keywords' => '',
     'created_at' => date('Y-m-d H:i:s')
@@ -77,6 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
     $author = sanitize($_POST['author'] ?? $admin_username);
     $status = (int)($_POST['status'] ?? 1);
     $show_featured_image = isset($_POST['show_featured_image']) ? 1 : 0;
+    $show_toc = isset($_POST['show_toc']) ? 1 : 0;
+    $show_author = isset($_POST['show_author']) ? 1 : 0;
+    $created_at = !empty($_POST['created_at']) ? date('Y-m-d H:i:s', strtotime($_POST['created_at'])) : date('Y-m-d H:i:s');
     $meta_description = sanitize($_POST['meta_description'] ?? '');
     $meta_keywords = sanitize($_POST['meta_keywords'] ?? '');
 
@@ -138,6 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
                 author = '$author',
                 status = $status,
                 show_featured_image = $show_featured_image,
+                show_toc = $show_toc,
+                show_author = $show_author,
+                created_at = '$created_at',
                 meta_description = '$meta_description',
                 meta_keywords = '$meta_keywords'
                 WHERE id = $post_id";
@@ -151,9 +159,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
             }
         } else {
             $insert_sql = "INSERT INTO blog_posts 
-                (title, slug, content, excerpt, image, category_id, author, status, show_featured_image, meta_description, meta_keywords) 
+                (title, slug, content, excerpt, image, category_id, author, status, show_featured_image, show_toc, show_author, created_at, meta_description, meta_keywords) 
                 VALUES 
-                ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, $show_featured_image, '$meta_description', '$meta_keywords')";
+                ('$title', '$slug', '$content_esc', '$excerpt', '$image', $cat_sql, '$author', $status, $show_featured_image, $show_toc, $show_author, '$created_at', '$meta_description', '$meta_keywords')";
             
             if (mysqli_query($conn, $insert_sql)) {
                 $new_id = mysqli_insert_id($conn);
@@ -381,9 +389,21 @@ $site_url = getSiteUrl();
                         <span class="font-bold text-gray-800 text-xs">Public</span>
                     </div>
 
-                    <div class="flex items-center justify-between py-1 border-b border-gray-100">
-                        <span class="text-gray-600 flex items-center gap-2"><i class="fa fa-calendar-alt text-xs text-gray-400"></i> Published on:</span>
-                        <span class="text-xs font-semibold text-gray-800"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
+                    <div class="py-1 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 flex items-center gap-2"><i class="fa fa-calendar-alt text-xs text-gray-400"></i> Published on:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span id="dateDisplay" class="text-xs font-semibold text-gray-800"><?php echo date('M d, Y H:i', strtotime($post['created_at'])); ?></span>
+                                <button type="button" onclick="$('#dateEditBox').slideToggle(150)" class="text-xs text-blue-600 hover:underline font-semibold ml-1">Edit</button>
+                            </div>
+                        </div>
+                        <div id="dateEditBox" class="hidden mt-2 pt-2 border-t border-gray-100">
+                            <input type="datetime-local" name="created_at" id="createdAtInput" value="<?php echo date('Y-m-d\TH:i', strtotime($post['created_at'])); ?>" class="w-full border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:border-blue-600">
+                            <div class="flex justify-end gap-1 mt-1.5">
+                                <button type="button" onclick="applyDateEdit()" class="bg-blue-600 text-white px-2 py-0.5 rounded text-[11px] font-semibold">OK</button>
+                                <button type="button" onclick="$('#dateEditBox').slideUp(150)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-[11px]">Cancel</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->
@@ -419,14 +439,17 @@ $site_url = getSiteUrl();
                     <div class="max-h-48 overflow-y-auto space-y-2 border border-gray-200 rounded-lg p-3 bg-gray-50/50 mb-3" id="categoriesList">
                         <label class="flex items-center gap-2.5 text-xs text-gray-700 hover:text-blue-600 cursor-pointer">
                             <input type="radio" name="category_id" value="0" <?php echo empty($post['category_id']) ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
-                            <span>(Uncategorized)</span>
+                            <span class="italic text-gray-500">Uncategorized</span>
                         </label>
-                        <?php foreach ($categories as $cat): ?>
+                        <?php
+                        $categories = mysqli_query($conn, "SELECT * FROM blog_categories ORDER BY name ASC");
+                        while ($cat = mysqli_fetch_assoc($categories)):
+                        ?>
                         <label class="flex items-center gap-2.5 text-xs text-gray-700 hover:text-blue-600 cursor-pointer">
                             <input type="radio" name="category_id" value="<?php echo $cat['id']; ?>" <?php echo $post['category_id'] == $cat['id'] ? 'checked' : ''; ?> class="text-blue-600 focus:ring-blue-500">
                             <span><?php echo htmlspecialchars($cat['name']); ?></span>
                         </label>
-                        <?php endforeach; ?>
+                        <?php endwhile; ?>
                     </div>
 
                     <!-- Inline Add Category Form -->
@@ -496,7 +519,7 @@ $site_url = getSiteUrl();
                         <i class="fa fa-user-pen text-gray-600"></i> Author
                     </h3>
                 </div>
-                <div class="p-5">
+                <div class="p-5 space-y-3">
                     <select name="author" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:border-blue-600 focus:outline-none bg-white">
                         <?php foreach ($authors as $auth): ?>
                         <option value="<?php echo htmlspecialchars($auth); ?>" <?php echo $post['author'] === $auth ? 'selected' : ''; ?>>
@@ -504,6 +527,34 @@ $site_url = getSiteUrl();
                         </option>
                         <?php endforeach; ?>
                     </select>
+
+                    <div class="pt-2 border-t text-left">
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" name="show_author" value="1" <?php echo ($post['show_author'] ?? 1) ? 'checked' : ''; ?> class="rounded text-blue-600 focus:ring-blue-500 mt-0.5">
+                            <div>
+                                <span class="text-xs text-gray-800 font-semibold block">Display author on post</span>
+                                <span class="text-[11px] text-gray-500 block leading-tight">Uncheck to hide author name and bio card</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Post Display Options Box -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa fa-sliders text-blue-600"></i> Post Options
+                    </h3>
+                </div>
+                <div class="p-5 space-y-3 text-left">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" name="show_toc" value="1" <?php echo ($post['show_toc'] ?? 1) ? 'checked' : ''; ?> class="rounded text-blue-600 focus:ring-blue-500 mt-0.5">
+                        <div>
+                            <span class="text-xs text-gray-800 font-semibold block">Table of Contents (TOC)</span>
+                            <span class="text-[11px] text-gray-500 block leading-tight">Auto-generate clickable Table of Contents on this article</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -623,6 +674,17 @@ function cancelSlugEdit() {
 // Status Switcher
 function updateStatus(val) {
     $('#postStatusInput').val(val);
+}
+
+// Date Editor
+function applyDateEdit() {
+    var val = $('#createdAtInput').val();
+    if (val) {
+        var d = new Date(val);
+        var formatted = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        $('#dateDisplay').text(formatted);
+    }
+    $('#dateEditBox').slideUp(150);
 }
 
 // Featured Image Handling
