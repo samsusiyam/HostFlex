@@ -327,14 +327,16 @@ function getImageUrl($path) {
 function getSiteUrl() {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+    $dir = preg_replace('#/admin$#i', '', $dir);
     return $proto . '://' . $host . ($dir ? $dir : '') . '/';
 }
 
 function getCanonicalUrl() {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+    $dir = preg_replace('#/admin$#i', '', $dir);
     $base = $proto . '://' . $host . ($dir ? $dir : '');
     
     if (isset($_GET['slug'])) {
