@@ -1,6 +1,13 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 
 $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : '';
+
+if (strpos($_SERVER['REQUEST_URI'] ?? '', 'page.php') !== false && !empty($slug)) {
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: /page/' . urlencode($slug));
+    exit;
+}
+
 $page = getPageBySlug($slug);
 
 if (!$page) {

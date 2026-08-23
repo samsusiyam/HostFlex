@@ -143,6 +143,27 @@ function getPageBySlug($slug) {
     return null;
 }
 
+function formatCleanUrl($url) {
+    if (empty($url)) return $url;
+    $trimmed = trim($url);
+    if (preg_match('/^category\.php\?slug=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
+        return '/category/' . $m[1];
+    }
+    if (preg_match('/^blog\.php\?slug=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
+        return '/blog/' . $m[1];
+    }
+    if (preg_match('/^blogs\.php\?category=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
+        return '/blog/category/' . $m[1];
+    }
+    if ($trimmed === 'blogs.php' || $trimmed === 'blogs') {
+        return '/blog';
+    }
+    if (preg_match('/^page\.php\?slug=([a-zA-Z0-9_-]+)$/i', $trimmed, $m)) {
+        return '/page/' . $m[1];
+    }
+    return $url;
+}
+
 function getMenuItems($location = 'header') {
     global $conn;
     $loc_esc = mysqli_real_escape_string($conn, $location);
@@ -150,6 +171,7 @@ function getMenuItems($location = 'header') {
     $result = mysqli_query($conn, $query);
     $items = [];
     while ($row = mysqli_fetch_assoc($result)) {
+        $row['url'] = formatCleanUrl($row['url']);
         $items[] = $row;
     }
     return $items;
@@ -259,8 +281,24 @@ function getSiteUrl() {
 function getCanonicalUrl() {
     $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $uri = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
-    return $proto . '://' . $host . $uri;
+    $dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    $base = $proto . '://' . $host . ($dir ? $dir : '');
+    
+    if (isset($_GET['slug'])) {
+        $slug = urlencode($_GET['slug']);
+        $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+        if ($script === 'category.php') return $base . '/category/' . $slug;
+        if ($script === 'blog.php') return $base . '/blog/' . $slug;
+        if ($script === 'page.php') return $base . '/page/' . $slug;
+    }
+    if (isset($_GET['category'])) {
+        return $base . '/blog/category/' . urlencode($_GET['category']);
+    }
+    
+    $clean_uri = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
+    if ($clean_uri === '/index.php') $clean_uri = '/';
+    if ($clean_uri === '/blogs.php') $clean_uri = '/blog';
+    return $proto . '://' . $host . $clean_uri;
 }
 
 function renderSeoTags($options = []) {

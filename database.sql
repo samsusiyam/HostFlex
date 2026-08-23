@@ -49,9 +49,9 @@ CREATE TABLE offers (
 );
 
 INSERT INTO offers (title, description, badge, price_label, link_url, link_text, sort_order) VALUES
-('Basic Web Hosting', 'Start your online journey with our affordable basic hosting plan', 'HOT DEAL', '৳50/mo', 'category.php?slug=basic', 'Learn More', 1),
-('Turbo Web Hosting', 'Unleash your website potential with premium speed & performance', 'POPULAR', '৳500/mo', 'category.php?slug=turbo', 'Learn More', 2),
-('BDIX VPS', 'Ultra-fast BDIX VPS for Bangladesh audience with local peering', 'BEST VALUE', '৳1000/mo', 'category.php?slug=vps', 'Learn More', 3);
+('Basic Web Hosting', 'Start your online journey with our affordable basic hosting plan', 'HOT DEAL', '৳50/mo', '/category/basic', 'Learn More', 1),
+('Turbo Web Hosting', 'Unleash your website potential with premium speed & performance', 'POPULAR', '৳500/mo', '/category/turbo', 'Learn More', 2),
+('BDIX VPS', 'Ultra-fast BDIX VPS for Bangladesh audience with local peering', 'BEST VALUE', '৳1000/mo', '/category/vps', 'Learn More', 3);
 
 CREATE TABLE contacts (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -245,17 +245,17 @@ CREATE TABLE menu_items (
 );
 
 INSERT INTO menu_items (label, url, parent_id, location, sort_order) VALUES
-('Home', 'index.php', 0, 'header', 1),
+('Home', '/', 0, 'header', 1),
 ('Hosting', '#', 0, 'header', 2),
-('Basic Web Hosting', 'category.php?slug=basic', 2, 'header', 3),
-('Turbo Web Hosting', 'category.php?slug=turbo', 2, 'header', 4),
-('SMM Web Hosting', 'category.php?slug=smm', 2, 'header', 5),
-('Ecommerce Web Hosting', 'category.php?slug=ecom', 2, 'header', 6),
+('Basic Web Hosting', '/category/basic', 2, 'header', 3),
+('Turbo Web Hosting', '/category/turbo', 2, 'header', 4),
+('SMM Web Hosting', '/category/smm', 2, 'header', 5),
+('Ecommerce Web Hosting', '/category/ecom', 2, 'header', 6),
 ('VPS', '#', 0, 'header', 7),
-('KVM VPS', 'category.php?slug=kvm', 7, 'header', 8),
-('BDIX VPS', 'category.php?slug=vps', 7, 'header', 9),
-('Offers', 'offers.php', 0, 'both', 10),
-('Contact', 'contact.php', 0, 'both', 11),
-('Terms of Service', 'page.php?slug=terms', 0, 'footer', 12),
-('Privacy Policy', 'page.php?slug=privacy', 0, 'footer', 13),
-('About Us', 'page.php?slug=about', 0, 'footer', 14);
+('KVM VPS', '/category/kvm', 7, 'header', 8),
+('BDIX VPS', '/category/vps', 7, 'header', 9),
+('Offers', '/offers.php', 0, 'both', 10),
+('Contact', '/contact.php', 0, 'both', 11),
+('Terms of Service', '/page/terms', 0, 'footer', 12),
+('Privacy Policy', '/page/privacy', 0, 'footer', 13),
+('About Us', '/page/about', 0, 'footer', 14);

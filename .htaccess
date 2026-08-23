@@ -10,17 +10,33 @@ RewriteEngine On
   RewriteRule "(^|/)\." - [F]
 </IfModule>
 
-# SEO-friendly URLs
+# SEO 301 Redirects (from direct query URLs to clean URLs)
 <IfModule mod_rewrite.c>
+  RewriteCond %{THE_REQUEST} \s/+category\.php\?slug=([a-zA-Z0-9_-]+)\s [NC]
+  RewriteRule ^category\.php$ /category/%1? [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+blog\.php\?slug=([a-zA-Z0-9_-]+)\s [NC]
+  RewriteRule ^blog\.php$ /blog/%1? [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+blogs\.php\?category=([a-zA-Z0-9_-]+)\s [NC]
+  RewriteRule ^blogs\.php$ /blog/category/%1? [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+blogs\.php(?:\s|\?) [NC]
+  RewriteRule ^blogs\.php$ /blog? [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+page\.php\?slug=([a-zA-Z0-9_-]+)\s [NC]
+  RewriteRule ^page\.php$ /page/%1? [R=301,L]
+
+  # Clean URLs Routing
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
 
   RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
-  RewriteRule ^blog/category/([a-z0-9-]+)$ blogs.php?category=$1 [L,QSA]
-  RewriteRule ^blog/([a-z0-9-]+)$ blog.php?slug=$1 [L,QSA]
-  RewriteRule ^page/([a-z0-9-]+)$ page.php?slug=$1 [L,QSA]
-  RewriteRule ^category/([a-z0-9-]+)$ category.php?slug=$1 [L,QSA]
-  RewriteRule ^blog$ blogs.php [L,QSA]
+  RewriteRule ^blog/category/([a-zA-Z0-9_-]+)/?$ blogs.php?category=$1 [L,QSA]
+  RewriteRule ^blog/([a-zA-Z0-9_-]+)/?$ blog.php?slug=$1 [L,QSA]
+  RewriteRule ^page/([a-zA-Z0-9_-]+)/?$ page.php?slug=$1 [L,QSA]
+  RewriteRule ^category/([a-zA-Z0-9_-]+)/?$ category.php?slug=$1 [L,QSA]
+  RewriteRule ^blog/?$ blogs.php [L,QSA]
 </IfModule>
 
 # Custom Error Pages

@@ -1,12 +1,18 @@
 <?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
 
 $slug = $_GET['slug'] ?? '';
-if (!$slug) { header('Location: blogs.php'); exit; }
+if (!$slug) { header('Location: /blog'); exit; }
+
+if (strpos($_SERVER['REQUEST_URI'] ?? '', 'blog.php') !== false && !empty($slug)) {
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: /blog/' . urlencode($slug));
+    exit;
+}
 
 $slug_esc = mysqli_real_escape_string($conn, $slug);
 $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.slug = '$slug_esc' AND p.status = 1"));
 
-if (!$post) { header('Location: blogs.php'); exit; }
+if (!$post) { include '404.php'; exit; }
 
 $page_title = $post['title'];
 $meta_desc = $post['meta_description'] ?: ($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 160));

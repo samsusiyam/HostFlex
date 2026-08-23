@@ -52,19 +52,19 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
             <?php while ($post = mysqli_fetch_assoc($posts)): ?>
             <div class="bg-white border rounded-xl overflow-hidden shadow hover:shadow-lg transition">
                 <?php if ($post['image']): ?>
-<a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>">
-                    <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>">
+                    <img src="<?php echo htmlspecialchars($post['image']); ?>" class="w-full h-48 object-cover" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
                 </a>
                 <?php endif; ?>
                 <div class="p-5">
                     <?php if ($post['category_name']): ?>
-                    <a href="blogs.php?category=<?php echo urlencode($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
+                    <a href="/blog/category/<?php echo urlencode($post['category_slug']); ?>" class="text-xs text-blue-600 font-semibold uppercase tracking-wide"><?php echo htmlspecialchars($post['category_name']); ?></a>
                     <?php endif; ?>
-                    <h3 class="text-lg font-bold mt-1 mb-2"><a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($post['title']); ?></a></h3>
+                    <h3 class="text-lg font-bold mt-1 mb-2"><a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-gray-900 hover:text-blue-600"><?php echo htmlspecialchars($post['title']); ?></a></h3>
                     <p class="text-sm text-gray-500 mb-3"><?php echo htmlspecialchars($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 150) . '...'); ?></p>
                     <div class="flex items-center justify-between text-xs text-gray-400">
                         <span><?php echo $post['author'] ? htmlspecialchars($post['author']) . ' • ' : ''; ?><?php echo date('d M Y', strtotime($post['created_at'])); ?></span>
-                        <a href="blog.php?slug=<?php echo htmlspecialchars($post['slug']); ?>" class="text-blue-600 hover:underline">Read More</a>
+                        <a href="/blog/<?php echo htmlspecialchars($post['slug']); ?>" class="text-blue-600 hover:underline font-medium">Read More</a>
                     </div>
                 </div>
             </div>
@@ -78,21 +78,42 @@ $categories = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 
         </div>
         <?php endif; ?>
         <?php else: ?>
-        <div class="text-center py-16 text-gray-400">
-            <i class="fa fa-newspaper text-5xl mb-4"></i>
-            <p class="text-lg">No blog posts found.</p>
+        <div class="bg-white border rounded-xl p-12 text-center text-gray-500">
+            <i class="fa fa-newspaper text-5xl text-gray-300 mb-4 block"></i>
+            <h3 class="text-xl font-bold text-gray-700 mb-2">No Posts Found</h3>
+            <p class="text-gray-500 mb-4">No blog posts matched your criteria.</p>
+            <a href="/blog" class="btn btn-blue inline-block">View All Posts</a>
         </div>
         <?php endif; ?>
     </div>
-    <div class="lg:w-72">
-        <div class="bg-white border rounded-xl p-5 sticky top-24">
-            <h3 class="font-semibold mb-4">Categories</h3>
+
+    <!-- Sidebar -->
+    <div class="w-full lg:w-80 space-y-6">
+        <!-- Search -->
+        <div class="bg-white border rounded-xl p-6 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-3">Search</h3>
+            <form method="GET" action="/blog">
+                <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
+                <div class="flex gap-2">
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Categories -->
+        <div class="bg-white border rounded-xl p-6 shadow-sm">
+            <h3 class="font-bold text-gray-900 mb-3">Categories</h3>
             <div class="space-y-2">
-                <a href="blogs.php" class="block text-sm <?php echo !$cat_slug ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">All Categories</a>
-                <?php while ($cat = mysqli_fetch_assoc($categories)):
+                <a href="/blog" class="block text-sm <?php echo empty($cat_slug) ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
+                    All Posts
+                </a>
+                <?php
+                $all_cats = mysqli_query($conn, "SELECT * FROM blog_categories WHERE status = 1 ORDER BY name");
+                while ($cat = mysqli_fetch_assoc($all_cats)):
                     $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE category_id = {$cat['id']} AND status = 1"));
                 ?>
-                <a href="blogs.php?category=<?php echo urlencode($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
+                <a href="/blog/category/<?php echo urlencode($cat['slug']); ?>" class="block text-sm <?php echo $cat_slug === $cat['slug'] ? 'text-blue-600 font-medium' : 'text-gray-600 hover:text-blue-600'; ?>">
                     <?php echo htmlspecialchars($cat['name']); ?> (<?php echo $count['c']; ?>)
                 </a>
                 <?php endwhile; ?>
