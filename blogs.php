@@ -219,10 +219,13 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
                 </h3>
                 <form method="GET" action="/blog">
                     <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
-                    <div class="relative flex items-center">
-                        <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="w-full border border-gray-300 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition">
-                        <button type="submit" class="absolute right-1.5 bg-blue-600 hover:bg-blue-700 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs transition">
-                            <i class="fa-solid fa-arrow-right"></i>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                            <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-xs md:text-sm text-gray-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition bg-white">
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2 rounded-lg text-xs md:text-sm transition flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer">
+                            <span>Search</span>
                         </button>
                     </div>
                 </form>
