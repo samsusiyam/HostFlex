@@ -1,3 +1,5 @@
+config/database.php
+config/installed.lock
 *.log
 .env
 .DS_Store
