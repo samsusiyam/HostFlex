@@ -205,17 +205,17 @@ if (isset($_GET['s'])) {
     </div>
     <?php endif; ?>
 
-    <!-- Human Explanation Card -->
+    <!-- Explanation Card (Full English) -->
     <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs">
         <div class="flex items-start gap-3">
             <span class="p-2 bg-blue-600 text-white rounded-xl text-xs shrink-0 mt-0.5"><i class="fa-solid fa-lightbulb"></i></span>
             <div>
-                <strong class="text-blue-900 block font-bold text-sm mb-0.5">How Exchange Rates Work (বিনিময় হার সহজ ব্যাখ্যা):</strong>
+                <strong class="text-blue-900 block font-bold text-sm mb-0.5">How Exchange Rates Work:</strong>
                 <p class="text-blue-800 leading-relaxed">
-                    সব প্ল্যানের মূল দাম ডাটাবেজে <strong>Base Currency (<?php echo htmlspecialchars($base_currency); ?>)</strong> হিসেবে সংরক্ষিত থাকে। 
-                    অন্য কোনো কারেন্সিতে কনভার্ট করতে ফর্মুলা: <code class="bg-blue-100 px-1.5 py-0.5 rounded font-mono text-blue-900 font-bold">Target Price = Base Amount × Rate</code>।
+                    All hosting plan and domain prices are stored in your primary <strong>Base Currency (<?php echo htmlspecialchars($base_currency); ?>)</strong>. 
+                    Prices displayed in other currencies are calculated using: <code class="bg-blue-100 px-1.5 py-0.5 rounded font-mono text-blue-900 font-bold">Target Price = Base Price × Multiplier Rate</code>.
                     <br>
-                    <span class="text-blue-700">যেমন: ১ ডলার = ১২২ টাকা হলে, BDT বেস কারেন্সিতে USD এর Rate হবে: <code class="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">1 ÷ 122 = 0.00819</code>। অথবা সরাসরি <strong>'Sync Live Rates'</strong> বাটনে ক্লিক করলে ইন্টারনেট থেকে সঠিক রেট স্বয়ংক্রিয়ভাবে আপডেট হয়ে যাবে।</span>
+                    <span class="text-blue-700">For example, if 1 USD = 122 BDT and your Base Currency is BDT, the USD rate multiplier is <code class="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">1 ÷ 122 ≈ 0.00820</code>. You can click <strong>'Sync Live Rates'</strong> at any time to automatically fetch real-time market rates from global exchange APIs.</span>
                 </p>
             </div>
         </div>

@@ -50,28 +50,16 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 
 <?php if ($multi_curr_enabled): ?>
-<!-- Desktop Currency Selector Dropdown -->
-<div class="relative" id="desktopCurrencyContainer">
-    <button type="button" id="desktopCurrencyBtn" onclick="toggleDesktopCurrency(event)" class="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 hover:border-blue-500 bg-gray-50/80 hover:bg-white text-xs font-bold text-gray-800 transition cursor-pointer shadow-xs">
-        <span class="text-blue-600 font-extrabold text-sm"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
-        <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
-        <i class="fa fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200" id="desktopCurrencyArrow"></i>
-    </button>
-    <div id="desktopCurrencyMenu" class="absolute right-0 top-full mt-2 hidden flex-col bg-white border border-gray-200 shadow-xl rounded-2xl p-2 min-w-[180px] z-[99999] animate-fadeIn">
-        <div class="px-3 py-1 text-[10px] font-extrabold uppercase text-gray-400 tracking-wider border-b border-gray-100 mb-1">Select Currency</div>
+<!-- Desktop Simple Minimal Currency Selector -->
+<div class="relative inline-flex items-center">
+    <select onchange="window.location.href=this.value" class="appearance-none bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-gray-800 text-xs font-bold py-2 pl-3 pr-7 rounded-xl cursor-pointer outline-none focus:border-blue-500 transition shadow-2xs">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs rounded-xl hover:bg-blue-50 hover:text-blue-600 font-semibold transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-700'; ?>">
-            <span class="flex items-center gap-2.5">
-                <span class="w-6 h-6 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-blue-600 <?php echo $user_curr['code'] === $c_code ? 'bg-blue-600 text-white' : ''; ?>"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
-                <span class="flex flex-col text-left">
-                    <strong class="leading-tight"><?php echo htmlspecialchars($c_code); ?></strong>
-                    <small class="text-[10px] text-gray-400 font-normal leading-none"><?php echo htmlspecialchars($c_item['name'] ?? $c_code); ?></small>
-                </span>
-            </span>
-            <?php if ($user_curr['code'] === $c_code): ?><i class="fa fa-check text-xs text-blue-600"></i><?php endif; ?>
-        </a>
+        <option value="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" <?php echo $user_curr['code'] === $c_code ? 'selected' : ''; ?>>
+            <?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?>
+        </option>
         <?php endforeach; ?>
-    </div>
+    </select>
+    <i class="fa fa-chevron-down text-[9px] text-gray-400 absolute right-2.5 pointer-events-none"></i>
 </div>
 <?php endif; ?>
 
@@ -101,24 +89,6 @@ foreach ($tree as $item):
 <a href="<?php echo $url; ?>" class="py-2.5 border-b border-gray-100 font-medium text-gray-800 hover:text-blue-600 transition"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
 
-<?php if ($multi_curr_enabled): ?>
-<!-- Minimal Standard Mobile Currency Switcher -->
-<div class="py-3 border-b border-gray-100">
-    <div class="flex items-center justify-between mb-2">
-        <span class="text-[11px] font-extrabold uppercase text-gray-400 tracking-wider">Currency</span>
-        <span class="text-xs font-bold text-blue-600"><?php echo htmlspecialchars($user_curr['symbol'] . ' ' . $user_curr['code']); ?></span>
-    </div>
-    <div class="grid grid-cols-3 gap-2">
-        <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="py-2 px-2.5 rounded-xl border text-center text-xs font-bold transition flex items-center justify-center gap-1.5 <?php echo $user_curr['code'] === $c_code ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'; ?>">
-            <span class="font-bold"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
-            <span><?php echo htmlspecialchars($c_code); ?></span>
-        </a>
-        <?php endforeach; ?>
-    </div>
-</div>
-<?php endif; ?>
-
 <div class="pt-3">
     <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold shadow-xs" data-ripple-light="true">
         <i class="fa fa-display"></i> Client Area
@@ -129,21 +99,16 @@ foreach ($tree as $item):
 <!-- Mobile Right Side Header Action Buttons -->
 <div class="xl:hidden flex items-center gap-2 ml-auto">
 <?php if ($multi_curr_enabled): ?>
-<!-- Compact Mobile Header Currency Pill -->
-<div class="relative">
-    <button type="button" onclick="toggleMobileHeaderCurrency(event)" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-800 transition cursor-pointer">
-        <span class="text-blue-600"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
-        <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
-        <i class="fa fa-chevron-down text-[8px] text-gray-400"></i>
-    </button>
-    <div id="mobileHeaderCurrencyMenu" class="absolute right-0 top-full mt-2 hidden flex-col bg-white border border-gray-200 shadow-2xl rounded-2xl p-2 min-w-[150px] z-[999999]">
+<!-- Mobile Simple Minimal Currency Selector in Header -->
+<div class="relative inline-flex items-center">
+    <select onchange="window.location.href=this.value" class="appearance-none bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-bold py-1.5 pl-2.5 pr-6 rounded-lg cursor-pointer outline-none focus:border-blue-500 transition">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs rounded-xl hover:bg-blue-50 font-bold transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'; ?>">
-            <span><?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?></span>
-            <?php if ($user_curr['code'] === $c_code): ?><i class="fa fa-check text-xs text-blue-600"></i><?php endif; ?>
-        </a>
+        <option value="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" <?php echo $user_curr['code'] === $c_code ? 'selected' : ''; ?>>
+            <?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?>
+        </option>
         <?php endforeach; ?>
-    </div>
+    </select>
+    <i class="fa fa-chevron-down text-[8px] text-gray-400 absolute right-2 pointer-events-none"></i>
 </div>
 <?php endif; ?>
 
@@ -152,56 +117,3 @@ foreach ($tree as $item):
 
 </div>
 </header>
-
-<script>
-function toggleDesktopCurrency(e) {
-    e.stopPropagation();
-    var menu = document.getElementById('desktopCurrencyMenu');
-    var arrow = document.getElementById('desktopCurrencyArrow');
-    if (!menu) return;
-    var isHidden = menu.classList.contains('hidden');
-    // close other menus
-    closeAllCurrencyMenus();
-    if (isHidden) {
-        menu.classList.remove('hidden');
-        menu.classList.add('flex');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-    }
-}
-
-function toggleMobileHeaderCurrency(e) {
-    e.stopPropagation();
-    var menu = document.getElementById('mobileHeaderCurrencyMenu');
-    if (!menu) return;
-    var isHidden = menu.classList.contains('hidden');
-    closeAllCurrencyMenus();
-    if (isHidden) {
-        menu.classList.remove('hidden');
-        menu.classList.add('flex');
-    }
-}
-
-function closeAllCurrencyMenus() {
-    var dMenu = document.getElementById('desktopCurrencyMenu');
-    var dArrow = document.getElementById('desktopCurrencyArrow');
-    var mMenu = document.getElementById('mobileHeaderCurrencyMenu');
-    if (dMenu) {
-        dMenu.classList.add('hidden');
-        dMenu.classList.remove('flex');
-    }
-    if (dArrow) dArrow.style.transform = '';
-    if (mMenu) {
-        mMenu.classList.add('hidden');
-        mMenu.classList.remove('flex');
-    }
-}
-
-document.addEventListener('click', function(e) {
-    var dCont = document.getElementById('desktopCurrencyContainer');
-    var mMenu = document.getElementById('mobileHeaderCurrencyMenu');
-    if (dCont && !dCont.contains(e.target) && (!mMenu || !mMenu.contains(e.target))) {
-        closeAllCurrencyMenus();
-    }
-});
-</script>
-
