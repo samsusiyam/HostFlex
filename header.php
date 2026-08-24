@@ -24,6 +24,10 @@
 <a href="/"><img class="h-[50px]" src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>" /></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
 <?php
+$active_currencies = getActiveCurrencies();
+$user_curr = getUserCurrency();
+$multi_curr_enabled = isMultiCurrencyEnabled() && count($active_currencies) > 1;
+
 $menu_items = getMenuItems('header');
 $tree = buildMenuTree($menu_items);
 foreach ($tree as $item):
@@ -44,6 +48,29 @@ foreach ($tree as $item):
 <?php else: ?>
 <a href="<?php echo $url; ?>" class="font-medium hover:text-blue-600"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
+
+<?php if ($multi_curr_enabled): ?>
+<!-- Desktop Currency Selector -->
+<div class="relative group/curr">
+    <button type="button" class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 hover:border-blue-500 bg-gray-50 text-xs font-bold text-gray-800 transition cursor-pointer">
+        <span class="text-blue-600 font-extrabold"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
+        <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
+        <i class="fa fa-chevron-down text-[9px] text-gray-400"></i>
+    </button>
+    <div class="absolute right-0 top-full mt-1.5 hidden group-hover/curr:flex flex-col bg-white border border-gray-200 shadow-xl rounded-xl p-1.5 min-w-[140px] z-50 animate-fadeIn">
+        <?php foreach ($active_currencies as $c_code => $c_item): ?>
+        <a href="?currency=<?php echo urlencode($c_code); ?>" class="flex items-center justify-between px-3 py-1.5 text-xs rounded-lg hover:bg-blue-50 hover:text-blue-600 font-semibold transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'; ?>">
+            <span class="flex items-center gap-2">
+                <strong class="w-4 text-center text-blue-600"><?php echo htmlspecialchars($c_item['symbol']); ?></strong>
+                <span><?php echo htmlspecialchars($c_code); ?></span>
+            </span>
+            <?php if ($user_curr['code'] === $c_code): ?><i class="fa fa-check text-[10px] text-blue-600"></i><?php endif; ?>
+        </a>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
 
@@ -69,6 +96,22 @@ foreach ($tree as $item):
 <?php else: ?>
 <a href="<?php echo $url; ?>" class="py-2.5 border-b border-gray-100 font-medium text-gray-800 hover:text-blue-600 transition"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
+
+<?php if ($multi_curr_enabled): ?>
+<!-- Mobile Currency Switcher -->
+<div class="py-2 border-b border-gray-100">
+    <div class="text-[11px] font-bold uppercase text-gray-400 mb-2">Currency</div>
+    <div class="flex flex-wrap gap-1.5">
+        <?php foreach ($active_currencies as $c_code => $c_item): ?>
+        <a href="?currency=<?php echo urlencode($c_code); ?>" class="px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1.5 <?php echo $user_curr['code'] === $c_code ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'; ?>">
+            <span><?php echo htmlspecialchars($c_item['symbol']); ?></span>
+            <span><?php echo htmlspecialchars($c_code); ?></span>
+        </a>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="pt-3">
     <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold shadow-xs" data-ripple-light="true">
         <i class="fa fa-display"></i> Client Area

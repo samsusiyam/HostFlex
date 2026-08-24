@@ -124,21 +124,47 @@ window.toggleMobileAccordion = function(btn) {
     }
 };
 
-const all_priceValue = document.querySelectorAll(".priceValue");
-const all_priceFor = document.querySelectorAll(".priceFor");
 const pricingSwitch = document.getElementById("pricingSwitch");
 if (pricingSwitch) {
     pricingSwitch.addEventListener("change", (e) => {
         const isAnnual = e.target?.checked;
-        for (let i = 0; i < all_priceFor.length; i++) {
-            const priceValue = all_priceValue[i];
-            const priceFor = all_priceFor[i];
-            if (isAnnual) {
-                priceFor.innerHTML = `/Year`;
-                priceValue.innerHTML = priceValue?.dataset?.yearly;
-            } else {
-                priceFor.innerHTML = `/Month`;
-                priceValue.innerHTML = priceValue?.dataset?.monthly;
+        const cards = document.querySelectorAll('.plan-pricing-card');
+        if (cards.length > 0) {
+            cards.forEach(card => {
+                const mode = card.dataset.billingMode;
+                const pVal = card.querySelector('.priceValue');
+                const pFor = card.querySelector('.priceFor');
+                if (!pVal || !pFor) return;
+
+                if (mode === 'yearly-only') {
+                    pVal.innerHTML = pVal.dataset.yearly;
+                    pFor.innerHTML = ' /Year';
+                } else if (mode === 'monthly-only') {
+                    pVal.innerHTML = pVal.dataset.monthly;
+                    pFor.innerHTML = ' /Month';
+                } else {
+                    if (isAnnual) {
+                        pVal.innerHTML = pVal.dataset.yearly;
+                        pFor.innerHTML = ' /Year';
+                    } else {
+                        pVal.innerHTML = pVal.dataset.monthly;
+                        pFor.innerHTML = ' /Month';
+                    }
+                }
+            });
+        } else {
+            const all_priceValue = document.querySelectorAll(".priceValue");
+            const all_priceFor = document.querySelectorAll(".priceFor");
+            for (let i = 0; i < all_priceFor.length; i++) {
+                const priceValue = all_priceValue[i];
+                const priceFor = all_priceFor[i];
+                if (isAnnual) {
+                    priceFor.innerHTML = ` /Year`;
+                    priceValue.innerHTML = priceValue?.dataset?.yearly;
+                } else {
+                    priceFor.innerHTML = ` /Month`;
+                    priceValue.innerHTML = priceValue?.dataset?.monthly;
+                }
             }
         }
     });

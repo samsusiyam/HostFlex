@@ -41,6 +41,21 @@ checkAdminLogin();
             </div>
         </a>
 
+        <!-- 1.1 Multi-Currency -->
+        <a href="settings-currency.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition group flex flex-col justify-between" data-name="currency exchange rate converter bdt usd eur gbp inr rates money price">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-emerald-600 transition">Multi-Currency & Rates</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Configure currencies (BDT, USD, EUR, etc.), exchange rates, and live conversion.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-emerald-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
         <!-- 2. Branding & Logos -->
         <a href="settings-branding.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition group flex flex-col justify-between" data-name="branding logo favicon dark light theme header footer logo">
             <div>

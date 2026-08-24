@@ -60,7 +60,8 @@ usort($homepage_sections, function($a, $b) {
     return ($a['sort_order'] ?? 0) - ($b['sort_order'] ?? 0);
 });
 
-$currency_symbol = getSetting('currency_symbol') ?: 'TK.';
+$user_curr = getUserCurrency();
+$currency_symbol = $user_curr['symbol'];
 $pricing_url = getSetting('whmcs_domain_pricing_url');
 ?>
 <!DOCTYPE html>
@@ -124,12 +125,14 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </div>
 </form>
 <div class="flex justify-between gap-4 md:gap-8">
-<?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
+<?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): 
+    $tld_conv = convertPriceAmount($item['price'] ?? 0, $user_curr);
+?>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
 <?php endforeach; else: ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>999</span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>455</span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>250</span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(999, $user_curr); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(455, $user_curr); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(250, $user_curr); ?></span></span></a>
 <?php endif; ?>
 </div>
 </div>
@@ -146,21 +149,34 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <?php if ($cat_heading): ?><div class="mb-10 text-center"><h2 class="text-3xl font-bold"><?php echo htmlspecialchars($cat_heading); ?></h2></div><?php endif; ?>
 <div class="grid grid-cols-1 gap-8 xsm:grid-cols-2 lg:grid-cols-<?php echo min(4, $cat_count); ?>">
 <?php while ($cat = mysqli_fetch_assoc($categories)):
-    $min_price = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MIN(monthly_price) as min_price FROM hosting_plans WHERE category = '{$cat['slug']}' AND status = 1"));
+    $min_monthly_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MIN(monthly_price) as min_price FROM hosting_plans WHERE category = '{$cat['slug']}' AND status = 1 AND monthly_price > 0"));
+    if ($min_monthly_row && $min_monthly_row['min_price'] > 0) {
+        $min_val = convertPriceAmount($min_monthly_row['min_price'], $user_curr);
+        $min_period = '/mo';
+    } else {
+        $min_yearly_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MIN(yearly_price) as min_price FROM hosting_plans WHERE category = '{$cat['slug']}' AND status = 1 AND yearly_price > 0"));
+        if ($min_yearly_row && $min_yearly_row['min_price'] > 0) {
+            $min_val = convertPriceAmount($min_yearly_row['min_price'], $user_curr);
+            $min_period = '/yr';
+        } else {
+            $min_val = null;
+            $min_period = '';
+        }
+    }
 ?>
-<div class="bg-white border border-blue-600 overflow-hidden rounded-xl shadow-xl">
-<div class="flex flex-col items-center justify-center">
-<div class="px-14 py-8"><img src="<?php echo htmlspecialchars($cat['image'] ?: 'images/s.png'); ?>" class="h-24 sm:h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" /></div>
-<h1 class="mb-4 px-8 text-xl font-bold text-black"><?php echo htmlspecialchars($cat['name']); ?></h1>
-<p class="text-md px-8 text-center font-normal text-gray-900"><?php echo htmlspecialchars($cat['description']); ?></p>
-<?php if ($min_price && $min_price['min_price']): ?>
-<span class="mt-4 w-[80%] rounded-md p-2 text-center dark:bg-gray-700">
-<p class="text-gray-800">Starting at</p>
-<p class="text-xl font-bold text-black"><?php echo $currency_symbol; ?> <?php echo $min_price['min_price']; ?> <span class="text-lg font-normal">/mo</span></p>
+<div class="bg-white border border-blue-600 overflow-hidden rounded-xl shadow-xl flex flex-col justify-between">
+<div class="flex flex-col items-center justify-center p-6 text-center">
+<div class="py-4"><img src="<?php echo htmlspecialchars($cat['image'] ?: 'images/s.png'); ?>" class="h-20" alt="<?php echo htmlspecialchars($cat['name']); ?>" /></div>
+<h3 class="mb-2 text-xl font-bold text-black"><?php echo htmlspecialchars($cat['name']); ?></h3>
+<p class="text-sm px-4 font-normal text-gray-700"><?php echo htmlspecialchars($cat['description']); ?></p>
+<?php if ($min_val !== null): ?>
+<span class="mt-4 w-[85%] rounded-lg p-2.5 text-center bg-gray-50 border border-gray-200">
+<p class="text-xs text-gray-600 font-semibold">Starting at</p>
+<p class="text-xl font-extrabold text-blue-600"><?php echo $currency_symbol; ?> <?php echo $min_val; ?> <span class="text-xs font-semibold text-gray-500"><?php echo $min_period; ?></span></p>
 </span>
 <?php endif; ?>
 </div>
-<div class="p-4"><a data-ripple-dark="true" href="/category/<?php echo $cat['slug']; ?>" class="btn btn-blue">Get started</a></div>
+<div class="p-4 pt-0"><a data-ripple-dark="true" href="/category/<?php echo $cat['slug']; ?>" class="btn btn-blue w-full block text-center font-bold">Get started</a></div>
 </div>
 <?php endwhile; ?>
 </div>

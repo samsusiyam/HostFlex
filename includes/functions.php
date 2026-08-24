@@ -511,3 +511,111 @@ function renderSeoTags($options = []) {
 
     return $html;
 }
+
+// ==========================================
+// MULTI-CURRENCY CONVERSION SYSTEM
+// ==========================================
+
+function getDefaultCurrencies() {
+    return [
+        'BDT' => ['code' => 'BDT', 'symbol' => '৳', 'name' => 'Bangladeshi Taka', 'rate' => 1.0, 'enabled' => 1],
+        'USD' => ['code' => 'USD', 'symbol' => '$', 'name' => 'US Dollar', 'rate' => 0.00833, 'enabled' => 1],
+        'EUR' => ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro', 'rate' => 0.00780, 'enabled' => 1],
+        'GBP' => ['code' => 'GBP', 'symbol' => '£', 'name' => 'British Pound', 'rate' => 0.00660, 'enabled' => 1],
+        'INR' => ['code' => 'INR', 'symbol' => '₹', 'name' => 'Indian Rupee', 'rate' => 0.72000, 'enabled' => 1],
+        'AED' => ['code' => 'AED', 'symbol' => 'AED', 'name' => 'UAE Dirham', 'rate' => 0.03060, 'enabled' => 0],
+        'SAR' => ['code' => 'SAR', 'symbol' => 'SAR', 'name' => 'Saudi Riyal', 'rate' => 0.03120, 'enabled' => 0],
+        'CAD' => ['code' => 'CAD', 'symbol' => 'CA$', 'name' => 'Canadian Dollar', 'rate' => 0.01180, 'enabled' => 0]
+    ];
+}
+
+function getCurrenciesList() {
+    $raw = getSetting('currencies_config');
+    if (!empty($raw)) {
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded) && !empty($decoded)) {
+            return $decoded;
+        }
+    }
+    return getDefaultCurrencies();
+}
+
+function getActiveCurrencies() {
+    $all = getCurrenciesList();
+    $active = [];
+    foreach ($all as $code => $cur) {
+        if (!empty($cur['enabled']) && $cur['enabled'] == 1) {
+            $active[$code] = $cur;
+        }
+    }
+    if (empty($active)) {
+        $base = getSetting('base_currency') ?: 'BDT';
+        $sym = getSetting('currency_symbol') ?: '৳';
+        $active[$base] = ['code' => $base, 'symbol' => $sym, 'name' => $base, 'rate' => 1.0, 'enabled' => 1];
+    }
+    return $active;
+}
+
+function isMultiCurrencyEnabled() {
+    $val = getSetting('multi_currency_enabled');
+    return ($val === '' || $val === '1' || $val === 1);
+}
+
+function getUserCurrency() {
+    $active = getActiveCurrencies();
+    
+    // Check if currency switch request in URL
+    if (isset($_GET['currency'])) {
+        $req_curr = strtoupper(trim($_GET['currency']));
+        if (isset($active[$req_curr])) {
+            $_SESSION['user_currency'] = $req_curr;
+            setcookie('user_currency', $req_curr, time() + (86400 * 30), '/');
+            return $active[$req_curr];
+        }
+    }
+    
+    // Check session
+    if (!empty($_SESSION['user_currency']) && isset($active[$_SESSION['user_currency']])) {
+        return $active[$_SESSION['user_currency']];
+    }
+    
+    // Check cookie
+    if (!empty($_COOKIE['user_currency']) && isset($active[$_COOKIE['user_currency']])) {
+        $_SESSION['user_currency'] = $_COOKIE['user_currency'];
+        return $active[$_COOKIE['user_currency']];
+    }
+    
+    // Fallback to base currency
+    $base = strtoupper(getSetting('base_currency') ?: 'BDT');
+    if (isset($active[$base])) {
+        return $active[$base];
+    }
+    
+    // Return first active currency
+    $first = reset($active);
+    return $first ?: ['code' => 'BDT', 'symbol' => '৳', 'name' => 'Bangladeshi Taka', 'rate' => 1.0, 'enabled' => 1];
+}
+
+function convertPriceAmount($base_amount, $target_currency = null) {
+    if ($base_amount === null || $base_amount === '' || !is_numeric($base_amount)) {
+        return 0;
+    }
+    $curr = $target_currency ?: getUserCurrency();
+    $rate = (float)($curr['rate'] ?? 1.0);
+    $converted = (float)$base_amount * $rate;
+    
+    $code = $curr['code'] ?? 'BDT';
+    if ($code === 'BDT' || $code === 'INR') {
+        return round($converted);
+    } else {
+        return (fmod($converted, 1) === 0.0) ? round($converted) : number_format($converted, 2, '.', '');
+    }
+}
+
+function formatCurrencyPrice($base_amount, $target_currency = null) {
+    $curr = $target_currency ?: getUserCurrency();
+    $converted = convertPriceAmount($base_amount, $curr);
+    $sym = $curr['symbol'] ?? '৳';
+    return $sym . ' ' . $converted;
+}
+
