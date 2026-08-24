@@ -109,7 +109,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(typeof Tawk_API !== "undefined" ? Tawk_API.toggle() : (document.getElementById("popupNotice") ? toggleFab() : window.location.href="/contact"))'); ?>" data-ripple-light="true" class="btn btn-blue !px-8 font-semibold shadow-xs"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:flex items-center justify-center"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="Cloud Web Hosting" class="max-w-[360px] max-h-[290px] w-auto h-auto object-contain rounded-xl shadow-lg" loading="lazy"></div>
+<div class="hidden px-6 lg:block text-center"><img src="/<?php echo ltrim($c['image'] ?? 'images/cloud.jpg', '/'); ?>" alt="Cloud Web Hosting" class="rounded-xl shadow-lg inline-block" style="max-width: 380px; max-height: 290px; width: 100%; height: auto; object-fit: contain;" loading="lazy"></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
