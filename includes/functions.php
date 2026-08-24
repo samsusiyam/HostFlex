@@ -670,4 +670,119 @@ function fetchLiveExchangeRates($base = null) {
     return ['success' => false, 'error' => 'Unable to connect to live exchange rates service.'];
 }
 
+// ==========================================
+// DOMAIN PRICING & PROFIT MARGIN ENGINE
+// ==========================================
+
+function ensureDomainPricingSchema() {
+    global $conn;
+    static $domain_checked = false;
+    if ($domain_checked || !$conn) return;
+    $domain_checked = true;
+
+    $create_sql = "CREATE TABLE IF NOT EXISTS domain_pricing (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        extension VARCHAR(30) NOT NULL UNIQUE,
+        category VARCHAR(50) DEFAULT 'Popular',
+        cost_currency VARCHAR(10) DEFAULT 'USD',
+        cost_price DECIMAL(10,2) DEFAULT 0.00,
+        margin_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
+        margin_value DECIMAL(10,2) DEFAULT 15.00,
+        register_price DECIMAL(10,2) NOT NULL,
+        renew_price DECIMAL(10,2) NOT NULL,
+        transfer_price DECIMAL(10,2) NOT NULL,
+        promo_price DECIMAL(10,2) DEFAULT NULL,
+        registrar VARCHAR(100) DEFAULT 'Namecheap',
+        sync_provider VARCHAR(50) DEFAULT 'custom',
+        is_featured TINYINT(1) DEFAULT 0,
+        is_popular TINYINT(1) DEFAULT 0,
+        is_promo TINYINT(1) DEFAULT 0,
+        status TINYINT(1) DEFAULT 1,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )";
+    mysqli_query($conn, $create_sql);
+
+    // Seed default common TLDs if empty
+    $count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM domain_pricing"))['c'] ?? 0;
+    if ($count == 0) {
+        $defaults = [
+            ['.com', 'Popular', 'USD', 9.50, 'percentage', 15.0, 1150.00, 1350.00, 1150.00, 999.00, 'Namecheap', 1, 1, 1, 1],
+            ['.net', 'Popular', 'USD', 11.20, 'percentage', 15.0, 1450.00, 1650.00, 1450.00, null, 'Namecheap', 1, 1, 0, 2],
+            ['.org', 'Popular', 'USD', 10.80, 'percentage', 15.0, 1390.00, 1590.00, 1390.00, null, 'ResellerClub', 1, 0, 0, 3],
+            ['.xyz', 'Tech', 'USD', 1.99, 'percentage', 20.0, 250.00, 1250.00, 1250.00, 199.00, 'Dynadot', 1, 1, 1, 4],
+            ['.online', 'Business', 'USD', 2.80, 'percentage', 20.0, 350.00, 1450.00, 1450.00, 299.00, 'Radix', 1, 0, 1, 5],
+            ['.site', 'General', 'USD', 2.50, 'percentage', 20.0, 320.00, 1350.00, 1350.00, null, 'Radix', 0, 0, 0, 6],
+            ['.tech', 'Tech', 'USD', 4.50, 'percentage', 15.0, 590.00, 1850.00, 1850.00, 499.00, 'Radix', 1, 1, 1, 7],
+            ['.info', 'General', 'USD', 3.90, 'percentage', 15.0, 499.00, 1550.00, 1550.00, null, 'WHMCS', 0, 0, 0, 8],
+            ['.biz', 'Business', 'USD', 5.50, 'percentage', 15.0, 750.00, 1650.00, 1650.00, null, 'WHMCS', 0, 0, 0, 9],
+            ['.io', 'Tech', 'USD', 35.00, 'percentage', 10.0, 4650.00, 4850.00, 4650.00, null, 'Namecheap', 1, 1, 0, 10],
+            ['.co', 'Business', 'USD', 11.50, 'percentage', 15.0, 1490.00, 1750.00, 1490.00, 990.00, 'Dynadot', 0, 0, 1, 11],
+            ['.me', 'General', 'USD', 6.00, 'percentage', 15.0, 850.00, 1650.00, 850.00, null, 'Namecheap', 0, 0, 0, 12],
+            ['.app', 'Tech', 'USD', 14.00, 'percentage', 12.0, 1850.00, 1850.00, 1850.00, null, 'Google/WHMCS', 0, 0, 0, 13],
+            ['.dev', 'Tech', 'USD', 14.00, 'percentage', 12.0, 1850.00, 1850.00, 1850.00, null, 'Google/WHMCS', 0, 0, 0, 14],
+            ['.ai', 'Tech', 'USD', 65.00, 'percentage', 10.0, 8600.00, 8600.00, 8600.00, null, 'Dynadot', 1, 1, 0, 15],
+            ['.com.bd', 'Country', 'USD', 15.00, 'percentage', 15.0, 1950.00, 1950.00, 1950.00, null, 'BTCL/Registrar', 1, 1, 0, 16]
+        ];
+        foreach ($defaults as $d) {
+            $promo_val = $d[9] !== null ? $d[9] : 'NULL';
+            mysqli_query($conn, "INSERT INTO domain_pricing 
+                (extension, category, cost_currency, cost_price, margin_type, margin_value, register_price, renew_price, transfer_price, promo_price, registrar, is_featured, is_popular, is_promo, sort_order) 
+                VALUES ('{$d[0]}', '{$d[1]}', '{$d[2]}', {$d[3]}, '{$d[4]}', {$d[5]}, {$d[6]}, {$d[7]}, {$d[8]}, $promo_val, '{$d[10]}', {$d[11]}, {$d[12]}, {$d[13]}, {$d[14]})");
+        }
+    }
+}
+
+function calculateSellingPriceFromCost($cost_amount, $cost_currency = 'USD', $margin_type = 'percentage', $margin_value = 15.0) {
+    $base_currency = strtoupper(getSetting('base_currency') ?: 'BDT');
+    $cost_currency = strtoupper(trim($cost_currency ?: 'USD'));
+    $cost_amount = (float)$cost_amount;
+    
+    // Convert cost_amount to base currency
+    $currencies = getCurrenciesList();
+    if ($cost_currency === $base_currency) {
+        $base_cost = $cost_amount;
+    } else {
+        $curr_data = $currencies[$cost_currency] ?? null;
+        $rate = (float)($curr_data['rate'] ?? 1.0);
+        if ($rate > 0) {
+            $base_cost = $cost_amount / $rate;
+        } else {
+            $base_cost = $cost_amount;
+        }
+    }
+
+    // Apply margin
+    if ($margin_type === 'percentage') {
+        $selling = $base_cost * (1 + ((float)$margin_value / 100));
+    } else {
+        $selling = $base_cost + (float)$margin_value;
+    }
+
+    return max(0, round($selling));
+}
+
+function getDomainPricingList($active_only = true, $category = null, $search = '') {
+    global $conn;
+    ensureDomainPricingSchema();
+    
+    $where = [];
+    if ($active_only) {
+        $where[] = "status = 1";
+    }
+    if ($category && $category !== 'all') {
+        $cat_esc = mysqli_real_escape_string($conn, $category);
+        $where[] = "category = '$cat_esc'";
+    }
+    if (!empty($search)) {
+        $s_esc = mysqli_real_escape_string($conn, $search);
+        $where[] = "(extension LIKE '%$s_esc%' OR registrar LIKE '%$s_esc%' OR category LIKE '%$s_esc%')";
+    }
+    
+    $where_sql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+    $sql = "SELECT * FROM domain_pricing $where_sql ORDER BY is_featured DESC, sort_order ASC, extension ASC";
+    return mysqli_query($conn, $sql);
+}
+
 

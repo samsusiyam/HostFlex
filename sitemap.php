@@ -36,6 +36,11 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
+    <url>
+        <loc><?= SITE_URL ?>domain-pricing</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
 <?php if ($blogPosts): while ($blog = $blogPosts->fetch_assoc()): ?>
     <url>
         <loc><?= rtrim(SITE_URL, '/') . getBlogPostUrl($blog) ?></loc>

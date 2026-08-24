@@ -109,7 +109,7 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(typeof Tawk_API !== "undefined" ? Tawk_API.toggle() : (document.getElementById("popupNotice") ? toggleFab() : window.location.href="/contact"))'); ?>" data-ripple-light="true" class="btn btn-blue !px-8 font-semibold shadow-xs"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
-<div class="hidden px-6 lg:block text-center"><img src="/<?php echo ltrim($c['image'] ?? 'images/cloud.jpg', '/'); ?>" alt="Cloud Web Hosting" class="rounded-xl shadow-lg inline-block" style="max-width: 380px; max-height: 290px; width: 100%; height: auto; object-fit: contain;" loading="lazy"></div>
+<div class="hidden px-6 lg:block text-center"><img src="/<?php echo ltrim($c['image'] ?? 'images/cloud.jpg', '/'); ?>" alt="Cloud Web Hosting" class="inline-block" style="max-width: 440px; max-height: 340px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.07));" loading="lazy"></div>
 </div>
 
 <?php elseif ($type === 'domain_search'): ?>
@@ -125,15 +125,25 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </div>
 </form>
 <div class="flex justify-between gap-4 md:gap-8">
+<?php
+ensureDomainPricingSchema();
+$featured_tlds_res = mysqli_query($conn, "SELECT * FROM domain_pricing WHERE status = 1 AND is_featured = 1 ORDER BY sort_order ASC, extension ASC LIMIT 4");
+if ($featured_tlds_res && mysqli_num_rows($featured_tlds_res) > 0):
+    while ($ftld = mysqli_fetch_assoc($featured_tlds_res)):
+        $price_to_show = ($ftld['promo_price'] !== null && $ftld['promo_price'] > 0) ? $ftld['promo_price'] : $ftld['register_price'];
+        $tld_conv = convertPriceAmount($price_to_show, $user_curr);
+?>
+<a href="/domain-pricing" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0 hover:scale-105 transition"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($ftld['extension']); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
+<?php endwhile; else: ?>
 <?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): 
     $tld_conv = convertPriceAmount($item['price'] ?? 0, $user_curr);
 ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
+<a href="/domain-pricing" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
 <?php endforeach; else: ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(999, $user_curr); ?></span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(455, $user_curr); ?></span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(250, $user_curr); ?></span></span></a>
-<?php endif; ?>
+<a href="/domain-pricing" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(999, $user_curr); ?></span></span></a>
+<a href="/domain-pricing" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(299, $user_curr); ?></span></span></a>
+<a href="/domain-pricing" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(199, $user_curr); ?></span></span></a>
+<?php endif; endif; ?>
 </div>
 </div>
 </div>

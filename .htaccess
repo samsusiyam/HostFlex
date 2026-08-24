@@ -50,6 +50,8 @@ RewriteEngine On
   RewriteRule ^blog/?$ blogs.php [L,QSA]
   RewriteRule ^contact/?$ contact.php [L,QSA]
   RewriteRule ^offers/?$ offers.php [L,QSA]
+  RewriteRule ^domain-pricing/?$ domain-pricing.php [L,QSA]
+  RewriteRule ^domains/?$ domain-pricing.php [L,QSA]
 </IfModule>
 
 # Custom Error Pages

@@ -218,6 +218,10 @@
                         <i class="fa-solid fa-server w-4 text-center"></i>
                         <span>Hosting Plans</span>
                     </a>
+                    <a href="domain-pricing.php" class="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition <?php echo strpos($_SERVER['PHP_SELF'], 'domain-pricing') !== false ? 'menu-item-active' : ''; ?>">
+                        <i class="fa-solid fa-globe w-4 text-center"></i>
+                        <span>Domain Pricing</span>
+                    </a>
                     <a href="offers.php" class="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition <?php echo strpos($_SERVER['PHP_SELF'], 'offer') !== false ? 'menu-item-active' : ''; ?>">
                         <i class="fa-solid fa-tags w-4 text-center"></i>
                         <span>Offers & Deals</span>

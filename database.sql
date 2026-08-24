@@ -268,3 +268,45 @@ INSERT INTO menu_items (label, url, parent_id, location, sort_order) VALUES
 ('Terms of Service', '/page/terms', 0, 'footer', 12),
 ('Privacy Policy', '/page/privacy', 0, 'footer', 13),
 ('About Us', '/page/about', 0, 'footer', 14);
+
+CREATE TABLE domain_pricing (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    extension VARCHAR(30) NOT NULL UNIQUE,
+    category VARCHAR(50) DEFAULT 'Popular',
+    cost_currency VARCHAR(10) DEFAULT 'USD',
+    cost_price DECIMAL(10,2) DEFAULT 0.00,
+    margin_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
+    margin_value DECIMAL(10,2) DEFAULT 15.00,
+    register_price DECIMAL(10,2) NOT NULL,
+    renew_price DECIMAL(10,2) NOT NULL,
+    transfer_price DECIMAL(10,2) NOT NULL,
+    promo_price DECIMAL(10,2) DEFAULT NULL,
+    registrar VARCHAR(100) DEFAULT 'Namecheap',
+    sync_provider VARCHAR(50) DEFAULT 'custom',
+    is_featured TINYINT(1) DEFAULT 0,
+    is_popular TINYINT(1) DEFAULT 0,
+    is_promo TINYINT(1) DEFAULT 0,
+    status TINYINT(1) DEFAULT 1,
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO domain_pricing (extension, category, cost_currency, cost_price, margin_type, margin_value, register_price, renew_price, transfer_price, promo_price, registrar, is_featured, is_popular, is_promo, sort_order) VALUES
+('.com', 'Popular', 'USD', 9.50, 'percentage', 15.0, 1150.00, 1350.00, 1150.00, 999.00, 'Namecheap', 1, 1, 1, 1),
+('.net', 'Popular', 'USD', 11.20, 'percentage', 15.0, 1450.00, 1650.00, 1450.00, NULL, 'Namecheap', 1, 1, 0, 2),
+('.org', 'Popular', 'USD', 10.80, 'percentage', 15.0, 1390.00, 1590.00, 1390.00, NULL, 'ResellerClub', 1, 0, 0, 3),
+('.xyz', 'Tech', 'USD', 1.99, 'percentage', 20.0, 250.00, 1250.00, 1250.00, 199.00, 'Dynadot', 1, 1, 1, 4),
+('.online', 'Business', 'USD', 2.80, 'percentage', 20.0, 350.00, 1450.00, 1450.00, 299.00, 'Radix', 1, 0, 1, 5),
+('.site', 'General', 'USD', 2.50, 'percentage', 20.0, 320.00, 1350.00, 1350.00, NULL, 'Radix', 0, 0, 0, 6),
+('.tech', 'Tech', 'USD', 4.50, 'percentage', 15.0, 590.00, 1850.00, 1850.00, 499.00, 'Radix', 1, 1, 1, 7),
+('.info', 'General', 'USD', 3.90, 'percentage', 15.0, 499.00, 1550.00, 1550.00, NULL, 'WHMCS', 0, 0, 0, 8),
+('.biz', 'Business', 'USD', 5.50, 'percentage', 15.0, 750.00, 1650.00, 1650.00, NULL, 'WHMCS', 0, 0, 0, 9),
+('.io', 'Tech', 'USD', 35.00, 'percentage', 10.0, 4650.00, 4850.00, 4650.00, NULL, 'Namecheap', 1, 1, 0, 10),
+('.co', 'Business', 'USD', 11.50, 'percentage', 15.0, 1490.00, 1750.00, 1490.00, 990.00, 'Dynadot', 0, 0, 1, 11),
+('.me', 'General', 'USD', 6.00, 'percentage', 15.0, 850.00, 1650.00, 850.00, NULL, 'Namecheap', 0, 0, 0, 12),
+('.app', 'Tech', 'USD', 14.00, 'percentage', 12.0, 1850.00, 1850.00, 1850.00, NULL, 'Google/WHMCS', 0, 0, 0, 13),
+('.dev', 'Tech', 'USD', 14.00, 'percentage', 12.0, 1850.00, 1850.00, 1850.00, NULL, 'Google/WHMCS', 0, 0, 0, 14),
+('.ai', 'Tech', 'USD', 65.00, 'percentage', 10.0, 8600.00, 8600.00, 8600.00, NULL, 'Dynadot', 1, 1, 0, 15),
+('.com.bd', 'Country', 'USD', 15.00, 'percentage', 15.0, 1950.00, 1950.00, 1950.00, NULL, 'BTCL/Registrar', 1, 1, 0, 16);
+
