@@ -27,7 +27,7 @@ $page_title = 'Blog';
 <?php
 $cat_slug = $_GET['category'] ?? '';
 $search_q = trim($_GET['search'] ?? '');
-$where = "WHERE p.status = 1";
+$where = "WHERE p.status = 1 AND p.deleted_at IS NULL";
 if ($cat_slug) {
     $cat_slug_esc = mysqli_real_escape_string($conn, $cat_slug);
     $where .= " AND c.slug = '$cat_slug_esc'";

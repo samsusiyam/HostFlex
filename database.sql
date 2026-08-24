@@ -207,6 +207,7 @@ CREATE TABLE blog_posts (
     show_featured_image TINYINT(1) DEFAULT 1,
     show_toc TINYINT(1) DEFAULT 1,
     show_author TINYINT(1) DEFAULT 1,
+    deleted_at DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES blog_categories(id) ON DELETE SET NULL
 );

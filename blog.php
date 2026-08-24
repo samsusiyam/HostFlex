@@ -15,9 +15,9 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', 'blog.php') !== false && !empty($slug)
 
 $slug_esc = mysqli_real_escape_string($conn, $slug);
 if (is_numeric($slug)) {
-    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE (p.id = " . (int)$slug . " OR p.slug = '$slug_esc') AND p.status = 1"));
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE (p.id = " . (int)$slug . " OR p.slug = '$slug_esc') AND p.status = 1 AND p.deleted_at IS NULL"));
 } else {
-    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.slug = '$slug_esc' AND p.status = 1"));
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.slug = '$slug_esc' AND p.status = 1 AND p.deleted_at IS NULL"));
 }
 
 if (!$post) { include '404.php'; exit; }
@@ -40,9 +40,9 @@ $toc = generateBlogTOC($post_content);
 // Related posts query
 $cat_id = (int)$post['category_id'];
 $curr_id = (int)$post['id'];
-$related_posts_res = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id != $curr_id " . ($cat_id > 0 ? "AND p.category_id = $cat_id " : "") . "ORDER BY p.created_at DESC LIMIT 3");
+$related_posts_res = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL AND p.id != $curr_id " . ($cat_id > 0 ? "AND p.category_id = $cat_id " : "") . "ORDER BY p.created_at DESC LIMIT 3");
 if (mysqli_num_rows($related_posts_res) === 0) {
-    $related_posts_res = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id != $curr_id ORDER BY p.created_at DESC LIMIT 3");
+    $related_posts_res = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL AND p.id != $curr_id ORDER BY p.created_at DESC LIMIT 3");
 }
 $related_posts = [];
 while ($rp = mysqli_fetch_assoc($related_posts_res)) {
@@ -50,8 +50,8 @@ while ($rp = mysqli_fetch_assoc($related_posts_res)) {
 }
 
 // Prev and Next posts
-$prev_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id < $curr_id ORDER BY p.id DESC LIMIT 1"));
-$next_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.id > $curr_id ORDER BY p.id ASC LIMIT 1"));
+$prev_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL AND p.id < $curr_id ORDER BY p.id DESC LIMIT 1"));
+$next_post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT p.id, p.title, p.slug, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL AND p.id > $curr_id ORDER BY p.id ASC LIMIT 1"));
 
 $blog_schema = [
     '@context' => 'https://schema.org',

@@ -4,16 +4,18 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
+ensureBlogSchema();
+
 $msg = '';
 $error = '';
 
-// Handle AJAX Quick Toggle Status
+// Handle AJAX Quick Toggle Status (Only for non-trashed posts)
 if (isset($_POST['ajax_toggle_status'])) {
     header('Content-Type: application/json');
     $id = (int)($_POST['id'] ?? 0);
     if ($id > 0) {
-        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT status, title FROM blog_posts WHERE id = $id"));
-        if ($curr) {
+        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT status, title, deleted_at FROM blog_posts WHERE id = $id"));
+        if ($curr && $curr['deleted_at'] === null) {
             $new_val = (int)$curr['status'] === 1 ? 0 : 1;
             mysqli_query($conn, "UPDATE blog_posts SET status = $new_val WHERE id = $id");
             logActivity('Toggled Blog Status', ($curr['title'] ?? 'Post') . " -> " . ($new_val ? 'Published' : 'Draft') . " (ID: $id)");
@@ -25,18 +27,82 @@ if (isset($_POST['ajax_toggle_status'])) {
     exit;
 }
 
-// Handle Delete via POST (Modal)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_post_id'])) {
-    $id = (int)$_POST['delete_post_id'];
+// Handle Single Move to Trash
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trash_post_id'])) {
+    $id = (int)$_POST['trash_post_id'];
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title FROM blog_posts WHERE id = $id"));
+    if ($post) {
+        mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NOW() WHERE id = $id");
+        logActivity('Moved Post to Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
+        $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" moved to Trash.';
+    }
+}
+
+// Handle Single Restore from Trash
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_post_id'])) {
+    $id = (int)$_POST['restore_post_id'];
+    $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title FROM blog_posts WHERE id = $id"));
+    if ($post) {
+        mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NULL WHERE id = $id");
+        logActivity('Restored Post from Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
+        $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" restored from Trash.';
+    }
+}
+
+// Handle Single Permanent (Force) Delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['force_delete_post_id'])) {
+    $id = (int)$_POST['force_delete_post_id'];
     $post = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image, title FROM blog_posts WHERE id = $id"));
-    if ($post && $post['image'] && file_exists('../' . $post['image'])) {
-        @unlink('../' . $post['image']);
+    if ($post && !empty($post['image']) && file_exists('../' . ltrim($post['image'], '/'))) {
+        @unlink('../' . ltrim($post['image'], '/'));
     }
     if (mysqli_query($conn, "DELETE FROM blog_posts WHERE id = $id")) {
-        logActivity('Deleted Post', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
+        logActivity('Permanently Deleted Post', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
         $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" permanently deleted.';
     } else {
         $error = 'Failed to delete post: ' . mysqli_error($conn);
+    }
+}
+
+// Handle Empty Trash
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empty_trash'])) {
+    $trashed_query = mysqli_query($conn, "SELECT id, image FROM blog_posts WHERE deleted_at IS NOT NULL");
+    $deleted_count = 0;
+    while ($tp = mysqli_fetch_assoc($trashed_query)) {
+        if (!empty($tp['image']) && file_exists('../' . ltrim($tp['image'], '/'))) {
+            @unlink('../' . ltrim($tp['image'], '/'));
+        }
+        $deleted_count++;
+    }
+    mysqli_query($conn, "DELETE FROM blog_posts WHERE deleted_at IS NOT NULL");
+    logActivity('Emptied Blog Trash', "Permanently deleted $deleted_count trashed posts");
+    $msg = "Trash emptied. $deleted_count posts permanently deleted.";
+}
+
+// Handle Bulk Actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action']) && !empty($_POST['selected_posts'])) {
+    $bulk_type = $_POST['bulk_action'];
+    $ids = array_map('intval', $_POST['selected_posts']);
+    $id_list = implode(',', $ids);
+
+    if ($bulk_type === 'trash') {
+        mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NOW() WHERE id IN ($id_list)");
+        logActivity('Bulk Moved Posts to Trash', count($ids) . ' posts moved to trash');
+        $msg = count($ids) . ' posts moved to Trash.';
+    } elseif ($bulk_type === 'restore') {
+        mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NULL WHERE id IN ($id_list)");
+        logActivity('Bulk Restored Posts', count($ids) . ' posts restored from trash');
+        $msg = count($ids) . ' posts restored from Trash.';
+    } elseif ($bulk_type === 'force_delete') {
+        $img_q = mysqli_query($conn, "SELECT image FROM blog_posts WHERE id IN ($id_list)");
+        while ($r = mysqli_fetch_assoc($img_q)) {
+            if (!empty($r['image']) && file_exists('../' . ltrim($r['image'], '/'))) {
+                @unlink('../' . ltrim($r['image'], '/'));
+            }
+        }
+        mysqli_query($conn, "DELETE FROM blog_posts WHERE id IN ($id_list)");
+        logActivity('Bulk Deleted Posts', count($ids) . ' posts permanently deleted');
+        $msg = count($ids) . ' posts permanently deleted.';
     }
 }
 
@@ -47,9 +113,10 @@ if (isset($_GET['msg'])) {
 }
 
 // Counts for Status Tabs
-$total_all = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts"))['c'] ?? 0;
-$total_pub = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 1"))['c'] ?? 0;
-$total_draft = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 0"))['c'] ?? 0;
+$total_all = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE deleted_at IS NULL"))['c'] ?? 0;
+$total_pub = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 1 AND deleted_at IS NULL"))['c'] ?? 0;
+$total_draft = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 0 AND deleted_at IS NULL"))['c'] ?? 0;
+$total_trash = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE deleted_at IS NOT NULL"))['c'] ?? 0;
 
 // Filter criteria
 $status_filter = isset($_GET['status']) ? (string)$_GET['status'] : 'all';
@@ -57,10 +124,16 @@ $category_filter = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
 $search = trim($_GET['search'] ?? '');
 
 $where_clauses = [];
-if ($status_filter === 'published') {
-    $where_clauses[] = "p.status = 1";
-} elseif ($status_filter === 'draft') {
-    $where_clauses[] = "p.status = 0";
+
+if ($status_filter === 'trash') {
+    $where_clauses[] = "p.deleted_at IS NOT NULL";
+} else {
+    $where_clauses[] = "p.deleted_at IS NULL";
+    if ($status_filter === 'published') {
+        $where_clauses[] = "p.status = 1";
+    } elseif ($status_filter === 'draft') {
+        $where_clauses[] = "p.status = 0";
+    }
 }
 
 if ($category_filter > 0) {
@@ -87,7 +160,7 @@ $posts_query = "SELECT p.*, c.name as category_name, c.slug as category_slug
                 FROM blog_posts p 
                 LEFT JOIN blog_categories c ON p.category_id = c.id 
                 $where_sql 
-                ORDER BY p.created_at DESC 
+                ORDER BY " . ($status_filter === 'trash' ? 'p.deleted_at DESC' : 'p.created_at DESC') . " 
                 LIMIT $per_page OFFSET $offset";
 $posts = mysqli_query($conn, $posts_query);
 
@@ -112,6 +185,11 @@ while ($c = mysqli_fetch_assoc($categories_res)) {
             <p class="text-xs text-gray-500">Manage, write, organize, and optimize your blog publications and guides.</p>
         </div>
         <div class="flex items-center gap-3">
+            <?php if ($status_filter === 'trash' && $total_trash > 0): ?>
+            <button type="button" onclick="openEmptyTrashModal()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-trash-can"></i> Empty Trash
+            </button>
+            <?php endif; ?>
             <a href="blog-edit.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
                 <i class="fa-solid fa-pen-nib"></i> Write New Post
             </a>
@@ -139,6 +217,16 @@ while ($c = mysqli_fetch_assoc($categories_res)) {
     </div>
     <?php endif; ?>
 
+    <?php if ($status_filter === 'trash'): ?>
+    <div class="p-4 rounded-2xl bg-rose-50/80 border border-rose-200 flex items-center justify-between gap-3 text-xs text-rose-900 font-medium">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-trash-can text-rose-600 text-sm"></i>
+            <span>You are currently viewing <strong>Trashed Posts</strong>. Trashed articles are hidden from the public website. You can restore them or permanently delete them.</span>
+        </div>
+        <a href="blogs.php" class="text-xs font-bold text-blue-600 hover:underline shrink-0">Back to All Posts</a>
+    </div>
+    <?php endif; ?>
+
     <!-- Status Tabs & Filter Controls -->
     <div class="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
         
@@ -155,6 +243,11 @@ while ($c = mysqli_fetch_assoc($categories_res)) {
             <a href="blogs.php?status=draft<?php echo $search ? '&search=' . urlencode($search) : ''; ?>" 
                class="px-3.5 py-1.5 rounded-xl transition <?php echo $status_filter === 'draft' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:bg-gray-100'; ?>">
                 Drafts (<?php echo $total_draft; ?>)
+            </a>
+            <a href="blogs.php?status=trash<?php echo $search ? '&search=' . urlencode($search) : ''; ?>" 
+               class="px-3.5 py-1.5 rounded-xl transition flex items-center gap-1.5 <?php echo $status_filter === 'trash' ? 'bg-rose-600 text-white shadow-xs' : 'text-rose-600 hover:bg-rose-50'; ?>">
+                <i class="fa-solid fa-trash-can text-[10px]"></i>
+                <span>Trash (<?php echo $total_trash; ?>)</span>
             </a>
         </div>
 
@@ -194,178 +287,331 @@ while ($c = mysqli_fetch_assoc($categories_res)) {
 
     </div>
 
-    <!-- Posts Table -->
-    <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-            <div class="text-xs text-gray-500 font-semibold">
-                Showing <strong class="text-gray-900"><?php echo mysqli_num_rows($posts); ?></strong> of <strong class="text-gray-900"><?php echo $total_filtered; ?></strong> articles
+    <!-- Posts Table with Bulk Actions -->
+    <form method="POST" id="bulkForm">
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <!-- Bulk Actions Selector -->
+                    <select name="bulk_action" id="bulkActionSelect" class="border border-gray-200 rounded-xl px-3 py-1.5 text-xs bg-gray-50 text-gray-700 font-semibold focus:outline-none">
+                        <option value="">Bulk Actions</option>
+                        <?php if ($status_filter === 'trash'): ?>
+                        <option value="restore">Restore Selected</option>
+                        <option value="force_delete">Delete Permanently</option>
+                        <?php else: ?>
+                        <option value="trash">Move to Trash</option>
+                        <?php endif; ?>
+                    </select>
+                    <button type="submit" onclick="return confirmBulkAction()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer">
+                        Apply
+                    </button>
+                    <span class="text-xs text-gray-400 font-normal">|</span>
+                    <span class="text-xs text-gray-500 font-semibold">
+                        Showing <strong class="text-gray-900"><?php echo mysqli_num_rows($posts); ?></strong> of <strong class="text-gray-900"><?php echo $total_filtered; ?></strong> articles
+                    </span>
+                </div>
+                <a href="blog-categories.php" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-folder-tree text-[11px]"></i> Manage Categories
+                </a>
             </div>
-            <a href="blog-categories.php" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
-                <i class="fa-solid fa-folder-tree text-[11px]"></i> Manage Categories
-            </a>
-        </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50/70 border-b border-gray-200 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    <tr>
-                        <th class="px-4 py-3.5 w-14 text-center">Image</th>
-                        <th class="px-4 py-3.5">Post Title</th>
-                        <th class="px-4 py-3.5">Category</th>
-                        <th class="px-4 py-3.5">Author</th>
-                        <th class="px-4 py-3.5">Status</th>
-                        <th class="px-4 py-3.5">Date</th>
-                        <th class="px-4 py-3.5 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 text-xs">
-                    <?php if (mysqli_num_rows($posts) > 0): ?>
-                        <?php while ($post = mysqli_fetch_assoc($posts)): 
-                            $post_url = getBlogPostUrl($post);
-                        ?>
-                        <tr class="hover:bg-blue-50/20 transition group">
-                            
-                            <!-- Thumbnail -->
-                            <td class="px-4 py-3.5 text-center">
-                                <?php if (!empty($post['image'])): ?>
-                                    <img src="/<?php echo ltrim($post['image'], '/'); ?>" alt="" class="w-10 h-10 object-cover rounded-xl border border-gray-200 shadow-xs inline-block">
-                                <?php else: ?>
-                                    <div class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs inline-block">
-                                        <i class="fa-solid fa-image"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </td>
-
-                            <!-- Title + Slug -->
-                            <td class="px-4 py-3.5 font-bold text-gray-900">
-                                <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="hover:text-blue-600 transition block text-sm">
-                                    <?php echo htmlspecialchars($post['title']); ?>
-                                </a>
-                                <div class="text-[11px] text-gray-400 font-mono font-normal truncate max-w-sm mt-0.5">
-                                    <?php echo htmlspecialchars($post['slug']); ?>
-                                </div>
-                            </td>
-
-                            <!-- Category -->
-                            <td class="px-4 py-3.5">
-                                <?php if (!empty($post['category_name'])): ?>
-                                    <a href="blogs.php?cat=<?php echo $post['category_id']; ?>" class="inline-block bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-lg text-[11px] font-bold transition">
-                                        <?php echo htmlspecialchars($post['category_name']); ?>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-gray-400 italic">Uncategorized</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <!-- Author -->
-                            <td class="px-4 py-3.5 text-gray-600 font-medium">
-                                <span class="inline-flex items-center gap-1">
-                                    <i class="fa-solid fa-user-circle text-gray-400 text-xs"></i>
-                                    <?php echo htmlspecialchars($post['author'] ?: 'Admin'); ?>
-                                </span>
-                            </td>
-
-                            <!-- 1-Click AJAX Status Toggle -->
-                            <td class="px-4 py-3.5">
-                                <button type="button" onclick="togglePostStatus(<?php echo $post['id']; ?>, this)" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $post['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'; ?>" title="Click to toggle Published/Draft">
-                                    <span class="w-1.5 h-1.5 rounded-full <?php echo $post['status'] ? 'bg-emerald-500' : 'bg-amber-500'; ?>"></span>
-                                    <span><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
-                                </button>
-                            </td>
-
-                            <!-- Date -->
-                            <td class="px-4 py-3.5 text-gray-500 whitespace-nowrap text-[11px]">
-                                <div class="font-bold text-gray-800"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></div>
-                                <div class="text-gray-400"><?php echo date('h:i A', strtotime($post['created_at'])); ?></div>
-                            </td>
-
-                            <!-- Action Buttons -->
-                            <td class="px-4 py-3.5 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <a href="<?php echo htmlspecialchars($post_url); ?>" target="_blank" class="p-1.5 bg-gray-50 hover:bg-emerald-50 text-emerald-600 rounded-lg border border-gray-200 hover:border-emerald-200 transition cursor-pointer" title="View Live Post">
-                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                                    </a>
-                                    <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="p-1.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 transition cursor-pointer" title="Edit Article">
-                                        <i class="fa-solid fa-pen text-xs"></i>
-                                    </a>
-                                    <button type="button" onclick="openDeleteBlogModal(<?php echo $post['id']; ?>, '<?php echo addslashes($post['title']); ?>', '<?php echo addslashes($post['image'] ?? ''); ?>', '<?php echo date('M d, Y', strtotime($post['created_at'])); ?>')" class="p-1.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200 hover:border-red-200 transition cursor-pointer" title="Delete Post">
-                                        <i class="fa-solid fa-trash-can text-xs"></i>
-                                    </button>
-                                </div>
-                            </td>
-
-                        </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50/70 border-b border-gray-200 text-xs font-bold text-gray-700 uppercase tracking-wider">
                         <tr>
-                            <td colspan="7" class="px-4 py-16 text-center text-gray-400">
-                                <i class="fa-solid fa-newspaper text-4xl mb-3 block text-gray-300"></i>
-                                <p class="text-base font-bold text-gray-700">No blog posts found</p>
-                                <p class="text-xs text-gray-500 mt-1">Get started by creating your very first article!</p>
-                                <a href="blog-edit.php" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl mt-4 shadow-xs transition cursor-pointer">
-                                    <i class="fa-solid fa-pen-nib"></i> Write First Post
-                                </a>
-                            </td>
+                            <th class="px-4 py-3.5 w-10 text-center">
+                                <input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)" class="rounded text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            </th>
+                            <th class="px-4 py-3.5 w-14 text-center">Image</th>
+                            <th class="px-4 py-3.5">Post Title</th>
+                            <th class="px-4 py-3.5">Category</th>
+                            <th class="px-4 py-3.5">Author</th>
+                            <th class="px-4 py-3.5">Status</th>
+                            <th class="px-4 py-3.5"><?php echo $status_filter === 'trash' ? 'Deleted Date' : 'Date'; ?></th>
+                            <th class="px-4 py-3.5 text-right">Actions</th>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        <?php if (mysqli_num_rows($posts) > 0): ?>
+                            <?php while ($post = mysqli_fetch_assoc($posts)): 
+                                $post_url = getBlogPostUrl($post);
+                                $is_trashed = !empty($post['deleted_at']);
+                            ?>
+                            <tr class="hover:bg-blue-50/20 transition group <?php echo $is_trashed ? 'bg-rose-50/30' : ''; ?>">
+                                
+                                <!-- Checkbox -->
+                                <td class="px-4 py-3.5 text-center">
+                                    <input type="checkbox" name="selected_posts[]" value="<?php echo $post['id']; ?>" class="post-checkbox rounded text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                </td>
 
-        <!-- Pagination -->
-        <?php if ($pages > 1): ?>
-        <div class="p-4 border-t border-gray-200 flex items-center justify-between bg-gray-50/50">
-            <span class="text-xs text-gray-500 font-semibold">
-                Page <?php echo $page; ?> of <?php echo $pages; ?>
-            </span>
-            <div class="flex items-center gap-1">
-                <?php for ($i = 1; $i <= $pages; $i++): ?>
-                    <?php 
-                    $query_params = $_GET;
-                    $query_params['p'] = $i;
-                    $page_url = 'blogs.php?' . http_build_query($query_params);
-                    ?>
-                    <a href="<?php echo $page_url; ?>" class="px-3 py-1.5 rounded-xl text-xs font-bold transition <?php echo $i == $page ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'; ?>">
-                        <?php echo $i; ?>
-                    </a>
-                <?php endfor; ?>
+                                <!-- Thumbnail -->
+                                <td class="px-4 py-3.5 text-center">
+                                    <?php if (!empty($post['image'])): ?>
+                                        <img src="/<?php echo ltrim($post['image'], '/'); ?>" alt="" class="w-10 h-10 object-cover rounded-xl border border-gray-200 shadow-xs inline-block">
+                                    <?php else: ?>
+                                        <div class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs inline-block">
+                                            <i class="fa-solid fa-image"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Title + Slug -->
+                                <td class="px-4 py-3.5 font-bold text-gray-900">
+                                    <?php if ($is_trashed): ?>
+                                    <span class="text-gray-800 block text-sm font-bold">
+                                        <?php echo htmlspecialchars($post['title']); ?>
+                                        <span class="ml-1 text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold">In Trash</span>
+                                    </span>
+                                    <?php else: ?>
+                                    <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="hover:text-blue-600 transition block text-sm">
+                                        <?php echo htmlspecialchars($post['title']); ?>
+                                    </a>
+                                    <?php endif; ?>
+                                    <div class="text-[11px] text-gray-400 font-mono font-normal truncate max-w-sm mt-0.5">
+                                        <?php echo htmlspecialchars($post['slug']); ?>
+                                    </div>
+                                </td>
+
+                                <!-- Category -->
+                                <td class="px-4 py-3.5">
+                                    <?php if (!empty($post['category_name'])): ?>
+                                        <a href="blogs.php?cat=<?php echo $post['category_id']; ?>" class="inline-block bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-lg text-[11px] font-bold transition">
+                                            <?php echo htmlspecialchars($post['category_name']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-gray-400 italic">Uncategorized</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Author -->
+                                <td class="px-4 py-3.5 text-gray-600 font-medium">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fa-solid fa-user-circle text-gray-400 text-xs"></i>
+                                        <?php echo htmlspecialchars($post['author'] ?: 'Admin'); ?>
+                                    </span>
+                                </td>
+
+                                <!-- 1-Click AJAX Status Toggle / Trash Indicator -->
+                                <td class="px-4 py-3.5">
+                                    <?php if ($is_trashed): ?>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                        <span>Trashed</span>
+                                    </span>
+                                    <?php else: ?>
+                                    <button type="button" onclick="togglePostStatus(<?php echo $post['id']; ?>, this)" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $post['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'; ?>" title="Click to toggle Published/Draft">
+                                        <span class="w-1.5 h-1.5 rounded-full <?php echo $post['status'] ? 'bg-emerald-500' : 'bg-amber-500'; ?>"></span>
+                                        <span><?php echo $post['status'] ? 'Published' : 'Draft'; ?></span>
+                                    </button>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Date -->
+                                <td class="px-4 py-3.5 text-gray-500 whitespace-nowrap text-[11px]">
+                                    <?php if ($is_trashed && !empty($post['deleted_at'])): ?>
+                                    <div class="font-bold text-rose-700"><?php echo date('M d, Y', strtotime($post['deleted_at'])); ?></div>
+                                    <div class="text-gray-400"><?php echo date('h:i A', strtotime($post['deleted_at'])); ?></div>
+                                    <?php else: ?>
+                                    <div class="font-bold text-gray-800"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></div>
+                                    <div class="text-gray-400"><?php echo date('h:i A', strtotime($post['created_at'])); ?></div>
+                                    <?php endif; ?>
+                                </td>
+
+                                <!-- Action Buttons -->
+                                <td class="px-4 py-3.5 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <?php if ($is_trashed): ?>
+                                        <!-- Actions in Trash: Restore & Force Delete -->
+                                        <button type="button" onclick="openRestoreBlogModal(<?php echo $post['id']; ?>, '<?php echo addslashes($post['title']); ?>')" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition cursor-pointer" title="Restore Post">
+                                            <i class="fa-solid fa-rotate-left text-xs"></i>
+                                        </button>
+                                        <button type="button" onclick="openForceDeleteBlogModal(<?php echo $post['id']; ?>, '<?php echo addslashes($post['title']); ?>', '<?php echo addslashes($post['image'] ?? ''); ?>')" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition cursor-pointer" title="Delete Permanently">
+                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                        </button>
+                                        <?php else: ?>
+                                        <!-- Normal Actions: View, Edit, Move to Trash -->
+                                        <a href="<?php echo htmlspecialchars($post_url); ?>" target="_blank" class="p-1.5 bg-gray-50 hover:bg-emerald-50 text-emerald-600 rounded-lg border border-gray-200 hover:border-emerald-200 transition cursor-pointer" title="View Live Post">
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                        </a>
+                                        <a href="blog-edit.php?id=<?php echo $post['id']; ?>" class="p-1.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 transition cursor-pointer" title="Edit Article">
+                                            <i class="fa-solid fa-pen text-xs"></i>
+                                        </a>
+                                        <button type="button" onclick="openTrashBlogModal(<?php echo $post['id']; ?>, '<?php echo addslashes($post['title']); ?>', '<?php echo addslashes($post['image'] ?? ''); ?>', '<?php echo date('M d, Y', strtotime($post['created_at'])); ?>')" class="p-1.5 bg-gray-50 hover:bg-rose-50 text-rose-600 rounded-lg border border-gray-200 hover:border-rose-200 transition cursor-pointer" title="Move to Trash">
+                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                            </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8" class="px-4 py-16 text-center text-gray-400">
+                                    <i class="fa-solid fa-newspaper text-4xl mb-3 block text-gray-300"></i>
+                                    <p class="text-base font-bold text-gray-700">
+                                        <?php echo $status_filter === 'trash' ? 'Trash is empty' : 'No blog posts found'; ?>
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        <?php echo $status_filter === 'trash' ? 'There are no articles in the trash.' : 'Get started by creating your very first article!'; ?>
+                                    </p>
+                                    <?php if ($status_filter !== 'trash'): ?>
+                                    <a href="blog-edit.php" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl mt-4 shadow-xs transition cursor-pointer">
+                                        <i class="fa-solid fa-pen-nib"></i> Write First Post
+                                    </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($pages > 1): ?>
+            <div class="p-4 border-t border-gray-200 flex items-center justify-between bg-gray-50/50">
+                <span class="text-xs text-gray-500 font-semibold">
+                    Page <?php echo $page; ?> of <?php echo $pages; ?>
+                </span>
+                <div class="flex items-center gap-1">
+                    <?php for ($i = 1; $i <= $pages; $i++): ?>
+                        <?php 
+                        $query_params = $_GET;
+                        $query_params['p'] = $i;
+                        $page_url = 'blogs.php?' . http_build_query($query_params);
+                        ?>
+                        <a href="<?php echo $page_url; ?>" class="px-3 py-1.5 rounded-xl text-xs font-bold transition <?php echo $i == $page ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
-    </div>
+    </form>
 
 </div>
 
 <!-- ==========================================
-     POPUP MODAL: DELETE CONFIRMATION
+     POPUP MODAL: MOVE TO TRASH CONFIRMATION
 =============================================== -->
-<div id="deleteBlogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+<div id="trashBlogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in duration-200">
         <form method="POST">
-            <input type="hidden" name="delete_post_id" id="delete_post_id_input" value="">
+            <input type="hidden" name="trash_post_id" id="trash_post_id_input" value="">
             
             <div class="p-6 text-center">
-                <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-4">
                     <i class="fa-solid fa-trash-can"></i>
                 </div>
-                <h3 class="text-base font-bold text-gray-900 mb-1">Delete Blog Article?</h3>
-                <p class="text-xs text-gray-500 mb-4">Are you sure you want to permanently delete this post? This cannot be undone.</p>
+                <h3 class="text-base font-bold text-gray-900 mb-1">Move Article to Trash?</h3>
+                <p class="text-xs text-gray-500 mb-4">This post will be hidden from the website and moved to the Trash. You can restore it anytime.</p>
                 
                 <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 text-xs text-left mb-2 flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-lg bg-gray-200 border border-gray-300 shrink-0 overflow-hidden flex items-center justify-center" id="deletePostImgBox">
+                    <div class="w-12 h-12 rounded-lg bg-gray-200 border border-gray-300 shrink-0 overflow-hidden flex items-center justify-center" id="trashPostImgBox">
                         <i class="fa-solid fa-image text-gray-400"></i>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="font-bold text-gray-900 truncate text-xs sm:text-sm" id="deletePostTitle">Post Title</div>
-                        <div class="text-[11px] text-gray-400 mt-0.5" id="deletePostDate">Date</div>
+                        <div class="font-bold text-gray-900 truncate text-xs sm:text-sm" id="trashPostTitle">Post Title</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5" id="trashPostDate">Date</div>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center justify-end gap-2 px-6 py-3.5 border-t bg-gray-50">
-                <button type="button" onclick="closeDeleteBlogModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
-                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-trash-can"></i> Yes, Delete Post
+                <button type="button" onclick="closeTrashBlogModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Move to Trash
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================
+     POPUP MODAL: RESTORE CONFIRMATION
+=============================================== -->
+<div id="restoreBlogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in duration-200">
+        <form method="POST">
+            <input type="hidden" name="restore_post_id" id="restore_post_id_input" value="">
+            
+            <div class="p-6 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-900 mb-1">Restore Blog Article?</h3>
+                <p class="text-xs text-gray-500 mb-4">This post will be restored from Trash and made accessible in your admin blog list.</p>
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs font-bold text-gray-800 text-center" id="restorePostTitle">
+                    Article Title
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 px-6 py-3.5 border-t bg-gray-50">
+                <button type="button" onclick="closeRestoreBlogModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-rotate-left"></i> Restore Article
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================
+     POPUP MODAL: PERMANENT FORCE DELETE
+=============================================== -->
+<div id="forceDeleteBlogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in duration-200">
+        <form method="POST">
+            <input type="hidden" name="force_delete_post_id" id="force_delete_post_id_input" value="">
+            
+            <div class="p-6 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-900 mb-1">Permanently Delete Article?</h3>
+                <p class="text-xs text-rose-600 font-semibold mb-4">Warning: This action cannot be undone. The article and its uploaded image will be permanently erased from the database and server.</p>
+                
+                <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 text-xs text-left mb-2 flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-lg bg-gray-200 border border-gray-300 shrink-0 overflow-hidden flex items-center justify-center" id="forceDeletePostImgBox">
+                        <i class="fa-solid fa-image text-gray-400"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-gray-900 truncate text-xs sm:text-sm" id="forceDeletePostTitle">Post Title</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 px-6 py-3.5 border-t bg-gray-50">
+                <button type="button" onclick="closeForceDeleteBlogModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Delete Permanently
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================
+     POPUP MODAL: EMPTY TRASH
+=============================================== -->
+<div id="emptyTrashModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in duration-200">
+        <form method="POST">
+            <input type="hidden" name="empty_trash" value="1">
+            
+            <div class="p-6 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-900 mb-1">Empty Entire Trash?</h3>
+                <p class="text-xs text-rose-600 font-semibold mb-4">Are you sure you want to permanently delete all <strong><?php echo $total_trash; ?></strong> articles currently in the Trash? This cannot be undone.</p>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 px-6 py-3.5 border-t bg-gray-50">
+                <button type="button" onclick="closeEmptyTrashModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
+                <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Yes, Empty Trash
                 </button>
             </div>
         </form>
@@ -393,29 +639,93 @@ function togglePostStatus(id, btn) {
     });
 }
 
-function openDeleteBlogModal(id, title, img, date) {
-    document.getElementById('delete_post_id_input').value = id;
-    document.getElementById('deletePostTitle').innerText = title;
-    document.getElementById('deletePostDate').innerText = 'Created: ' + date;
-    
-    var imgBox = document.getElementById('deletePostImgBox');
+// Select all checkboxes
+function toggleSelectAll(master) {
+    var checkboxes = document.querySelectorAll('.post-checkbox');
+    checkboxes.forEach(function(cb) {
+        cb.checked = master.checked;
+    });
+}
+
+function confirmBulkAction() {
+    var sel = document.getElementById('bulkActionSelect').value;
+    if (!sel) {
+        alert('Please choose a bulk action first.');
+        return false;
+    }
+    var checkedCount = document.querySelectorAll('.post-checkbox:checked').length;
+    if (checkedCount === 0) {
+        alert('Please select at least one article.');
+        return false;
+    }
+    if (sel === 'force_delete') {
+        return confirm('Are you sure you want to permanently delete ' + checkedCount + ' articles? This cannot be undone.');
+    }
+    return true;
+}
+
+// Trash Modal Handlers
+function openTrashBlogModal(id, title, img, date) {
+    document.getElementById('trash_post_id_input').value = id;
+    document.getElementById('trashPostTitle').innerText = title;
+    document.getElementById('trashPostDate').innerText = 'Created: ' + date;
+    var imgBox = document.getElementById('trashPostImgBox');
     if (img) {
         imgBox.innerHTML = '<img src="/' + img.replace(/^\/+/, '') + '" class="w-full h-full object-cover">';
     } else {
         imgBox.innerHTML = '<i class="fa-solid fa-image text-gray-400"></i>';
     }
-    
-    document.getElementById('deleteBlogModal').classList.remove('hidden');
+    document.getElementById('trashBlogModal').classList.remove('hidden');
 }
 
-function closeDeleteBlogModal() {
-    document.getElementById('deleteBlogModal').classList.add('hidden');
+function closeTrashBlogModal() {
+    document.getElementById('trashBlogModal').classList.add('hidden');
+}
+
+// Restore Modal Handlers
+function openRestoreBlogModal(id, title) {
+    document.getElementById('restore_post_id_input').value = id;
+    document.getElementById('restorePostTitle').innerText = title;
+    document.getElementById('restoreBlogModal').classList.remove('hidden');
+}
+
+function closeRestoreBlogModal() {
+    document.getElementById('restoreBlogModal').classList.add('hidden');
+}
+
+// Force Delete Modal Handlers
+function openForceDeleteBlogModal(id, title, img) {
+    document.getElementById('force_delete_post_id_input').value = id;
+    document.getElementById('forceDeletePostTitle').innerText = title;
+    var imgBox = document.getElementById('forceDeletePostImgBox');
+    if (img) {
+        imgBox.innerHTML = '<img src="/' + img.replace(/^\/+/, '') + '" class="w-full h-full object-cover">';
+    } else {
+        imgBox.innerHTML = '<i class="fa-solid fa-image text-gray-400"></i>';
+    }
+    document.getElementById('forceDeleteBlogModal').classList.remove('hidden');
+}
+
+function closeForceDeleteBlogModal() {
+    document.getElementById('forceDeleteBlogModal').classList.add('hidden');
+}
+
+// Empty Trash Modal Handlers
+function openEmptyTrashModal() {
+    document.getElementById('emptyTrashModal').classList.remove('hidden');
+}
+
+function closeEmptyTrashModal() {
+    document.getElementById('emptyTrashModal').classList.add('hidden');
 }
 
 // Keyboard ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        closeDeleteBlogModal();
+        closeTrashBlogModal();
+        closeRestoreBlogModal();
+        closeForceDeleteBlogModal();
+        closeEmptyTrashModal();
     }
 });
 </script>

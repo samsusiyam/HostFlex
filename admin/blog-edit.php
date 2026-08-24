@@ -178,6 +178,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_post'])) {
 if (isset($_GET['msg'])) {
     if ($_GET['msg'] === 'created') $msg = 'Post published successfully!';
     if ($_GET['msg'] === 'updated') $msg = 'Post updated successfully!';
+    if ($_GET['msg'] === 'restored') $msg = 'Post restored successfully from Trash!';
+}
+
+// Handle Move to Trash from Edit Form
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_move_trash']) && $is_edit) {
+    mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NOW() WHERE id = $post_id");
+    logActivity('Moved Post to Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $post_id . ')');
+    header("Location: blogs.php?status=trash");
+    exit;
+}
+
+// Handle Restore from Edit Form
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_restore_trash']) && $is_edit) {
+    mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NULL WHERE id = $post_id");
+    logActivity('Restored Post from Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $post_id . ')');
+    header("Location: blog-edit.php?id=$post_id&msg=restored");
+    exit;
 }
 
 // Fetch categories
@@ -223,6 +240,20 @@ $site_url = getSiteUrl();
     </div>
     <?php endif; ?>
 </div>
+
+<?php if ($is_edit && !empty($post['deleted_at'])): ?>
+<div class="bg-rose-50 border-l-4 border-rose-500 text-rose-800 px-4 py-3 rounded-lg text-sm mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+    <div class="flex items-center gap-2">
+        <i class="fa fa-trash-can text-rose-500 text-base"></i>
+        <span>This article is currently in the <strong>Trash</strong> (Moved on <?php echo date('M d, Y', strtotime($post['deleted_at'])); ?>). It is hidden from your live website.</span>
+    </div>
+    <form method="POST" class="inline">
+        <button type="submit" name="action_restore_trash" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+            <i class="fa fa-rotate-left"></i> Restore Article
+        </button>
+    </form>
+</div>
+<?php endif; ?>
 
 <?php if ($msg): ?>
 <div class="bg-green-50 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-lg text-sm mb-6 flex items-center justify-between shadow-sm">
@@ -421,9 +452,15 @@ $site_url = getSiteUrl();
 
                     <?php if ($is_edit): ?>
                     <div class="pt-2 border-t text-center">
-                        <a href="blogs.php?delete=<?php echo $post['id']; ?>" onclick="return confirm('Are you sure you want to delete this post? This action cannot be undone.')" class="text-xs text-red-600 hover:text-red-800 font-semibold">
-                            <i class="fa fa-trash-can mr-1"></i> Move to Trash
-                        </a>
+                        <?php if (!empty($post['deleted_at'])): ?>
+                        <button type="submit" name="action_restore_trash" class="text-xs text-emerald-600 hover:text-emerald-800 font-bold flex items-center justify-center gap-1 mx-auto cursor-pointer">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Restore from Trash
+                        </button>
+                        <?php else: ?>
+                        <button type="submit" name="action_move_trash" onclick="return confirm('Move this article to the Trash?')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center justify-center gap-1 mx-auto cursor-pointer">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Move to Trash
+                        </button>
+                        <?php endif; ?>
                     </div>
                     <?php endif; ?>
                 </div>

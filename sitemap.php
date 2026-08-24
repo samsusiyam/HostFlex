@@ -9,7 +9,7 @@ define('SITE_URL', $protocol . '://' . $host . $dir . '/');
 
 header('Content-Type: application/xml; charset=utf-8');
 
-$blogPosts = $conn->query("SELECT p.id, p.slug, p.created_at, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1");
+$blogPosts = $conn->query("SELECT p.id, p.slug, p.created_at, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL");
 $pages = $conn->query("SELECT slug FROM pages WHERE status = 1");
 $categories = $conn->query("SELECT slug FROM categories WHERE status = 1");
 $blogCategories = $conn->query("SELECT slug FROM blog_categories WHERE status = 1");

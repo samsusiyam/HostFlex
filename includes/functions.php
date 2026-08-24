@@ -43,6 +43,10 @@ function ensureBlogSchema() {
     if ($res && mysqli_num_rows($res) === 0) {
         mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN show_author TINYINT(1) DEFAULT 1");
     }
+    $res = mysqli_query($conn, "SHOW COLUMNS FROM blog_posts LIKE 'deleted_at'");
+    if ($res && mysqli_num_rows($res) === 0) {
+        mysqli_query($conn, "ALTER TABLE blog_posts ADD COLUMN deleted_at DATETIME DEFAULT NULL AFTER status");
+    }
 }
 
 function getReadingTime($content) {

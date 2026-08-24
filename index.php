@@ -308,7 +308,7 @@ if (empty($cards)) {
 <?php
 $blog_count = (int)($c['count'] ?? 3);
 $blog_heading = $c['heading'] ?? 'Latest Blog';
-$blog_posts = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 ORDER BY p.created_at DESC LIMIT $blog_count");
+$blog_posts = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 AND p.deleted_at IS NULL ORDER BY p.created_at DESC LIMIT $blog_count");
 if (mysqli_num_rows($blog_posts) > 0):
 ?>
 <section class="section_gap bg-white">

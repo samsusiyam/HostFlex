@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
     }
 }
 
-$categories_query = "SELECT c.*, (SELECT COUNT(*) FROM blog_posts p WHERE p.category_id = c.id) as post_count FROM blog_categories c ORDER BY c.name ASC";
+$categories_query = "SELECT c.*, (SELECT COUNT(*) FROM blog_posts p WHERE p.category_id = c.id AND p.deleted_at IS NULL) as post_count FROM blog_categories c ORDER BY c.name ASC";
 $categories = mysqli_query($conn, $categories_query);
 $total_cats = mysqli_num_rows($categories);
 ?>
