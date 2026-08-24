@@ -19,7 +19,7 @@
     <i class="fa fa-tools mr-1"></i> Maintenance Mode is ACTIVE. Visitors see a maintenance page.
 </div>
 <?php endif; ?>
-<header class="w-full h-[90px] flex items-center bg-white dark:bg-gray-900 sticky border-b top-0 left-0 right-0 z-[99999]">
+<header class="relative w-full h-[90px] flex items-center bg-white dark:bg-gray-900 sticky border-b top-0 left-0 right-0 z-[99999]">
 <div class="content flex items-center justify-between w-full">
 <a href="/"><img class="h-[50px]" src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>" /></a>
 <div class="hidden xl:flex items-center gap-6 font-normal">
@@ -46,6 +46,13 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
+
+<div class="xl:hidden w-fit ml-auto">
+<button type="button" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-100 border text-blue-600 text-xl px-3 py-2 rounded-lg cursor-pointer"><i class="fa fa-bars"></i></button>
+</div>
+</div>
+
+<!-- Full-Width Mobile Drawer -->
 <div id="mobile-nav" class="mobile-nav-drawer xl:hidden">
     <div class="flex flex-col space-y-1">
     <?php foreach ($tree as $item):
@@ -77,8 +84,38 @@ foreach ($tree as $item):
         </a>
     </div>
 </div>
-<div class="xl:hidden w-fit ml-auto">
-<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-100 border text-blue-600 text-xl px-3 py-2 rounded-lg"><i class="fa fa-bars"></i></button>
-</div>
-</div>
 </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var toggleBtn = document.getElementById("mobile-nav-toggle");
+    var mobileNav = document.getElementById("mobile-nav");
+    if (toggleBtn && mobileNav) {
+        toggleBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            var isOpen = mobileNav.classList.toggle("active");
+            toggleBtn.innerHTML = isOpen ? '<i class="fa fa-times"></i>' : '<i class="fa fa-bars"></i>';
+        });
+        document.addEventListener("click", function(e) {
+            if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+                mobileNav.classList.remove("active");
+                toggleBtn.innerHTML = '<i class="fa fa-bars"></i>';
+            }
+        });
+    }
+});
+
+function toggleMobileSubmenu(btn) {
+    var wasOpen = btn.classList.contains('open');
+    document.querySelectorAll('.mobile-dropdown-btn').forEach(function(b) {
+        b.classList.remove('open');
+        var sm = b.nextElementSibling;
+        if (sm) sm.classList.remove('open');
+    });
+    if (!wasOpen) {
+        btn.classList.add('open');
+        var sm = btn.nextElementSibling;
+        if (sm) sm.classList.add('open');
+    }
+}
+</script>

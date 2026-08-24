@@ -893,11 +893,11 @@
     max-height: 82vh;
     overflow-y: auto;
     z-index: 99999;
-    display: none;
+    display: none !important;
     animation: mobileMenuSlide 0.25s ease-out forwards;
 }
 .mobile-nav-drawer.active {
-    display: block;
+    display: block !important;
 }
 @keyframes mobileMenuSlide {
     from {
@@ -952,12 +952,12 @@
     color: #2563eb;
 }
 .mobile-sub-menu {
-    display: none;
+    display: none !important;
     padding: 4px 6px 8px 16px;
     margin: 2px 0 6px 0;
 }
 .mobile-sub-menu.open {
-    display: block;
+    display: block !important;
 }
 .mobile-sub-link {
     display: flex;
