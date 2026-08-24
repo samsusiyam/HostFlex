@@ -9,8 +9,45 @@ $success = '';
 
 // Load current configuration
 $multi_enabled = getSetting('multi_currency_enabled') !== '0';
-$base_currency = getSetting('base_currency') ?: 'BDT';
+$base_currency = strtoupper(getSetting('base_currency') ?: 'BDT');
 $currencies = getCurrenciesList();
+
+// Handle 1-Click Live Exchange Rate Auto-Sync (Google / Open Exchange API)
+if (isset($_GET['sync_live_rates']) && $_GET['sync_live_rates'] === '1') {
+    $api_res = fetchLiveExchangeRates($base_currency);
+    if ($api_res['success'] && !empty($api_res['rates'])) {
+        $rates = $api_res['rates'];
+        $synced_count = 0;
+        foreach ($currencies as $c_code => &$c_data) {
+            if ($c_code === $base_currency) {
+                $c_data['rate'] = 1.0;
+            } elseif (isset($rates[$c_code])) {
+                $c_data['rate'] = (float)$rates[$c_code];
+                $synced_count++;
+            }
+        }
+        unset($c_data);
+        $json = json_encode($currencies, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $json_esc = mysqli_real_escape_string($conn, $json);
+        mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('currencies_config', '$json_esc') ON DUPLICATE KEY UPDATE setting_value = '$json_esc'");
+        logActivity('Synced Live Currency Rates', "Live rates fetched for $base_currency ($synced_count updated)");
+        header('Location: settings-currency.php?s=3');
+        exit;
+    } else {
+        $error = 'Failed to fetch live exchange rates: ' . ($api_res['error'] ?? 'API timeout');
+    }
+}
+
+// Handle 1-Click Standard Preset Reset
+if (isset($_GET['reset_presets']) && $_GET['reset_presets'] === '1') {
+    $defaults = getDefaultCurrencies();
+    $json = json_encode($defaults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $json_esc = mysqli_real_escape_string($conn, $json);
+    mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('currencies_config', '$json_esc') ON DUPLICATE KEY UPDATE setting_value = '$json_esc'");
+    logActivity('Reset Currency Presets', 'Restored default exchange rates');
+    header('Location: settings-currency.php?s=2');
+    exit;
+}
 
 // Handle AJAX Quick Toggle Currency Status
 if (isset($_POST['ajax_toggle_currency'])) {
@@ -113,21 +150,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_currencies'])) {
     exit;
 }
 
-// Handle 1-Click Standard Preset Reset
-if (isset($_GET['reset_presets']) && $_GET['reset_presets'] === '1') {
-    $defaults = getDefaultCurrencies();
-    $json = json_encode($defaults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    $json_esc = mysqli_real_escape_string($conn, $json);
-    mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('currencies_config', '$json_esc') ON DUPLICATE KEY UPDATE setting_value = '$json_esc'");
-    logActivity('Reset Currency Presets', 'Restored default exchange rates');
-    header('Location: settings-currency.php?s=2');
-    exit;
-}
-
 $success_msg = '';
 if (isset($_GET['s'])) {
     if ($_GET['s'] === '1') $success_msg = 'Currency configuration and exchange rates saved successfully!';
-    if ($_GET['s'] === '2') $success_msg = 'Default currency presets restored successfully!';
+    if ($_GET['s'] === '2') $success_msg = 'Default standard currency presets restored successfully!';
+    if ($_GET['s'] === '3') $success_msg = '⚡ Live real-time exchange rates successfully synced and updated from online API!';
 }
 ?>
 <?php include 'header.php'; ?>
@@ -135,17 +162,21 @@ if (isset($_GET['s'])) {
 <div class="space-y-6">
 
     <!-- Header Banner -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-xs">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-xs">
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm"><i class="fa-solid fa-coins"></i></span>
                 <h1 class="text-2xl font-bold text-gray-900">Multi-Currency & Exchange Rates</h1>
             </div>
-            <p class="text-xs text-gray-500">Configure multi-currency conversion, dynamic frontend currency switchers, and real-time exchange rates.</p>
+            <p class="text-xs text-gray-500">Configure multi-currency conversion, dynamic frontend currency switchers, and real-time live exchange rate synchronization.</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- 1-Click Live Auto Sync -->
+            <a href="settings-currency.php?sync_live_rates=1" onclick="return confirm('Fetch and apply real-time live exchange rates from the global online exchange API?')" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-bolt text-amber-300"></i> Sync Live Rates (Auto)
+            </a>
             <a href="settings-currency.php?reset_presets=1" onclick="return confirm('Restore default standard exchange rate presets?')" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
-                <i class="fa-solid fa-rotate-left"></i> Restore Standard Presets
+                <i class="fa-solid fa-rotate-left"></i> Restore Presets
             </a>
             <button type="button" onclick="openAddCurrencyModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid fa-plus"></i> Add New Currency
@@ -153,7 +184,7 @@ if (isset($_GET['s'])) {
         </div>
     </div>
 
-    <!-- Alert -->
+    <!-- Alert / Messages -->
     <?php if ($success_msg): ?>
     <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between bg-emerald-50 text-emerald-800 border border-emerald-200">
         <div class="flex items-center gap-2">
@@ -163,6 +194,32 @@ if (isset($_GET['s'])) {
         <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
     </div>
     <?php endif; ?>
+
+    <?php if ($error): ?>
+    <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between bg-rose-50 text-rose-800 border border-rose-200">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm"></i>
+            <span><?php echo htmlspecialchars($error); ?></span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    <?php endif; ?>
+
+    <!-- Human Explanation Card -->
+    <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs">
+        <div class="flex items-start gap-3">
+            <span class="p-2 bg-blue-600 text-white rounded-xl text-xs shrink-0 mt-0.5"><i class="fa-solid fa-lightbulb"></i></span>
+            <div>
+                <strong class="text-blue-900 block font-bold text-sm mb-0.5">How Exchange Rates Work (বিনিময় হার সহজ ব্যাখ্যা):</strong>
+                <p class="text-blue-800 leading-relaxed">
+                    সব প্ল্যানের মূল দাম ডাটাবেজে <strong>Base Currency (<?php echo htmlspecialchars($base_currency); ?>)</strong> হিসেবে সংরক্ষিত থাকে। 
+                    অন্য কোনো কারেন্সিতে কনভার্ট করতে ফর্মুলা: <code class="bg-blue-100 px-1.5 py-0.5 rounded font-mono text-blue-900 font-bold">Target Price = Base Amount × Rate</code>।
+                    <br>
+                    <span class="text-blue-700">যেমন: ১ ডলার = ১২২ টাকা হলে, BDT বেস কারেন্সিতে USD এর Rate হবে: <code class="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">1 ÷ 122 = 0.00819</code>। অথবা সরাসরি <strong>'Sync Live Rates'</strong> বাটনে ক্লিক করলে ইন্টারনেট থেকে সঠিক রেট স্বয়ংক্রিয়ভাবে আপডেট হয়ে যাবে।</span>
+                </p>
+            </div>
+        </div>
+    </div>
 
     <form method="POST" class="space-y-6">
 
@@ -205,10 +262,10 @@ if (isset($_GET['s'])) {
 
         <!-- Currencies Table Card -->
         <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                     <h3 class="text-sm font-bold text-gray-900">Configured Currencies & Conversion Rates</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Rates represent: <strong>1 <?php echo htmlspecialchars($base_currency); ?> = X Target Currency</strong>.</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Rate Multiplier: <strong>1 <?php echo htmlspecialchars($base_currency); ?> = X Target Currency</strong>.</p>
                 </div>
                 <span class="text-xs bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full border border-blue-200">
                     <?php echo count($currencies); ?> Currencies Configured
@@ -222,8 +279,9 @@ if (isset($_GET['s'])) {
                             <th class="py-3.5 px-6">Currency</th>
                             <th class="py-3.5 px-4">Symbol</th>
                             <th class="py-3.5 px-4">Name</th>
-                            <th class="py-3.5 px-4">Rate (1 <?php echo htmlspecialchars($base_currency); ?> =)</th>
-                            <th class="py-3.5 px-4">Quick Converter Preview</th>
+                            <th class="py-3.5 px-4">Multiplier (1 <?php echo htmlspecialchars($base_currency); ?> =)</th>
+                            <th class="py-3.5 px-4">Market Value</th>
+                            <th class="py-3.5 px-4">1,000 <?php echo htmlspecialchars($base_currency); ?> Plan</th>
                             <th class="py-3.5 px-4 text-center">Status</th>
                             <th class="py-3.5 px-4 text-right">Action</th>
                         </tr>
@@ -232,6 +290,7 @@ if (isset($_GET['s'])) {
                         <?php foreach ($currencies as $c): 
                             $is_base = ($c['code'] === $base_currency);
                             $enabled = !empty($c['enabled']);
+                            $rate_val = (float)($c['rate'] ?? 1.0);
                         ?>
                         <tr class="hover:bg-gray-50/50 transition">
                             <td class="py-3.5 px-6 font-bold text-gray-900">
@@ -244,7 +303,7 @@ if (isset($_GET['s'])) {
                                             <input type="hidden" name="curr_code[]" value="<?php echo htmlspecialchars($c['code']); ?>">
                                             <span class="font-extrabold text-xs text-gray-900"><?php echo htmlspecialchars($c['code']); ?></span>
                                             <?php if ($is_base): ?>
-                                            <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Base Currency</span>
+                                             <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Base</span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -254,18 +313,35 @@ if (isset($_GET['s'])) {
                                 <input type="text" name="curr_symbol[]" value="<?php echo htmlspecialchars($c['symbol']); ?>" class="w-16 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-center font-bold text-gray-800 focus:border-blue-500 outline-none">
                             </td>
                             <td class="py-3.5 px-4">
-                                <input type="text" name="curr_name[]" value="<?php echo htmlspecialchars($c['name']); ?>" class="w-44 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-800 focus:border-blue-500 outline-none">
+                                <input type="text" name="curr_name[]" value="<?php echo htmlspecialchars($c['name']); ?>" class="w-40 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs text-gray-800 focus:border-blue-500 outline-none">
                             </td>
                             <td class="py-3.5 px-4">
                                 <div class="flex items-center gap-1.5">
-                                    <input type="number" step="0.000001" min="0.000001" name="curr_rate[]" value="<?php echo (float)$c['rate']; ?>" <?php echo $is_base ? 'readonly' : ''; ?> class="w-28 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-gray-800 focus:border-blue-500 outline-none <?php echo $is_base ? 'bg-gray-100 text-gray-500' : ''; ?>">
+                                    <input type="number" step="0.000001" min="0.000001" name="curr_rate[]" id="rate_<?php echo $c['code']; ?>" value="<?php echo (float)$c['rate']; ?>" <?php echo $is_base ? 'readonly' : ''; ?> class="w-28 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-gray-800 focus:border-blue-500 outline-none <?php echo $is_base ? 'bg-gray-100 text-gray-500' : ''; ?>">
                                 </div>
                             </td>
-                            <td class="py-3.5 px-4 font-mono font-semibold text-gray-700 text-xs">
+                            <!-- Market Value Badge -->
+                            <td class="py-3.5 px-4">
+                                <?php if ($is_base): ?>
+                                <span class="text-xs text-gray-400 font-semibold">1.00 (Base)</span>
+                                <?php elseif ($rate_val > 0): ?>
+                                    <?php if ($rate_val < 1.0): ?>
+                                    <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg font-mono font-bold text-[11px] border border-emerald-200">
+                                        1 <?php echo $c['code']; ?> ≈ <?php echo round(1 / $rate_val, 2); ?> <?php echo $base_currency; ?>
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg font-mono font-bold text-[11px] border border-blue-200">
+                                        1 <?php echo $base_currency; ?> ≈ <?php echo round($rate_val, 2); ?> <?php echo $c['code']; ?>
+                                    </span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                            <!-- Preview 1000 BDT plan -->
+                            <td class="py-3.5 px-4 font-mono font-bold text-gray-900 text-xs">
                                 <?php 
                                     $sample_base = 1000;
                                     $sample_conv = convertPriceAmount($sample_base, $c);
-                                    echo htmlspecialchars($c['symbol']) . ' ' . $sample_conv . ' <span class="text-[10px] text-gray-400 font-sans font-normal">(' . $base_currency . ' ' . $sample_base . ')</span>';
+                                    echo htmlspecialchars($c['symbol']) . ' ' . $sample_conv;
                                 ?>
                             </td>
                             <td class="py-3.5 px-4 text-center">
@@ -289,9 +365,9 @@ if (isset($_GET['s'])) {
                 </table>
             </div>
 
-            <div class="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+            <div class="p-6 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-gray-500">Changes to exchange rates take effect instantly on all frontend plan cards, domain lookups, and pricing tables.</p>
-                <button type="submit" name="save_currencies" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-xs transition flex items-center gap-2 text-xs cursor-pointer">
+                <button type="submit" name="save_currencies" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-xs transition flex items-center gap-2 text-xs cursor-pointer w-full sm:w-auto justify-center">
                     <i class="fa-solid fa-floppy-disk"></i> Save Currency Settings & Rates
                 </button>
             </div>
@@ -315,11 +391,11 @@ if (isset($_GET['s'])) {
         <form method="POST" class="space-y-4 text-xs">
             <div>
                 <label class="block font-bold text-gray-700 mb-1">Currency Code (ISO 3-Letter)</label>
-                <input type="text" name="new_code" required placeholder="e.g. AUD, CAD, JPY" maxlength="5" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs font-bold uppercase focus:ring-1 focus:ring-emerald-500 outline-none">
+                <input type="text" name="new_code" required placeholder="e.g. AUD, CAD, JPY, MYR" maxlength="5" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs font-bold uppercase focus:ring-1 focus:ring-emerald-500 outline-none">
             </div>
             <div>
                 <label class="block font-bold text-gray-700 mb-1">Currency Symbol</label>
-                <input type="text" name="new_symbol" required placeholder="e.g. A$, CA$, ¥" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-emerald-500 outline-none">
+                <input type="text" name="new_symbol" required placeholder="e.g. A$, CA$, ¥, RM" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-emerald-500 outline-none">
             </div>
             <div>
                 <label class="block font-bold text-gray-700 mb-1">Currency Name</label>
@@ -353,29 +429,28 @@ if (isset($_GET['s'])) {
 function openAddCurrencyModal() {
     document.getElementById('addCurrencyModal').classList.remove('hidden');
 }
+
 function closeAddCurrencyModal() {
     document.getElementById('addCurrencyModal').classList.add('hidden');
 }
 
 function ajaxToggleCurrency(code, checkbox) {
-    var formData = new FormData();
-    formData.append('ajax_toggle_currency', '1');
-    formData.append('code', code);
-
+    const isChecked = checkbox.checked;
     fetch('settings-currency.php', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'ajax_toggle_currency=1&code=' + encodeURIComponent(code)
     })
     .then(r => r.json())
-    .then(res => {
-        if (!res.success) {
-            checkbox.checked = !checkbox.checked;
+    .then(data => {
+        if (!data.success) {
+            checkbox.checked = !isChecked;
             alert('Failed to update currency status.');
         }
     })
     .catch(() => {
-        checkbox.checked = !checkbox.checked;
-        alert('Connection error.');
+        checkbox.checked = !isChecked;
+        alert('Server error.');
     });
 }
 </script>

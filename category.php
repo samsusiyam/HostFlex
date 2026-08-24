@@ -67,16 +67,33 @@ $product_schema = [
 <p class="text-gray-600 mt-1">Honest and affordable pricing model to help you get started easily.</p>
 </div>
 
-<!-- Pricing Switcher Box matching reference -->
-<div class="flex justify-center w-full md:w-auto">
-<div class="pricing-toggle-box">
-    <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=false; toggleBillingSwitch(false);">Monthly</span>
-    <label class="custom-switch">
-        <input type="checkbox" id="pricingSwitch" onchange="toggleBillingSwitch(this.checked)">
-        <span class="slider"></span>
-    </label>
-    <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=true; toggleBillingSwitch(true);">Annually</span>
-</div>
+<!-- Pricing Switcher Box matching reference & Currency Selector -->
+<?php 
+$active_currencies = getActiveCurrencies();
+$multi_curr_enabled = isMultiCurrencyEnabled() && count($active_currencies) > 1;
+?>
+<div class="flex flex-col sm:flex-row items-center justify-center md:justify-end gap-3 w-full md:w-auto">
+    <div class="pricing-toggle-box">
+        <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=false; toggleBillingSwitch(false);">Monthly</span>
+        <label class="custom-switch">
+            <input type="checkbox" id="pricingSwitch" onchange="toggleBillingSwitch(this.checked)">
+            <span class="slider"></span>
+        </label>
+        <span class="toggle-label" onclick="document.getElementById('pricingSwitch').checked=true; toggleBillingSwitch(true);">Annually</span>
+    </div>
+
+    <?php if ($multi_curr_enabled): ?>
+    <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3.5 py-2 shadow-xs text-xs font-bold text-gray-700">
+        <span class="text-gray-400 uppercase text-[10px] tracking-wider flex items-center gap-1"><i class="fa-solid fa-coins text-blue-600"></i> Currency:</span>
+        <select onchange="window.location.href=this.value" class="bg-transparent font-extrabold text-blue-600 focus:outline-none cursor-pointer pr-1">
+            <?php foreach ($active_currencies as $c_code => $c_item): ?>
+            <option value="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" <?php echo $user_curr['code'] === $c_code ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?>
+            </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php endif; ?>
 </div>
 </div>
 

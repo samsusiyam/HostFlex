@@ -619,3 +619,51 @@ function formatCurrencyPrice($base_amount, $target_currency = null) {
     return $sym . ' ' . $converted;
 }
 
+function getCurrencySwitchUrl($code) {
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    $parts = parse_url($uri);
+    $path = $parts['path'] ?? '/';
+    $query_params = [];
+    if (!empty($parts['query'])) {
+        parse_str($parts['query'], $query_params);
+    }
+    $query_params['currency'] = strtoupper(trim($code));
+    return $path . '?' . http_build_query($query_params);
+}
+
+function fetchLiveExchangeRates($base = null) {
+    if (!$base) {
+        $base = strtoupper(getSetting('base_currency') ?: 'BDT');
+    }
+    
+    $urls = [
+        "https://open.er-api.com/v6/latest/$base",
+        "https://api.exchangerate-api.com/v4/latest/$base"
+    ];
+    
+    foreach ($urls as $url) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'HostNibo-CurrencySync/1.0');
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        if ($res) {
+            $data = json_decode($res, true);
+            if (isset($data['rates']) && is_array($data['rates'])) {
+                return [
+                    'success' => true,
+                    'base' => $base,
+                    'rates' => $data['rates'],
+                    'time' => $data['time_last_update_utc'] ?? date('Y-m-d H:i:s')
+                ];
+            }
+        }
+    }
+    
+    return ['success' => false, 'error' => 'Unable to connect to live exchange rates service.'];
+}
+
+
