@@ -12,6 +12,10 @@ RewriteEngine On
 
 # SEO 301 Redirects (from direct query URLs to clean URLs)
 <IfModule mod_rewrite.c>
+  # 301 Redirect /index.php to root /
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php(\?|\s) [NC]
+  RewriteRule ^index\.php$ / [R=301,L]
+
   RewriteCond %{THE_REQUEST} \s/+category\.php\?slug=([a-zA-Z0-9_-]+)\s [NC]
   RewriteRule ^category\.php$ /category/%1? [R=301,L]
 

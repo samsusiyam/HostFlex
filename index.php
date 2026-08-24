@@ -1,4 +1,14 @@
-<?php require_once 'config/database.php'; require_once 'includes/functions.php'; checkMaintenance();
+<?php 
+require_once 'config/database.php'; 
+require_once 'includes/functions.php'; 
+checkMaintenance();
+
+if (isset($_SERVER['REQUEST_URI']) && preg_match('#/index\.php(\?|$)#i', $_SERVER['REQUEST_URI'])) {
+    $qs = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: /" . $qs);
+    exit;
+}
 
 // Load homepage sections
 $homepage_sections_raw = getSetting('homepage_sections');
