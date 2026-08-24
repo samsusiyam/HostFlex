@@ -50,16 +50,26 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 
 <?php if ($multi_curr_enabled): ?>
-<!-- Desktop Simple Minimal Currency Selector -->
-<div class="relative inline-flex items-center">
-    <select onchange="window.location.href=this.value" class="appearance-none bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-gray-800 text-xs font-bold py-2 pl-3 pr-7 rounded-xl cursor-pointer outline-none focus:border-blue-500 transition shadow-2xs">
+<!-- Desktop Custom Currency Dropdown -->
+<div class="relative" id="desktopCurrencyWrapper">
+    <button type="button" onclick="toggleCurrencyMenu('desktopCurrencyDropdown')" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-800 transition cursor-pointer shadow-2xs">
+        <span class="text-blue-600 font-extrabold"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
+        <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
+        <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
+    </button>
+    <div id="desktopCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-40 bg-white border border-gray-100 rounded-2xl shadow-xl p-1.5 z-[999999] animate-fadeIn">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <option value="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" <?php echo $user_curr['code'] === $c_code ? 'selected' : ''; ?>>
-            <?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?>
-        </option>
+        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'; ?>">
+            <span class="flex items-center gap-2">
+                <span class="w-5 text-center text-blue-600 font-extrabold"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
+                <span><?php echo htmlspecialchars($c_code); ?></span>
+            </span>
+            <?php if ($user_curr['code'] === $c_code): ?>
+            <i class="fa-solid fa-check text-[10px] text-blue-600"></i>
+            <?php endif; ?>
+        </a>
         <?php endforeach; ?>
-    </select>
-    <i class="fa fa-chevron-down text-[9px] text-gray-400 absolute right-2.5 pointer-events-none"></i>
+    </div>
 </div>
 <?php endif; ?>
 
@@ -99,16 +109,26 @@ foreach ($tree as $item):
 <!-- Mobile Right Side Header Action Buttons -->
 <div class="xl:hidden flex items-center gap-2 ml-auto">
 <?php if ($multi_curr_enabled): ?>
-<!-- Mobile Simple Minimal Currency Selector in Header -->
-<div class="relative inline-flex items-center">
-    <select onchange="window.location.href=this.value" class="appearance-none bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-bold py-1.5 pl-2.5 pr-6 rounded-lg cursor-pointer outline-none focus:border-blue-500 transition">
+<!-- Mobile Custom Currency Dropdown in Topbar -->
+<div class="relative" id="mobileCurrencyWrapper">
+    <button type="button" onclick="toggleCurrencyMenu('mobileCurrencyDropdown')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-800 transition cursor-pointer">
+        <span class="text-blue-600 font-extrabold"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
+        <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
+        <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
+    </button>
+    <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-36 bg-white border border-gray-100 rounded-2xl shadow-2xl p-1.5 z-[999999] animate-fadeIn">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <option value="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" <?php echo $user_curr['code'] === $c_code ? 'selected' : ''; ?>>
-            <?php echo htmlspecialchars($c_item['symbol'] . ' ' . $c_code); ?>
-        </option>
+        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'; ?>">
+            <span class="flex items-center gap-2">
+                <span class="w-4 text-center text-blue-600 font-extrabold"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
+                <span><?php echo htmlspecialchars($c_code); ?></span>
+            </span>
+            <?php if ($user_curr['code'] === $c_code): ?>
+            <i class="fa-solid fa-check text-[10px] text-blue-600"></i>
+            <?php endif; ?>
+        </a>
         <?php endforeach; ?>
-    </select>
-    <i class="fa fa-chevron-down text-[8px] text-gray-400 absolute right-2 pointer-events-none"></i>
+    </div>
 </div>
 <?php endif; ?>
 
@@ -117,3 +137,30 @@ foreach ($tree as $item):
 
 </div>
 </header>
+
+<script>
+function toggleCurrencyMenu(id) {
+    var target = document.getElementById(id);
+    if (!target) return;
+    var isHidden = target.classList.contains('hidden');
+    // close both
+    var d = document.getElementById('desktopCurrencyDropdown');
+    var m = document.getElementById('mobileCurrencyDropdown');
+    if (d) d.classList.add('hidden');
+    if (m) m.classList.add('hidden');
+    if (isHidden) {
+        target.classList.remove('hidden');
+    }
+}
+
+document.addEventListener('click', function(e) {
+    var dWrap = document.getElementById('desktopCurrencyWrapper');
+    var mWrap = document.getElementById('mobileCurrencyWrapper');
+    if ((!dWrap || !dWrap.contains(e.target)) && (!mWrap || !mWrap.contains(e.target))) {
+        var d = document.getElementById('desktopCurrencyDropdown');
+        var m = document.getElementById('mobileCurrencyDropdown');
+        if (d) d.classList.add('hidden');
+        if (m) m.classList.add('hidden');
+    }
+});
+</script>
