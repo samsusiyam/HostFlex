@@ -16,51 +16,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('$s_key', '$s_value')");
         }
     }
+    $state = ($_POST['maintenance_mode'] ?? '0') === '1' ? 'Enabled' : 'Disabled';
+    logActivity('Updated Maintenance Mode', "Status: $state");
     header('Location: settings-maintenance.php?s=1');
     exit;
 }
-if (isset($_GET['s'])) {
-    $success = 'Maintenance settings saved!';
-}
+
+$success = isset($_GET['s']) ? 'Maintenance mode settings saved!' : '';
 $settings_result = mysqli_query($conn, "SELECT * FROM settings ORDER BY setting_key");
-$s = []; while ($row = mysqli_fetch_assoc($settings_result)) { $s[$row['setting_key']] = $row['setting_value']; }
+$s = []; 
+while ($row = mysqli_fetch_assoc($settings_result)) { 
+    $s[$row['setting_key']] = $row['setting_value']; 
+}
 $is_active = ($s['maintenance_mode'] ?? '0') === '1';
 ?>
 <?php include 'header.php'; ?>
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Maintenance Mode</h1>
-    <p class="text-gray-500">Enable maintenance mode to temporarily hide your website from visitors</p>
-</div>
-<?php if (isset($success)): ?><div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"><?php echo $success; ?></div><?php endif; ?>
 
-<?php if ($is_active): ?>
-<div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4 flex items-center gap-2">
-    <i class="fa fa-exclamation-triangle"></i> <strong>Maintenance mode is currently ACTIVE.</strong> Visitors will see the maintenance page. Admin users can still access the site.
-</div>
-<?php endif; ?>
-
-<form method="POST">
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <div class="flex items-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="hidden" name="maintenance_mode" value="0">
-                <input type="checkbox" name="maintenance_mode" value="1" <?php echo $is_active ? 'checked' : ''; ?> class="sr-only peer" id="maintenanceToggle">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
-                <span class="ms-3 text-sm font-medium text-gray-700">Enable Maintenance Mode</span>
-            </label>
-        </div>
-        <div class="grid grid-cols-1 gap-4 max-w-2xl">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Page Title (Browser Tab)</label>
-                <input type="text" name="maintenance_title" value="<?php echo htmlspecialchars($s['maintenance_title'] ?? 'Under Maintenance'); ?>" class="w-full border rounded px-3 py-2">
+<div class="space-y-6">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-xs">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="p-2 bg-orange-50 text-orange-600 rounded-lg text-sm"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                <h1 class="text-2xl font-bold text-gray-900">Maintenance Mode</h1>
             </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Heading</label>
-                <input type="text" name="maintenance_heading" value="<?php echo htmlspecialchars($s['maintenance_heading'] ?? "We'll be back soon!"); ?>" class="w-full border rounded px-3 py-2">
-            </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                <textarea name="maintenance_message" rows="4" class="w-full border rounded px-3 py-2"><?php echo htmlspecialchars($s['maintenance_message'] ?? 'Our website is currently undergoing scheduled maintenance. Please check back later.'); ?></textarea>
-            </div>
+            <p class="text-xs text-gray-500">Temporarily redirect non-admin visitors to an under-maintenance landing page during system upgrades.</p>
         </div>
     </div>
-    <button type="submit" name="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"><i class="fa fa-save"></i> Save Settings</button>
-</form>
+
+    <!-- Alert Notification -->
+    <?php if ($success): ?>
+    <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
+            <span><?php echo htmlspecialchars($success); ?></span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($is_active): ?>
+    <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 flex items-center gap-3 text-xs font-semibold shadow-xs">
+        <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm shrink-0">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+            <strong class="block text-amber-950 font-bold">Maintenance mode is currently ACTIVE!</strong>
+            <span class="text-amber-800/90">Public visitors see your maintenance message. Logged-in administrators retain full access.</span>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <form method="POST" class="space-y-6">
+        
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6 space-y-6 text-xs max-w-2xl">
+            
+            <!-- Toggle Switch -->
+            <div class="p-4 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-900">Enable Maintenance Mode</h3>
+                    <p class="text-[11px] text-gray-500 mt-0.5">Toggle site offline status for visitors</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="maintenance_mode" value="0">
+                    <input type="checkbox" name="maintenance_mode" value="1" <?php echo $is_active ? 'checked' : ''; ?> class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                </label>
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-700 mb-1">Browser Tab Title</label>
+                <input type="text" name="maintenance_title" value="<?php echo htmlspecialchars($s['maintenance_title'] ?? 'Under Maintenance - Host Nibo'); ?>" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-amber-500 focus:border-amber-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-700 mb-1">Page Heading</label>
+                <input type="text" name="maintenance_heading" value="<?php echo htmlspecialchars($s['maintenance_heading'] ?? "We'll Be Back Shortly! 🚀"); ?>" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-amber-500 focus:border-amber-500 outline-none font-bold">
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-700 mb-1">Visitor Notice Message</label>
+                <textarea name="maintenance_message" rows="4" class="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-1 focus:ring-amber-500 focus:border-amber-500 outline-none leading-relaxed"><?php echo htmlspecialchars($s['maintenance_message'] ?? 'Our platform is currently undergoing scheduled infrastructure upgrades. We apologize for any inconvenience.'); ?></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" name="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-xs transition flex items-center gap-2 text-xs cursor-pointer">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Maintenance Settings
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
 <?php include 'footer.php'; ?>

@@ -1,75 +1,242 @@
 <?php
-$page_title = 'Settings';
+$page_title = 'Settings Hub';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 ?>
 <?php include 'header.php'; ?>
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800"><i class="fa fa-cog text-blue-600 mr-2"></i> Settings</h1>
-    <p class="text-gray-500">Manage your website configuration</p>
+
+<div class="space-y-6">
+    
+    <!-- Page Header & Search -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-xs">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg text-sm"><i class="fa-solid fa-sliders"></i></span>
+                <h1 class="text-2xl font-bold text-gray-900">Settings & Configuration</h1>
+            </div>
+            <p class="text-xs text-gray-500">Centralized control center for branding, integrations, SEO, communications, and system security.</p>
+        </div>
+        <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input type="text" id="settingsSearchInput" onkeyup="filterSettingsCards(this.value)" placeholder="Search any setting..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-xs text-gray-800 focus:bg-white focus:outline-none focus:border-blue-600 transition">
+        </div>
+    </div>
+
+    <!-- Settings Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="settingsGrid">
+        
+        <!-- 1. General -->
+        <a href="settings-general.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-blue-300 transition group flex flex-col justify-between" data-name="general site name tagline currency contact email phone">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-globe"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition">General Settings</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Site title, description, phone, email address, and currency symbol configuration.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 2. Branding & Logos -->
+        <a href="settings-branding.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition group flex flex-col justify-between" data-name="branding logo favicon dark light theme header footer logo">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-emerald-600 transition">Logo & Branding</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Header logo, footer logo, favicon (.ico/.png), and branding preview.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-emerald-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 3. Homepage Editor -->
+        <a href="settings-homepage.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-purple-300 transition group flex flex-col justify-between" data-name="homepage hero features cta sections sort order home banner">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-house-laptop"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-purple-600 transition">Homepage Customizer</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Customize hero banner, features grid, promo section, and CTA banners.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-purple-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 4. WHMCS Integration -->
+        <a href="settings-whmcs.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-indigo-300 transition group flex flex-col justify-between" data-name="whmcs billing client area cart register login domain check">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition">WHMCS Integration</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Client login, shopping cart, registration, and domain lookup WHMCS URLs.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-indigo-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 5. SMTP Mail Server -->
+        <a href="settings-smtp.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-amber-300 transition group flex flex-col justify-between" data-name="smtp email mail server gmail mailgun cpanel test email">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-amber-600 transition">SMTP Mail Server</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Configure outgoing SMTP host, port, authentication, and dispatch test emails.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-amber-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 6. Notice Popup & Social FAB -->
+        <a href="settings-popup.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-yellow-300 transition group flex flex-col justify-between" data-name="popup modal notice banner floating fab whatsapp telegram social">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-yellow-600 transition">Popup Notice & FAB</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Promotional popups, WhatsApp/Telegram floating action buttons.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-yellow-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 7. SEO & Schemas -->
+        <a href="settings-seo.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-slate-300 transition group flex flex-col justify-between" data-name="seo meta title description keywords google opengraph sitemap">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-slate-800 transition">Global SEO & Meta</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Global meta title, description, keywords, OpenGraph images, and search previews.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-slate-700 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 8. Integrations & Chat -->
+        <a href="settings-integrations.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-teal-300 transition group flex flex-col justify-between" data-name="integrations analytics pixel ga4 tawk crisp onesignal recaptcha">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-teal-600 transition">Integrations & Scripts</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Google Analytics 4, FB Pixel, Tawk.to, Crisp live chat, and reCAPTCHA keys.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-teal-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 9. Security & Access Slug -->
+        <a href="settings-security.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-rose-300 transition group flex flex-col justify-between" data-name="security access slug secret url login protection lock">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-rose-600 transition">Security & Admin Slug</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Secret access token parameter, IP access rules, and brute-force defenses.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-rose-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 10. Maintenance Mode -->
+        <a href="settings-maintenance.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-orange-300 transition group flex flex-col justify-between" data-name="maintenance mode offline under construction lock">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-orange-600 transition">Maintenance Mode</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Toggle site offline for upgrades with customized maintenance message and timer.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-orange-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 11. Blog Permalinks -->
+        <a href="settings-permalinks.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-cyan-300 transition group flex flex-col justify-between" data-name="permalinks blog url structure routing slug post_name">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-cyan-600 transition">Blog Permalinks</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Configure URL structure format for blog posts and article routing.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-cyan-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 12. Contact Page -->
+        <a href="settings-contact.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-pink-300 transition group flex flex-col justify-between" data-name="contact page heading subheading recaptcha inquiry">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-pink-600 transition">Contact Page</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Contact heading, subtitle text, and form protection options.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-pink-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+        <!-- 13. Footer Settings -->
+        <a href="settings-footer.php" class="setting-card bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md hover:border-blue-300 transition group flex flex-col justify-between" data-name="footer copyright description links">
+            <div>
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-shoe-prints"></i>
+                </div>
+                <h3 class="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition">Footer Content</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2">Copyright notices, description text, and footer quick links.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+                <span>Configure</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition"></i>
+            </div>
+        </a>
+
+    </div>
+
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <a href="settings-general.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-blue-100 p-3 rounded-lg"><i class="fa fa-globe text-blue-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">General</h3><p class="text-sm text-gray-500">Site name, tagline, contact info</p></div>
-        </div>
-    </a>
-    <a href="settings-branding.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-green-100 p-3 rounded-lg"><i class="fa fa-image text-green-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Logo & Branding</h3><p class="text-sm text-gray-500">Header/footer logos, description</p></div>
-        </div>
-    </a>
-    <a href="settings-homepage.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-purple-100 p-3 rounded-lg"><i class="fa fa-home text-purple-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Homepage Editor</h3><p class="text-sm text-gray-500">Hero, features, CTA sections</p></div>
-        </div>
-    </a>
-    <a href="settings-whmcs.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-indigo-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-indigo-100 p-3 rounded-lg"><i class="fa fa-link text-indigo-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">WHMCS Integration</h3><p class="text-sm text-gray-500">Domain & client area URLs</p></div>
-        </div>
-    </a>
-    <a href="settings-popup.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-yellow-100 p-3 rounded-lg"><i class="fa fa-bell text-yellow-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Popup & Social</h3><p class="text-sm text-gray-500">Notice, WhatsApp, Telegram, FAB</p></div>
-        </div>
-    </a>
-    <a href="settings-contact.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-pink-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-pink-100 p-3 rounded-lg"><i class="fa fa-envelope text-pink-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Contact Page</h3><p class="text-sm text-gray-500">Heading, subheading text</p></div>
-        </div>
-    </a>
-    <a href="settings-seo.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-gray-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-gray-100 p-3 rounded-lg"><i class="fa fa-search text-gray-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">SEO</h3><p class="text-sm text-gray-500">Meta keywords, author</p></div>
-        </div>
-    </a>
-    <a href="settings-integrations.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-teal-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-teal-100 p-3 rounded-lg"><i class="fa fa-puzzle-piece text-teal-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Integrations</h3><p class="text-sm text-gray-500">Custom code, OneSignal, Tawk.to, Crisp, reCAPTCHA</p></div>
-        </div>
-    </a>
-    <a href="settings-maintenance.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-orange-100 p-3 rounded-lg"><i class="fa fa-shield-alt text-orange-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Maintenance</h3><p class="text-sm text-gray-500">Maintenance mode, title, message</p></div>
-        </div>
-    </a>
-    <a href="settings-footer.php" class="bg-white rounded-lg shadow p-6 border-l-4 border-cyan-500 hover:shadow-lg transition hover:-translate-y-0.5">
-        <div class="flex items-center gap-4">
-            <div class="bg-cyan-100 p-3 rounded-lg"><i class="fa fa-shoe-prints text-cyan-600 text-xl"></i></div>
-            <div><h3 class="font-semibold text-gray-800">Footer</h3><p class="text-sm text-gray-500">Copyright, footer description</p></div>
-        </div>
-    </a>
-</div>
+<script>
+function filterSettingsCards(q) {
+    q = q.trim().toLowerCase();
+    document.querySelectorAll('.setting-card').forEach(card => {
+        var name = card.dataset.name || '';
+        if (!q || name.includes(q)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+
 <?php include 'footer.php'; ?>
