@@ -881,18 +881,25 @@
 }
 
 /* Mobile Menu UI/UX Overhaul */
+@media (max-width: 1279px) {
+    .desktop-nav-menu,
+    .hidden.xl\:flex {
+        display: none !important;
+    }
+}
+
 .mobile-nav-drawer {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
-    background: #ffffff;
+    background: #ffffff !important;
     border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15) !important;
     padding: 16px 20px 24px;
     max-height: 82vh;
     overflow-y: auto;
-    z-index: 99999;
+    z-index: 999999 !important;
     display: none !important;
     animation: mobileMenuSlide 0.25s ease-out forwards;
 }
