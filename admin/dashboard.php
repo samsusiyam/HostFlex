@@ -1,210 +1,266 @@
 <?php
-$page_title = 'Dashboard';
+$page_title = 'Admin Dashboard';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$total_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans"))['c'];
-$active_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans WHERE status=1"))['c'];
-$total_offers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM offers"))['c'];
-$total_contacts = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM contacts"))['c'];
+$total_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans"))['c'] ?? 0;
+$active_plans = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM hosting_plans WHERE status=1"))['c'] ?? 0;
+$total_offers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM offers"))['c'] ?? 0;
+$total_contacts = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM contacts"))['c'] ?? 0;
 $unread_contacts = getUnreadContacts();
 $recent_contacts = mysqli_query($conn, "SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5");
-$total_blog = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts"))['c'];
-$total_subscribers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM subscribers"))['c'];
-$total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM users"))['c'];
-$total_pages = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM pages"))['c'];
+$total_blog = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts"))['c'] ?? 0;
+$total_subscribers = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM subscribers"))['c'] ?? 0;
+$total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM users"))['c'] ?? 0;
+$total_pages = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM pages"))['c'] ?? 0;
 $total_categories = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM categories"))['c'] ?? 0;
 ?>
 <?php include 'header.php'; ?>
-<div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
-    <p class="text-gray-500">Welcome back, <?php echo $_SESSION['admin_username']; ?>!</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Total Plans</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_plans; ?></h3>
+
+<div class="space-y-6">
+    
+    <!-- Welcome Header -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg text-sm"><i class="fa-solid fa-chart-pie"></i></span>
+                <h1 class="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
             </div>
-            <div class="bg-blue-100 p-3 rounded-full"><i class="fa fa-server text-blue-600 text-xl"></i></div>
+            <p class="text-xs text-gray-500">Welcome back, <strong><?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?></strong>! Here is what's happening on your website.</p>
         </div>
-        <p class="text-green-600 text-sm mt-2"><?php echo $active_plans; ?> active</p>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a href="/" target="_blank" class="w-full sm:w-auto text-center bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
+                <i class="fa-solid fa-external-link mr-1"></i> Live Site
+            </a>
+            <a href="settings.php" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition">
+                <i class="fa-solid fa-gear mr-1"></i> Settings
+            </a>
+        </div>
     </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Active Offers</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_offers; ?></h3>
+
+    <!-- Stat Cards (Row 1) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Plans -->
+        <a href="plans.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hosting Plans</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-server"></i>
+                </div>
             </div>
-            <div class="bg-green-100 p-3 rounded-full"><i class="fa fa-tags text-green-600 text-xl"></i></div>
-        </div>
-        <a href="offers.php" class="text-blue-600 text-sm mt-2 block">Manage Offers</a>
-    </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Total Messages</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_contacts; ?></h3>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_plans; ?></span>
+                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><?php echo $active_plans; ?> active</span>
             </div>
-            <div class="bg-yellow-100 p-3 rounded-full"><i class="fa fa-envelope text-yellow-600 text-xl"></i></div>
-        </div>
-        <p class="text-red-600 text-sm mt-2"><?php echo $unread_contacts; ?> unread</p>
-    </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Blog Posts</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_blog; ?></h3>
+        </a>
+
+        <!-- Offers -->
+        <a href="offers.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Special Offers</span>
+                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-tags"></i>
+                </div>
             </div>
-            <div class="bg-purple-100 p-3 rounded-full"><i class="fa fa-blog text-purple-600 text-xl"></i></div>
-        </div>
-        <a href="blogs.php" class="text-blue-600 text-sm mt-2 block">Manage Blog</a>
-    </div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-teal-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Subscribers</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_subscribers; ?></h3>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_offers; ?></span>
+                <span class="text-[11px] font-semibold text-purple-600">Promotions & Deals</span>
             </div>
-            <div class="bg-teal-100 p-3 rounded-full"><i class="fa fa-envelope-open text-teal-600 text-xl"></i></div>
-        </div>
-        <a href="subscribers.php" class="text-blue-600 text-sm mt-2 block">Manage Subscribers</a>
-    </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-indigo-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">CMS Pages</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_pages; ?></h3>
+        </a>
+
+        <!-- Messages -->
+        <a href="contacts.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Inquiries</span>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
             </div>
-            <div class="bg-indigo-100 p-3 rounded-full"><i class="fa fa-file text-indigo-600 text-xl"></i></div>
-        </div>
-        <a href="pages.php" class="text-blue-600 text-sm mt-2 block">Manage Pages</a>
-    </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-pink-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Admin Users</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_users; ?></h3>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_contacts; ?></span>
+                <?php if ($unread_contacts > 0): ?>
+                <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full"><?php echo $unread_contacts; ?> unread</span>
+                <?php else: ?>
+                <span class="text-[11px] text-gray-400">All answered</span>
+                <?php endif; ?>
             </div>
-            <div class="bg-pink-100 p-3 rounded-full"><i class="fa fa-users text-pink-600 text-xl"></i></div>
-        </div>
-        <a href="users.php" class="text-blue-600 text-sm mt-2 block">Manage Users</a>
-    </div>
-    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm">Categories</p>
-                <h3 class="text-2xl font-bold"><?php echo $total_categories; ?></h3>
+        </a>
+
+        <!-- Blog Posts -->
+        <a href="blogs.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Blog Articles</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-newspaper"></i>
+                </div>
             </div>
-            <div class="bg-orange-100 p-3 rounded-full"><i class="fa fa-th-large text-orange-600 text-xl"></i></div>
-        </div>
-        <a href="categories.php" class="text-blue-600 text-sm mt-2 block">Manage Categories</a>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_blog; ?></span>
+                <span class="text-[11px] font-semibold text-emerald-600">Published Posts</span>
+            </div>
+        </a>
+
     </div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b flex justify-between items-center">
-            <h2 class="font-semibold text-gray-700">Recent Messages</h2>
-            <a href="contacts.php" class="text-blue-600 text-sm">View All</a>
-        </div>
-        <div class="p-4">
-            <?php if (mysqli_num_rows($recent_contacts) > 0): ?>
-                <?php while ($msg = mysqli_fetch_assoc($recent_contacts)): ?>
-                    <div class="flex items-start space-x-3 py-3 border-b last:border-0">
-                        <div class="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-gray-600 font-bold"><?php echo strtoupper(substr($msg['name'], 0, 1)); ?></div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <h4 class="font-medium text-sm"><?php echo htmlspecialchars($msg['name']); ?></h4>
-                                <span class="text-xs text-gray-400"><?php echo timeAgo($msg['created_at']); ?></span>
-                            </div>
-                            <p class="text-gray-500 text-sm truncate"><?php echo htmlspecialchars($msg['subject']); ?></p>
-                            <?php if (!$msg['is_read']): ?>
-                                <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded">New</span>
-                            <?php endif; ?>
+
+    <!-- Stat Cards (Row 2) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Subscribers -->
+        <a href="subscribers.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Subscribers</span>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_subscribers; ?></span>
+                <span class="text-[11px] font-semibold text-teal-600">Newsletter</span>
+            </div>
+        </a>
+
+        <!-- Categories -->
+        <a href="categories.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Categories</span>
+                <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-folder-tree"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_categories; ?></span>
+                <span class="text-[11px] font-semibold text-sky-600">Hosting Types</span>
+            </div>
+        </a>
+
+        <!-- CMS Pages -->
+        <a href="pages.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">CMS Pages</span>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_pages; ?></span>
+                <span class="text-[11px] font-semibold text-indigo-600">Custom Content</span>
+            </div>
+        </a>
+
+        <!-- Users -->
+        <a href="users.php" class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Staff Users</span>
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg group-hover:scale-110 transition">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-extrabold text-gray-900"><?php echo $total_users; ?></span>
+                <span class="text-[11px] font-semibold text-rose-600">Active Accounts</span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Recent Inquiries & Quick Shortcuts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Recent Inquiries -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
+                <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-inbox text-blue-600"></i> Recent Inquiries
+                </h3>
+                <a href="contacts.php" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">View All Inquiries →</a>
+            </div>
+            
+            <div class="divide-y divide-gray-100 p-2 flex-1">
+                <?php if (mysqli_num_rows($recent_contacts) > 0): ?>
+                    <?php while ($msg = mysqli_fetch_assoc($recent_contacts)): ?>
+                    <div class="p-3 hover:bg-gray-50 rounded-xl transition flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 font-bold flex items-center justify-center text-xs border border-blue-100 shrink-0 mt-0.5">
+                            <?php echo strtoupper(substr($msg['name'], 0, 2)); ?>
                         </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-bold text-xs text-gray-900 truncate"><?php echo htmlspecialchars($msg['name']); ?></h4>
+                                <span class="text-[10px] text-gray-400 whitespace-nowrap"><?php echo timeAgo($msg['created_at']); ?></span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate mt-0.5"><?php echo htmlspecialchars($msg['subject']); ?></p>
+                        </div>
+                        <?php if (!$msg['is_read']): ?>
+                        <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2"></span>
+                        <?php endif; ?>
                     </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p class="text-gray-400 text-center py-4">No messages yet</p>
-            <?php endif; ?>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="py-12 text-center text-gray-400 text-xs">
+                        <i class="fa-solid fa-inbox text-3xl text-gray-300 mb-2 block"></i>
+                        No contact inquiries received yet.
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
+
+        <!-- Quick Shortcuts -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6 flex flex-col justify-between">
+            <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Quick Navigation
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <a href="plans.php" class="p-3.5 rounded-xl border border-gray-200/80 hover:border-blue-300 hover:bg-blue-50/40 transition flex items-center gap-3 group">
+                    <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm group-hover:scale-110 transition">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-gray-900">Manage Plans</div>
+                        <div class="text-[10px] text-gray-400">Hosting packages</div>
+                    </div>
+                </a>
+
+                <a href="offers.php" class="p-3.5 rounded-xl border border-gray-200/80 hover:border-purple-300 hover:bg-purple-50/40 transition flex items-center gap-3 group">
+                    <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm group-hover:scale-110 transition">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-gray-900">Promo Offers</div>
+                        <div class="text-[10px] text-gray-400">Deals & badges</div>
+                    </div>
+                </a>
+
+                <a href="blogs.php" class="p-3.5 rounded-xl border border-gray-200/80 hover:border-emerald-300 hover:bg-emerald-50/40 transition flex items-center gap-3 group">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm group-hover:scale-110 transition">
+                        <i class="fa-solid fa-newspaper"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-gray-900">Blog Manager</div>
+                        <div class="text-[10px] text-gray-400">Articles & guides</div>
+                    </div>
+                </a>
+
+                <a href="settings-general.php" class="p-3.5 rounded-xl border border-gray-200/80 hover:border-amber-300 hover:bg-amber-50/40 transition flex items-center gap-3 group">
+                    <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm group-hover:scale-110 transition">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-gray-900">Site Settings</div>
+                        <div class="text-[10px] text-gray-400">Branding, WHMCS, SEO</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                <span>System Status: <strong class="text-emerald-600">Operational</strong></span>
+                <a href="activity-logs.php" class="text-blue-600 hover:underline">View Audit Trail →</a>
+            </div>
+        </div>
+
     </div>
-    <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b">
-            <h2 class="font-semibold text-gray-700">Quick Actions</h2>
-        </div>
-        <div class="p-4 space-y-3">
-            <a href="plans.php?action=add" class="flex items-center space-x-3 p-3 bg-blue-50 rounded hover:bg-blue-100 transition">
-                <i class="fa fa-plus-circle text-blue-600"></i>
-                <span>Add New Hosting Plan</span>
-            </a>
-            <a href="offers.php?action=add" class="flex items-center space-x-3 p-3 bg-green-50 rounded hover:bg-green-100 transition">
-                <i class="fa fa-plus-circle text-green-600"></i>
-                <span>Add New Offer</span>
-            </a>
-            <a href="contacts.php" class="flex items-center space-x-3 p-3 bg-yellow-50 rounded hover:bg-yellow-100 transition">
-                <i class="fa fa-inbox text-yellow-600"></i>
-                <span>View Contact Messages <?php if ($unread_contacts > 0): ?>(<?php echo $unread_contacts; ?> unread)<?php endif; ?></span>
-            </a>
-            <a href="settings.php" class="flex items-center space-x-3 p-3 bg-purple-50 rounded hover:bg-purple-100 transition">
-                <i class="fa fa-cog text-purple-600"></i>
-                <span>Update Site Settings</span>
-            </a>
-        </div>
-    </div>
+
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-    <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b flex justify-between items-center">
-            <h2 class="font-semibold text-gray-700">Recent Activity</h2>
-            <a href="activity-logs.php" class="text-blue-600 text-sm">View All</a>
-        </div>
-        <div class="p-4">
-            <?php $recent_activities = mysqli_query($conn, "SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 6"); ?>
-            <?php if (mysqli_num_rows($recent_activities) > 0): ?>
-                <?php while ($act = mysqli_fetch_assoc($recent_activities)): ?>
-                <div class="flex items-start space-x-3 py-2 border-b last:border-0 text-sm">
-                    <div class="bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-gray-500"><i class="fa fa-history"></i></div>
-                    <div class="flex-1">
-                        <span class="font-medium"><?php echo htmlspecialchars($act['username']); ?></span>
-                        <span class="text-gray-500"><?php echo htmlspecialchars($act['action']); ?></span>
-                        <span class="text-gray-400 text-xs block"><?php echo timeAgo($act['created_at']); ?></span>
-                    </div>
-                </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p class="text-gray-400 text-center py-4 text-sm">No activity yet.</p>
-            <?php endif; ?>
-        </div>
-    </div>
-    <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b flex justify-between items-center">
-            <h2 class="font-semibold text-gray-700">Recent Logins</h2>
-            <a href="login-logs.php" class="text-blue-600 text-sm">View All</a>
-        </div>
-        <div class="p-4">
-            <?php $recent_logins = mysqli_query($conn, "SELECT * FROM login_logs ORDER BY created_at DESC LIMIT 6"); ?>
-            <?php if (mysqli_num_rows($recent_logins) > 0): ?>
-                <?php while ($log = mysqli_fetch_assoc($recent_logins)): ?>
-                <div class="flex items-start space-x-3 py-2 border-b last:border-0 text-sm">
-                    <div class="bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center">
-                        <i class="fa fa-sign-in-alt <?php echo $log['status'] == 'success' ? 'text-green-600' : 'text-red-600'; ?>"></i>
-                    </div>
-                    <div class="flex-1">
-                        <span class="font-medium"><?php echo htmlspecialchars($log['username']); ?></span>
-                        <span class="text-xs px-1.5 py-0.5 rounded <?php echo $log['status'] == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>"><?php echo ucfirst($log['status']); ?></span>
-                        <span class="text-gray-400 text-xs block"><?php echo timeAgo($log['created_at']); ?></span>
-                    </div>
-                </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p class="text-gray-400 text-center py-4 text-sm">No login activity yet.</p>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
+
 <?php include 'footer.php'; ?>

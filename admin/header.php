@@ -30,25 +30,25 @@
 </div>
 <?php endif; ?>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-<nav class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex justify-between h-16">
+<nav class="bg-white shadow-sm border-b sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4">
+        <div class="flex justify-between h-14 sm:h-16">
             <div class="flex items-center">
-                <button onclick="toggleSidebar()" class="md:hidden mr-3 text-gray-500 hover:text-blue-600"><i class="fa fa-bars text-xl"></i></button>
-                <a href="dashboard.php" class="flex items-center space-x-3">
-                    <img src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" class="h-8 object-contain" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>">
-                    <span class="font-semibold text-gray-700 hidden sm:inline">Admin Panel</span>
+                <button onclick="toggleSidebar()" class="md:hidden mr-2.5 p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition"><i class="fa fa-bars text-lg"></i></button>
+                <a href="dashboard.php" class="flex items-center space-x-2 sm:space-x-3">
+                    <img src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" class="h-7 sm:h-8 object-contain" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>">
+                    <span class="font-bold text-gray-800 text-sm sm:text-base hidden xs:inline">Admin Panel</span>
                 </a>
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="/" target="_blank" class="text-gray-500 hover:text-blue-600 hidden sm:inline"><i class="fa fa-external-link-alt"></i> View Site</a>
-                <a href="logout.php" class="text-gray-500 hover:text-red-600"><i class="fa fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span></a>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <a href="/" target="_blank" class="text-xs sm:text-sm font-semibold text-gray-600 hover:text-blue-600 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition hidden xs:inline-flex items-center gap-1.5"><i class="fa fa-external-link-alt text-xs"></i> View Site</a>
+                <a href="logout.php" class="text-xs sm:text-sm font-semibold text-red-600 hover:text-red-700 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition inline-flex items-center gap-1.5"><i class="fa fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span></a>
             </div>
         </div>
     </div>
 </nav>
-<div class="flex">
-    <aside class="admin-sidebar w-64 bg-white shadow-sm min-h-screen border-r md:relative" id="adminSidebar">
+<div class="flex min-h-screen">
+    <aside class="admin-sidebar w-64 bg-white shadow-sm min-h-screen border-r md:relative shrink-0" id="adminSidebar">
         <nav class="p-4 space-y-1">
             <a href="dashboard.php" class="flex items-center space-x-3 px-4 py-2.5 rounded hover:bg-blue-50 text-gray-700 hover:text-blue-600 <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'bg-blue-50 text-blue-600' : ''; ?>">
                 <i class="fa fa-chart-pie w-5"></i><span>Dashboard</span>
@@ -164,8 +164,7 @@
                 <i class="fa fa-external-link-alt w-5"></i><span>View Website</span>
             </a>
         </nav>
-    </aside>
-    <main class="flex-1 p-4 md:p-6">
+    <main class="flex-1 p-3 sm:p-4 md:p-6 min-w-0 max-w-full overflow-x-hidden">
     <script>
         function toggleSidebar() {
             document.getElementById('adminSidebar').classList.toggle('open');
