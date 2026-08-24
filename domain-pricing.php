@@ -24,243 +24,786 @@ $site_name = getSetting('site_name') ?: 'Host Nibo';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php include "cdnjs.php"; ?>
-<title>Domain Name Pricing - <?php echo htmlspecialchars($site_name); ?></title>
-<?php echo renderSeoTags([
-    'title' => 'Domain Name Pricing & TLD Registration - ' . $site_name,
-    'description' => 'Search, register, and transfer domains with transparent pricing and no hidden fees. Explore prices for .com, .net, .org, .xyz, and hundreds more.',
-    'keywords' => 'domain pricing, buy domain, domain registration, domain transfer, tld prices, cheap domains'
-]); ?>
-<style>
-    /* Soft scrollbar for table */
-    .overflow-x-auto::-webkit-scrollbar { height: 6px; }
-    .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-    .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Name Pricing - <?php echo htmlspecialchars($site_name); ?></title>
+    <?php include "cdnjs.php"; ?>
+    <?php echo renderSeoTags([
+        'title' => 'Domain Name Pricing & TLD Registration - ' . $site_name,
+        'description' => 'Search, register & transfer domains with clear pricing. No hidden fees, ever.',
+        'keywords' => 'domain pricing, buy domain, domain registration, domain transfer, tld prices, cheap domains'
+    ]); ?>
+    
+    <style>
+        .domain-page-wrap {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.5) 0%, white 50%, rgba(238, 242, 255, 0.3) 100%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 56px 20px;
+            text-align: center;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 15px;
+            color: #64748b;
+            max-width: 540px;
+            margin: 0 auto 36px;
+        }
+
+        /* Search Box */
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 8px;
+            max-width: 560px;
+            margin: 0 auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .search-form:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+
+        .search-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            flex: 1;
+        }
+
+        .search-input-wrap i {
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        .search-form input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #0f172a;
+            background: transparent;
+        }
+
+        .search-form input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .trust-points {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px 28px;
+            margin-top: 28px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .trust-points span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trust-points .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .dot-blue { background: #3b82f6; }
+        .dot-green { background: #10b981; }
+        .dot-indigo { background: #6366f1; }
+
+        /* ========== PRICING SECTION ========== */
+        .pricing-section {
+            padding: 40px 0 56px;
+        }
+
+        .pricing-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .tab-btn.active {
+            background: #0f172a;
+            color: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .filter-search {
+            position: relative;
+            width: 100%;
+        }
+
+        .filter-search input {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .filter-search input:focus {
+            background: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-search i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        /* Table Container */
+        .table-wrap {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        /* Desktop Table */
+        .desktop-table {
+            display: none;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .desktop-table thead {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .desktop-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+
+        .desktop-table th:last-child {
+            text-align: right;
+        }
+
+        .desktop-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .desktop-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .desktop-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tld-name {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 15px;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .badge-popular {
+            display: inline-flex;
+            padding: 2px 7px;
+            font-size: 9px;
+            font-weight: 800;
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            letter-spacing: 0.03em;
+            margin-left: 8px;
+        }
+
+        .badge-sale {
+            display: inline-flex;
+            padding: 2px 7px;
+            font-size: 9px;
+            font-weight: 800;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            border-radius: 6px;
+            letter-spacing: 0.03em;
+            margin-left: 6px;
+        }
+
+        .price-old {
+            font-size: 12px;
+            color: #94a3b8;
+            text-decoration: line-through;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .price-new {
+            font-size: 15px;
+            font-weight: 900;
+            color: #2563eb;
+        }
+
+        .price-normal {
+            font-size: 15px;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .price-note {
+            font-size: 10px;
+            color: #10b981;
+            font-weight: 700;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .price-sub {
+            font-size: 10px;
+            color: #94a3b8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .price-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .price-text span {
+            font-size: 12px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .btn-transfer {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            padding: 7px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-transfer:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .btn-register {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .btn-register:hover {
+            background: #1d4ed8;
+        }
+
+        /* Mobile Cards */
+        .mobile-cards {
+            display: block;
+        }
+
+        .mobile-card {
+            padding: 18px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .mobile-card:last-child {
+            border-bottom: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .card-tld {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-tld .tld-name {
+            font-size: 17px;
+        }
+
+        .card-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+
+        .card-info label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+
+        .card-info span {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-actions a {
+            flex: 1;
+            text-align: center;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .card-actions .transfer {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .card-actions .transfer:hover {
+            background: #e2e8f0;
+        }
+
+        .card-actions .register {
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .card-actions .register:hover {
+            background: #1d4ed8;
+        }
+
+        /* No Results */
+        .no-results {
+            display: none;
+            padding: 60px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .no-results i {
+            font-size: 36px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* ========== BENEFITS ========== */
+        .benefits {
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 48px 0;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .benefit-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .benefit-card:hover {
+            border-color: #bfdbfe;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .benefit-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .icon-blue { background: #eff6ff; color: #2563eb; }
+        .icon-green { background: #ecfdf5; color: #059669; }
+        .icon-indigo { background: #eef2ff; color: #4f46e5; }
+
+        .benefit-card h3 {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .benefit-card p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.55;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (min-width: 640px) {
+            .hero h1 {
+                font-size: 2.75rem;
+            }
+
+            .search-form {
+                flex-direction: row;
+                align-items: center;
+                padding: 6px;
+            }
+
+            .search-btn {
+                width: auto;
+                padding: 12px 24px;
+            }
+
+            .desktop-table {
+                display: table;
+            }
+
+            .mobile-cards {
+                display: none;
+            }
+
+            .filter-bar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .filter-search {
+                width: 240px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .hero-inner {
+                padding: 72px 24px;
+            }
+
+            .benefits-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+<body class="domain-page-wrap">
 
 <?php include "header.php"; ?>
 <?php include "contact-btn.php"; ?>
 
-<!-- ==================== HERO SECTION ==================== -->
-<section class="relative bg-white border-b border-slate-200/70 overflow-hidden">
-    <!-- Subtle background gradient -->
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-white to-indigo-50/30 pointer-events-none"></div>
-    
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-14 md:py-20 text-center">
-        
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold mb-5">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="badge-pill">
+            <span class="badge-dot"></span>
             Transparent Domain Pricing
         </div>
 
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Find the perfect domain<br class="hidden sm:block"> for your business
-        </h1>
-        
-        <p class="text-sm sm:text-base text-slate-600 mt-4 max-w-2xl mx-auto leading-relaxed">
-            Search, register & transfer domains with clear pricing. No hidden fees, ever.
-        </p>
+        <h1>Find the perfect domain<br>for your business</h1>
+        <p>Search, register & transfer domains with clear pricing. No hidden fees, ever.</p>
 
-        <!-- Search Box -->
-        <div class="mt-9 max-w-2xl mx-auto">
-            <form method="post" action="<?php echo htmlspecialchars($whmcs_search_url); ?>" 
-                  class="group bg-white border border-slate-200 hover:border-slate-300 focus-within:!border-blue-500 focus-within:ring-4 focus-within:ring-blue-100/70 rounded-2xl p-1.5 sm:p-2 shadow-sm transition-all duration-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                
-                <div class="flex items-center gap-3 w-full px-3.5 py-2.5 sm:py-1.5">
-                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm shrink-0 group-focus-within:text-blue-500 transition"></i>
-                    <input type="text" 
-                           name="domain" 
-                           placeholder="Search your domain (e.g. brandname.com)" 
-                           required 
-                           class="w-full text-sm sm:text-[15px] font-medium text-slate-900 placeholder:text-slate-400 bg-transparent border-none outline-none">
-                </div>
-                
-                <button type="submit" 
-                        class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm rounded-xl transition shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer">
-                    <span>Search Domain</span>
-                    <i class="fa-solid fa-arrow-right text-xs opacity-90"></i>
-                </button>
-            </form>
-        </div>
+        <form class="search-form" method="post" action="<?php echo htmlspecialchars($whmcs_search_url); ?>">
+            <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="domain" placeholder="Search your domain (e.g. brandname.com)" required>
+            </div>
+            <button type="submit" class="search-btn">
+                Search Domain
+                <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+            </button>
+        </form>
 
-        <!-- Trust Points -->
-        <div class="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 mt-7 text-xs font-semibold text-slate-500">
-            <span class="inline-flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                Instant Search
-            </span>
-            <span class="inline-flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Transparent Pricing
-            </span>
-            <span class="inline-flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                Easy Management
-            </span>
+        <div class="trust-points">
+            <span><span class="dot dot-blue"></span> Instant Search</span>
+            <span><span class="dot dot-green"></span> Transparent Pricing</span>
+            <span><span class="dot dot-indigo"></span> Easy Management</span>
         </div>
     </div>
 </section>
 
-<!-- ==================== PRICING SECTION ==================== -->
-<section class="py-10 md:py-14">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 space-y-5">
+<!-- PRICING -->
+<section class="pricing-section">
+    <div class="pricing-container">
         
-        <!-- Filter Bar -->
-        <div class="bg-white p-3 sm:p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            
-            <!-- Category Tabs -->
-            <div class="flex flex-wrap items-center gap-1.5" id="tldFilterTabs">
-                <button type="button" onclick="setTldCategory('all', this)" 
-                        class="tld-tab-btn active px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-900 text-white shadow-sm cursor-pointer">
-                    All TLDs (<?php echo count($all_tlds); ?>)
-                </button>
-                <button type="button" onclick="setTldCategory('Popular', this)" 
-                        class="tld-tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-                    Popular
-                </button>
-                <button type="button" onclick="setTldCategory('Tech', this)" 
-                        class="tld-tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-                    Tech & Dev
-                </button>
-                <button type="button" onclick="setTldCategory('Business', this)" 
-                        class="tld-tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-                    Business
-                </button>
-                <button type="button" onclick="setTldCategory('Country', this)" 
-                        class="tld-tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-                    Country
-                </button>
+        <!-- Filter -->
+        <div class="filter-bar">
+            <div class="tabs" id="tldFilterTabs">
+                <button type="button" class="tab-btn active" onclick="setTldCategory('all', this)">All TLDs (<?php echo count($all_tlds); ?>)</button>
+                <button type="button" class="tab-btn" onclick="setTldCategory('Popular', this)">Popular</button>
+                <button type="button" class="tab-btn" onclick="setTldCategory('Tech', this)">Tech & Dev</button>
+                <button type="button" class="tab-btn" onclick="setTldCategory('Business', this)">Business</button>
+                <button type="button" class="tab-btn" onclick="setTldCategory('Country', this)">Country</button>
             </div>
 
-            <!-- Live Search -->
-            <div class="relative w-full md:w-60">
-                <input type="text" 
-                       id="tldLiveSearch" 
-                       oninput="runTldFilter()" 
-                       placeholder="Filter TLD..." 
-                       class="w-full pl-3.5 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
-                <i class="fa-solid fa-filter absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+            <div class="filter-search">
+                <input type="text" id="tldLiveSearch" oninput="runTldFilter()" placeholder="Filter TLD...">
+                <i class="fa-solid fa-filter"></i>
             </div>
         </div>
 
-        <!-- Pricing Container -->
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <!-- Table / Cards -->
+        <div class="table-wrap">
             
-            <!-- Desktop / Tablet Table -->
-            <div class="hidden sm:block overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-extrabold uppercase text-[10px] tracking-wider">
-                            <th class="py-4 px-5 md:px-6 w-[26%]">TLD</th>
-                            <th class="py-4 px-5 md:px-6 w-[24%]">Registration</th>
-                            <th class="py-4 px-5 md:px-6 w-[20%]">Renewal</th>
-                            <th class="py-4 px-5 md:px-6 w-[15%]">Transfer</th>
-                            <th class="py-4 px-5 md:px-6 w-[15%] text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-slate-700 font-medium" id="desktopTbody">
-                        <?php if (!empty($all_tlds)): ?>
-                        <?php foreach ($all_tlds as $tld): 
-                            $reg_conv = convertPriceAmount($tld['register_price'], $user_curr);
-                            $ren_conv = convertPriceAmount($tld['renew_price'], $user_curr);
-                            $tra_conv = convertPriceAmount($tld['transfer_price'], $user_curr);
-                            $has_promo = $tld['promo_price'] !== null && $tld['promo_price'] > 0;
-                            $promo_conv = $has_promo ? convertPriceAmount($tld['promo_price'], $user_curr) : null;
-                        ?>
-                        <tr class="tld-table-row hover:bg-slate-50/60 transition-colors" 
-                            data-category="<?php echo htmlspecialchars($tld['category']); ?>" 
-                            data-ext="<?php echo htmlspecialchars(strtolower($tld['extension'])); ?>">
-                            
-                            <!-- TLD -->
-                            <td class="py-4 px-5 md:px-6">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="font-black text-[15px] text-slate-900 font-mono tracking-tight">
-                                        <?php echo htmlspecialchars($tld['extension']); ?>
-                                    </span>
-                                    <?php if ($tld['is_popular']): ?>
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200/70 tracking-wide">
-                                        POPULAR
-                                    </span>
-                                    <?php endif; ?>
-                                    <?php if ($tld['is_promo']): ?>
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/70 tracking-wide">
-                                        SALE
-                                    </span>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-
-                            <!-- Registration -->
-                            <td class="py-4 px-5 md:px-6">
-                                <?php if ($has_promo): ?>
-                                <div>
-                                    <div class="flex items-baseline gap-1.5">
-                                        <span class="text-xs text-slate-400 font-semibold line-through">
-                                            <?php echo $currency_symbol; ?><?php echo $reg_conv; ?>
-                                        </span>
-                                        <span class="text-[15px] font-black text-blue-600">
-                                            <?php echo $currency_symbol; ?><?php echo $promo_conv; ?>
-                                        </span>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-emerald-600 block mt-0.5">First year promo</span>
-                                </div>
-                                <?php else: ?>
-                                <div>
-                                    <span class="text-[15px] font-black text-slate-900">
-                                        <?php echo $currency_symbol; ?><?php echo $reg_conv; ?>
-                                    </span>
-                                    <span class="text-[10px] font-normal text-slate-400 block mt-0.5">1 Year</span>
-                                </div>
-                                <?php endif; ?>
-                            </td>
-
-                            <!-- Renewal -->
-                            <td class="py-4 px-5 md:px-6">
-                                <span class="text-sm font-bold text-slate-700">
-                                    <?php echo $currency_symbol; ?><?php echo $ren_conv; ?>
-                                    <span class="text-xs font-normal text-slate-400">/year</span>
-                                </span>
-                            </td>
-
-                            <!-- Transfer -->
-                            <td class="py-4 px-5 md:px-6">
-                                <span class="text-sm font-bold text-slate-700">
-                                    <?php echo $currency_symbol; ?><?php echo $tra_conv; ?>
-                                </span>
-                            </td>
-
-                            <!-- Actions -->
-                            <td class="py-4 px-5 md:px-6 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <a href="<?php echo htmlspecialchars($whmcs_tra_url); ?>" 
-                                       class="text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition">
-                                        Transfer
-                                    </a>
-                                    <a href="<?php echo htmlspecialchars($whmcs_reg_url); ?>" 
-                                       class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-lg transition shadow-sm inline-flex items-center gap-1.5 cursor-pointer">
-                                        <span>Register</span>
-                                        <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="py-16 text-center text-slate-400 font-medium">
-                                No active domain pricing records available.
-                            </td>
-                        </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+            <!-- Desktop Table -->
+            <table class="desktop-table">
+                <thead>
+                    <tr>
+                        <th style="width:26%">TLD</th>
+                        <th style="width:24%">Registration</th>
+                        <th style="width:20%">Renewal</th>
+                        <th style="width:15%">Transfer</th>
+                        <th style="width:15%; text-align:right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="desktopTbody">
+                    <?php if (!empty($all_tlds)): ?>
+                    <?php foreach ($all_tlds as $tld): 
+                        $reg_conv = convertPriceAmount($tld['register_price'], $user_curr);
+                        $ren_conv = convertPriceAmount($tld['renew_price'], $user_curr);
+                        $tra_conv = convertPriceAmount($tld['transfer_price'], $user_curr);
+                        $has_promo = $tld['promo_price'] !== null && $tld['promo_price'] > 0;
+                        $promo_conv = $has_promo ? convertPriceAmount($tld['promo_price'], $user_curr) : null;
+                    ?>
+                    <tr class="tld-table-row" data-category="<?php echo htmlspecialchars($tld['category']); ?>" data-ext="<?php echo htmlspecialchars(strtolower($tld['extension'])); ?>">
+                        <td>
+                            <span class="tld-name"><?php echo htmlspecialchars($tld['extension']); ?></span>
+                            <?php if ($tld['is_popular']): ?>
+                            <span class="badge-popular">POPULAR</span>
+                            <?php endif; ?>
+                            <?php if ($tld['is_promo']): ?>
+                            <span class="badge-sale">SALE</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($has_promo): ?>
+                            <span class="price-old"><?php echo $currency_symbol; ?><?php echo $reg_conv; ?></span>
+                            <span class="price-new"><?php echo $currency_symbol; ?><?php echo $promo_conv; ?></span>
+                            <span class="price-note">First year promo</span>
+                            <?php else: ?>
+                            <span class="price-normal"><?php echo $currency_symbol; ?><?php echo $reg_conv; ?></span>
+                            <span class="price-sub">1 Year</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><span class="price-text"><?php echo $currency_symbol; ?><?php echo $ren_conv; ?><span>/year</span></span></td>
+                        <td><span class="price-text"><?php echo $currency_symbol; ?><?php echo $tra_conv; ?></span></td>
+                        <td>
+                            <div class="actions">
+                                <a href="<?php echo htmlspecialchars($whmcs_tra_url); ?>" class="btn-transfer">Transfer</a>
+                                <a href="<?php echo htmlspecialchars($whmcs_reg_url); ?>" class="btn-register">Register <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <tr>
+                        <td colspan="5" style="padding:48px 20px; text-align:center; color:#94a3b8;">
+                            No active domain pricing records available.
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
 
             <!-- Mobile Cards -->
-            <div class="sm:hidden divide-y divide-slate-100" id="mobileCardsContainer">
+            <div class="mobile-cards" id="mobileCardsContainer">
                 <?php if (!empty($all_tlds)): ?>
                 <?php foreach ($all_tlds as $tld): 
                     $reg_conv = convertPriceAmount($tld['register_price'], $user_curr);
@@ -269,186 +812,116 @@ $site_name = getSetting('site_name') ?: 'Host Nibo';
                     $has_promo = $tld['promo_price'] !== null && $tld['promo_price'] > 0;
                     $promo_conv = $has_promo ? convertPriceAmount($tld['promo_price'], $user_curr) : null;
                 ?>
-                <div class="tld-card-row p-4 space-y-3.5" 
-                     data-category="<?php echo htmlspecialchars($tld['category']); ?>" 
-                     data-ext="<?php echo htmlspecialchars(strtolower($tld['extension'])); ?>">
-                    
-                    <!-- Header -->
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="font-black text-lg text-slate-900 font-mono">
-                                <?php echo htmlspecialchars($tld['extension']); ?>
-                            </span>
+                <div class="mobile-card tld-card-row" data-category="<?php echo htmlspecialchars($tld['category']); ?>" data-ext="<?php echo htmlspecialchars(strtolower($tld['extension'])); ?>">
+                    <div class="card-header">
+                        <div class="card-tld">
+                            <span class="tld-name"><?php echo htmlspecialchars($tld['extension']); ?></span>
                             <?php if ($tld['is_popular']): ?>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200/70">
-                                POPULAR
-                            </span>
+                            <span class="badge-popular">POPULAR</span>
                             <?php endif; ?>
                             <?php if ($tld['is_promo']): ?>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                                SALE
-                            </span>
+                            <span class="badge-sale">SALE</span>
                             <?php endif; ?>
                         </div>
-                        
-                        <div class="text-right shrink-0">
+                        <div class="card-price">
                             <?php if ($has_promo): ?>
-                            <div class="flex items-baseline gap-1 justify-end">
-                                <span class="text-xs text-slate-400 font-semibold line-through">
-                                    <?php echo $currency_symbol; ?><?php echo $reg_conv; ?>
-                                </span>
-                                <span class="text-base font-black text-blue-600">
-                                    <?php echo $currency_symbol; ?><?php echo $promo_conv; ?>
-                                </span>
-                            </div>
+                            <span class="price-old"><?php echo $currency_symbol; ?><?php echo $reg_conv; ?></span>
+                            <span class="price-new"><?php echo $currency_symbol; ?><?php echo $promo_conv; ?></span>
                             <?php else: ?>
-                            <span class="text-base font-black text-slate-900">
-                                <?php echo $currency_symbol; ?><?php echo $reg_conv; ?>
-                            </span>
+                            <span class="price-normal"><?php echo $currency_symbol; ?><?php echo $reg_conv; ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
-
-                    <!-- Price Info -->
-                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <div class="card-info">
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Renewal</span>
-                            <span class="font-bold text-slate-700">
-                                <?php echo $currency_symbol; ?><?php echo $ren_conv; ?> /yr
-                            </span>
+                            <label>Renewal</label>
+                            <span><?php echo $currency_symbol; ?><?php echo $ren_conv; ?> /yr</span>
                         </div>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Transfer</span>
-                            <span class="font-bold text-slate-700">
-                                <?php echo $currency_symbol; ?><?php echo $tra_conv; ?>
-                            </span>
+                            <label>Transfer</label>
+                            <span><?php echo $currency_symbol; ?><?php echo $tra_conv; ?></span>
                         </div>
                     </div>
-
-                    <!-- Buttons -->
-                    <div class="flex items-center gap-2">
-                        <a href="<?php echo htmlspecialchars($whmcs_tra_url); ?>" 
-                           class="w-1/2 py-2.5 text-center text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
-                            Transfer
-                        </a>
-                        <a href="<?php echo htmlspecialchars($whmcs_reg_url); ?>" 
-                           class="w-1/2 py-2.5 text-center text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>Register</span>
-                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </a>
+                    <div class="card-actions">
+                        <a href="<?php echo htmlspecialchars($whmcs_tra_url); ?>" class="transfer">Transfer</a>
+                        <a href="<?php echo htmlspecialchars($whmcs_reg_url); ?>" class="register">Register <i class="fa-solid fa-arrow-right" style="font-size:10px;"></i></a>
                     </div>
                 </div>
                 <?php endforeach; ?>
                 <?php endif; ?>
             </div>
 
-            <!-- No Results -->
-            <div id="noResultsNotice" class="hidden py-16 text-center text-slate-400 font-medium text-sm">
-                <i class="fa-solid fa-globe text-4xl mb-3 text-slate-300 block"></i>
+            <div class="no-results" id="noResultsNotice">
+                <i class="fa-solid fa-globe"></i>
                 No domain extensions match your search.
             </div>
         </div>
     </div>
 </section>
 
-<!-- ==================== BENEFITS SECTION ==================== -->
-<section class="py-12 md:py-16 bg-white border-t border-slate-200/70">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-blue-200 hover:shadow-sm transition-all duration-200">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-4">
+<!-- BENEFITS -->
+<section class="benefits">
+    <div class="pricing-container">
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon icon-blue">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h3 class="text-sm font-extrabold text-slate-900 mb-1.5">Free WHOIS Privacy</h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    Protect your personal contact details from public lookups and spam at no extra cost.
-                </p>
+                <h3>Free WHOIS Privacy</h3>
+                <p>Protect your personal contact details from public lookups and spam at no extra cost.</p>
             </div>
-
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-emerald-200 hover:shadow-sm transition-all duration-200">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-4">
+            <div class="benefit-card">
+                <div class="benefit-icon icon-green">
                     <i class="fa-solid fa-tag"></i>
                 </div>
-                <h3 class="text-sm font-extrabold text-slate-900 mb-1.5">Transparent Pricing</h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    No hidden fees, surprise price hikes, or unexpected renewal charges down the road.
-                </p>
+                <h3>Transparent Pricing</h3>
+                <p>No hidden fees, surprise price hikes, or unexpected renewal charges down the road.</p>
             </div>
-
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-indigo-200 hover:shadow-sm transition-all duration-200">
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-4">
+            <div class="benefit-card">
+                <div class="benefit-icon icon-indigo">
                     <i class="fa-solid fa-sliders"></i>
                 </div>
-                <h3 class="text-sm font-extrabold text-slate-900 mb-1.5">Easy Domain Management</h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    Full DNS control, nameservers, transfers, and email forwarding from one simple dashboard.
-                </p>
+                <h3>Easy Domain Management</h3>
+                <p>Full DNS control, nameservers, transfers, and email forwarding from one simple dashboard.</p>
             </div>
-
         </div>
     </div>
 </section>
 
 <script>
-var activeCategory = 'all';
+    let activeCategory = 'all';
 
-function setTldCategory(cat, btn) {
-    activeCategory = cat;
-    
-    document.querySelectorAll('.tld-tab-btn').forEach(function(b) {
-        b.className = 'tld-tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 cursor-pointer';
-    });
-    btn.className = 'tld-tab-btn active px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl transition bg-slate-900 text-white shadow-sm cursor-pointer';
-    
-    runTldFilter();
-}
+    function setTldCategory(cat, btn) {
+        activeCategory = cat;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        runTldFilter();
+    }
 
-function runTldFilter() {
-    var search = (document.getElementById('tldLiveSearch').value || '').trim().toLowerCase();
-    
-    var desktopRows = document.querySelectorAll('.tld-table-row');
-    var mobileCards = document.querySelectorAll('.tld-card-row');
-    var visibleCount = 0;
+    function runTldFilter() {
+        const search = (document.getElementById('tldLiveSearch').value || '').trim().toLowerCase();
+        const rows = document.querySelectorAll('.tld-table-row, .tld-card-row');
+        let visible = 0;
 
-    desktopRows.forEach(function(row) {
-        var cat = row.getAttribute('data-category') || '';
-        var ext = row.getAttribute('data-ext') || '';
+        rows.forEach(row => {
+            const cat = row.getAttribute('data-category') || '';
+            const ext = row.getAttribute('data-ext') || '';
+            const matchCat = activeCategory === 'all' || cat === activeCategory;
+            const matchSearch = !search || ext.includes(search) || cat.toLowerCase().includes(search);
 
-        var matchesCat = (activeCategory === 'all' || cat === activeCategory);
-        var matchesSearch = (search === '' || ext.indexOf(search) !== -1 || cat.toLowerCase().indexOf(search) !== -1);
+            if (matchCat && matchSearch) {
+                row.style.display = '';
+                visible++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
 
-        if (matchesCat && matchesSearch) {
-            row.style.display = '';
-            visibleCount++;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-
-    mobileCards.forEach(function(card) {
-        var cat = card.getAttribute('data-category') || '';
-        var ext = card.getAttribute('data-ext') || '';
-
-        var matchesCat = (activeCategory === 'all' || cat === activeCategory);
-        var matchesSearch = (search === '' || ext.indexOf(search) !== -1 || cat.toLowerCase().indexOf(search) !== -1);
-
-        if (matchesCat && matchesSearch) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    var notice = document.getElementById('noResultsNotice');
-    if (notice) {
-        if (visibleCount === 0 && (desktopRows.length > 0 || mobileCards.length > 0)) {
-            notice.classList.remove('hidden');
-        } else {
-            notice.classList.add('hidden');
+        const notice = document.getElementById('noResultsNotice');
+        if (notice) {
+            notice.style.display = (visible === 0 && rows.length > 0) ? 'block' : 'none';
         }
     }
-}
 </script>
 
 <?php include "footer.php"; ?>
