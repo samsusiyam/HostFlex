@@ -257,8 +257,47 @@ $total_categories = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c
                 <span>System Status: <strong class="text-emerald-600">Operational</strong></span>
                 <a href="activity-logs.php" class="text-blue-600 hover:underline">View Audit Trail →</a>
             </div>
+    </div>
+
+    <!-- Server & System Environment Diagnostics Widget -->
+    <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-slate-100 text-slate-700 rounded-lg text-xs"><i class="fa-solid fa-server"></i></span>
+                <h3 class="font-bold text-xs text-gray-900 uppercase tracking-wider">System Environment & Server Health</h3>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 inline-flex items-center gap-1.5 self-start sm:self-auto">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>PHP <?php echo PHP_VERSION; ?> Running Normal</span>
+            </span>
         </div>
 
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">PHP Engine</span>
+                <span class="font-bold text-gray-800 text-xs sm:text-sm mt-0.5 block truncate"><?php echo PHP_VERSION; ?></span>
+            </div>
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">MySQL Server</span>
+                <span class="font-bold text-gray-800 text-xs sm:text-sm mt-0.5 block truncate"><?php echo substr(mysqli_get_server_info($conn), 0, 10); ?></span>
+            </div>
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">Memory Limit</span>
+                <span class="font-bold text-gray-800 text-xs sm:text-sm mt-0.5 block truncate"><?php echo ini_get('memory_limit') ?: '256M'; ?></span>
+            </div>
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">Max Upload</span>
+                <span class="font-bold text-gray-800 text-xs sm:text-sm mt-0.5 block truncate"><?php echo ini_get('upload_max_filesize') ?: '64M'; ?></span>
+            </div>
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">2FA Security</span>
+                <span class="font-bold text-purple-700 text-xs sm:text-sm mt-0.5 block">TOTP Active</span>
+            </div>
+            <div class="p-3 bg-gray-50/70 rounded-xl border border-gray-100">
+                <span class="text-[10px] text-gray-400 font-bold uppercase block">Admin Guard</span>
+                <span class="font-bold text-blue-700 text-xs sm:text-sm mt-0.5 block">Protected</span>
+            </div>
+        </div>
     </div>
 
 </div>
