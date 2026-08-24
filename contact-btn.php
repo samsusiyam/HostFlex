@@ -57,14 +57,18 @@ function toggleFab() { var el = document.getElementById("fabOptions"); if (el) e
 <?php endif; ?>
 
 <?php if ($popup_enabled === '' || $popup_enabled === '1'):
-    $popup_bg = getSetting('popup_notice_bg_color') ?: 'rgba(255,255,255,0.8)';
+    $popup_title = getSetting('popup_notice_title') ?: '📢 নোটিশ';
+    $popup_msg = getSetting('popup_notice_message') ?: '';
+    $notice_hash = md5($popup_title . $popup_msg);
+    $popup_bg = getSetting('popup_notice_bg_color') ?: 'rgba(255,255,255,0.95)';
     $popup_text_color = getSetting('popup_notice_text_color') ?: '#333';
     $wa = getSetting('whatsapp_number');
     $tg = getSetting('telegram_link');
 ?>
-<div id="popupNotice" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:<?php echo $popup_bg; ?>;backdrop-filter:blur(14px);border-radius:18px;box-shadow:0 8px 35px rgba(0,0,0,0.2);padding:26px 22px;z-index:9999;width:92%;max-width:360px;font-family:'Segoe UI','Helvetica Neue',sans-serif;text-align:center;animation:fadeIn 0.35s ease-in-out;border:1px solid rgba(13,110,253,0.1);">
-<h2 style="font-size:20px;margin-bottom:14px;font-weight:700;text-transform:uppercase;background:linear-gradient(90deg,#0d6efd,#6610f2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;"><?php echo getSetting('popup_notice_title') ?: '📢 নোটিশ'; ?></h2>
-<div style="font-size:14px;color:<?php echo $popup_text_color; ?>;line-height:1.7;margin-bottom:12px;"><?php echo nl2br(getSetting('popup_notice_message')); ?></div>
+<?php if (!empty($popup_msg) || !empty($popup_title)): ?>
+<div id="popupNotice" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:<?php echo $popup_bg; ?>;backdrop-filter:blur(14px);border-radius:18px;box-shadow:0 8px 35px rgba(0,0,0,0.2);padding:26px 22px;z-index:9999;width:92%;max-width:380px;font-family:'Segoe UI','Helvetica Neue',sans-serif;text-align:center;animation:fadeIn 0.35s ease-in-out;border:1px solid rgba(13,110,253,0.15);">
+<h2 style="font-size:20px;margin-bottom:14px;font-weight:700;text-transform:uppercase;background:linear-gradient(90deg,#0d6efd,#6610f2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;"><?php echo htmlspecialchars($popup_title); ?></h2>
+<div style="font-size:14px;color:<?php echo $popup_text_color; ?>;line-height:1.7;margin-bottom:14px;"><?php echo nl2br(htmlspecialchars($popup_msg)); ?></div>
 <div style="margin-top:16px;">
 <?php if ($wa): ?><a href="https://wa.me/<?php echo $wa; ?>" target="_blank" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;margin-right:8px;font-weight:600;display:inline-block;transition:all 0.3s ease;">💬 WhatsApp</a><?php endif; ?>
 <?php if ($tg): ?><a href="<?php echo $tg; ?>" target="_blank" style="background:linear-gradient(135deg,#0088cc,#005f99);color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;display:inline-block;transition:all 0.3s ease;">📨 Telegram</a><?php endif; ?>
@@ -79,7 +83,23 @@ function toggleFab() { var el = document.getElementById("fabOptions"); if (el) e
 </style>
 
 <script>
-window.onload = function() { if (!localStorage.getItem("noticeClosed")) { var el = document.getElementById('popupNotice'); if (el) el.style.display = 'block'; } };
-function closePopup() { if (document.getElementById('dontShow') && document.getElementById('dontShow').checked) { localStorage.setItem("noticeClosed", "true"); } var el = document.getElementById('popupNotice'); if (el) el.style.display = 'none'; }
+window.addEventListener('DOMContentLoaded', function() {
+    var noticeHash = '<?php echo $notice_hash; ?>';
+    var savedHash = localStorage.getItem("noticeSeenHash");
+    if (savedHash !== noticeHash) {
+        var el = document.getElementById('popupNotice');
+        if (el) el.style.display = 'block';
+    }
+});
+
+function closePopup() {
+    var noticeHash = '<?php echo $notice_hash; ?>';
+    if (document.getElementById('dontShow') && document.getElementById('dontShow').checked) {
+        localStorage.setItem("noticeSeenHash", noticeHash);
+    }
+    var el = document.getElementById('popupNotice');
+    if (el) el.style.display = 'none';
+}
 </script>
+<?php endif; ?>
 <?php endif; ?>

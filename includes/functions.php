@@ -495,7 +495,7 @@ function renderSeoTags($options = []) {
         'url' => getSiteUrl(),
         'potentialAction' => [
             '@type' => 'SearchAction',
-            'target' => getSiteUrl() . 'blogs.php?search={search_term_string}',
+            'target' => getSiteUrl() . 'blog?search={search_term_string}',
             'query-input' => 'required name=search_term_string'
         ]
     ];

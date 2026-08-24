@@ -47,7 +47,7 @@ foreach ($footer_tree as $parent):
 </div>
 <div class="border-t border-b border-gray-400 border-opacity-25">
 <div class="content py-4 flex justify-between flex-col items-center lg:flex-row gap-4">
-<p style="color: #ffffff" class="text-center py-6"><?php echo getSetting('footer_copyright'); ?></p>
+<p style="color: #ffffff" class="text-center py-6"><?php echo htmlspecialchars(str_replace('{year}', date('Y'), getSetting('footer_copyright') ?: '© ' . date('Y') . ' Host Nibo. All rights reserved.')); ?></p>
 </div>
 </div>
 </div>
@@ -72,7 +72,7 @@ function subscribeNewsletter(e) {
     msgDiv.innerHTML = '';
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'subscribe.php', true);
+    xhr.open('POST', '/subscribe.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         btn.disabled = false;

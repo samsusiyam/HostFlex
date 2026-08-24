@@ -81,8 +81,12 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 
 <style>
 .btn-blue {
-    background-color: #0718c4;
-    color: #000503;
+    background-color: #0718c4 !important;
+    color: #ffffff !important;
+}
+.btn-blue:hover {
+    background-color: #05129c !important;
+    color: #ffffff !important;
 }
 </style>
 
@@ -98,10 +102,10 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <div class="content grid-cols-2 lg:grid">
 <div class="flex flex-col justify-center gap-6 md:gap-12">
 <h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
-<p class="md:max-w-[600px] lg:pr-12"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
+<p class="md:max-w-[600px] lg:pr-12 text-gray-600"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
 <div class="flex w-fit gap-x-2">
-<a href="<?php echo htmlspecialchars($c['button_url'] ?: getSetting('whmcs_domain_register_url')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
-<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(Tawk_API.toggle())'); ?>" data-ripple-light="true" class="btn btn-blue !px-8"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
+<a href="<?php echo htmlspecialchars($c['button_url'] ?: (getSetting('whmcs_domain_register_url') ?: '/contact')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple font-semibold shadow-xs"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
+<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(typeof Tawk_API !== "undefined" ? Tawk_API.toggle() : (document.getElementById("popupNotice") ? toggleFab() : window.location.href="/contact"))'); ?>" data-ripple-light="true" class="btn btn-blue !px-8 font-semibold shadow-xs"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
 <div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="Cloud Web Hosting" class="rounded-xl shadow-lg" loading="lazy"></div>
@@ -111,21 +115,21 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 <!-- Domain Search -->
 <div class="content mt-32 mb-10">
 <div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
-<form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: getSetting('whmcs_domain_search_url')); ?>" class="flex w-auto">
+<form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: (getSetting('whmcs_domain_search_url') ?: '#')); ?>" class="flex w-auto">
 <input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px]" type="search" />
 <div class="ml-2 w-fit">
-<button type="submit" size="custom" class="h-[53px] btn btn-blue">
+<button type="submit" size="custom" class="h-[53px] btn btn-blue font-semibold">
 <i class="fa fa-search"></i> <span class="hidden sm:block">Search</span>
 </button>
 </div>
 </form>
 <div class="flex justify-between gap-4 md:gap-8">
 <?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): ?>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo htmlspecialchars($item['price'] ?? ''); ?></span></span></a>
 <?php endforeach; else: ?>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1"><?php echo $currency_symbol; ?>999</span></span></a>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1"><?php echo $currency_symbol; ?>455</span></span></a>
-<a href="<?php echo $pricing_url; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1"><?php echo $currency_symbol; ?>250</span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>999</span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>455</span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?>250</span></span></a>
 <?php endif; ?>
 </div>
 </div>
@@ -253,7 +257,7 @@ if (empty($cards)) {
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-6 py-10">
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <div class="flex justify-center px-4 py-5"><img src="/images/svg/LiveChat.svg" alt class="w-12 h-14"></div>
-<a href="javascript:void(Tawk_API.toggle())"><h1 class="text-md text-gray-100 text-center bg-blue-600 py-3 px-4 font-semibold">Live Chat</h1></a>
+<a href="javascript:void(typeof Tawk_API !== 'undefined' ? Tawk_API.toggle() : (document.getElementById('popupNotice') ? toggleFab() : window.location.href='/contact'))"><h1 class="text-md text-gray-100 text-center bg-blue-600 py-3 px-4 font-semibold hover:bg-blue-700 transition">Live Chat</h1></a>
 </div>
 <div class="bg-white shadow-lg rounded-xl overflow-hidden">
 <div class="flex justify-center px-4 py-5"><img src="/images/svg/EmailSupport.svg" alt class="w-12 h-14"></div>
