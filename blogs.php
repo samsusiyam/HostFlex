@@ -54,6 +54,13 @@ $pages = ceil($total / $per_page);
 $posts = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id $where ORDER BY p.created_at DESC LIMIT $per_page OFFSET $offset");
 $categories = mysqli_query($conn, "SELECT c.*, COUNT(p.id) as post_count FROM blog_categories c LEFT JOIN blog_posts p ON c.id = p.category_id AND p.status = 1 WHERE c.status = 1 GROUP BY c.id ORDER BY c.name ASC");
 $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM blog_posts WHERE status = 1"))['c'] ?? 0);
+
+// Recent Posts for sidebar
+$recent_posts_res = mysqli_query($conn, "SELECT p.*, c.name as category_name, c.slug as category_slug FROM blog_posts p LEFT JOIN blog_categories c ON p.category_id = c.id WHERE p.status = 1 ORDER BY p.created_at DESC LIMIT 4");
+$recent_posts = [];
+while ($rp = mysqli_fetch_assoc($recent_posts_res)) {
+    $recent_posts[] = $rp;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,14 +118,14 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
             </span>
         </div>
         <a href="/blog" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 hover:underline ml-2">
-            <i class="fa-solid fa-xmark"></i> Clear
+            <i class="fa-solid fa-xmark"></i> Clear Filters
         </a>
     </div>
     <?php endif; ?>
 
-    <!-- Mobile Top Search Widget (Visible on Mobile only) -->
-    <div class="block lg:hidden mb-6">
-        <div class="bg-white border border-gray-200 rounded-2xl p-3.5 shadow-xs">
+    <!-- Mobile Top Search Widget (Visible on Mobile Only) -->
+    <div class="blog-mobile-search">
+        <div class="blog-search-card">
             <form method="GET" action="/blog" class="blog-search-form">
                 <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
                 <div class="blog-search-input-wrapper">
@@ -132,85 +139,92 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
         </div>
     </div>
 
-    <!-- Main Content & Sidebar Grid -->
-    <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Main Content & Sidebar Layout -->
+    <div class="blog-layout-wrapper">
         
         <!-- Posts Column (Left) -->
-        <div class="flex-1 min-w-0">
+        <main class="blog-main-column">
             <?php if (mysqli_num_rows($posts) > 0): ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="blog-grid">
                 <?php while ($post = mysqli_fetch_assoc($posts)): ?>
-                <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between">
+                <article class="blog-card">
                     <div>
-                        <?php if (!empty($post['image'])): ?>
-                        <a href="<?php echo getBlogPostUrl($post); ?>" class="block overflow-hidden h-44 sm:h-48 bg-gray-100 relative group">
-                            <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
-                        </a>
-                        <?php else: ?>
-                        <a href="<?php echo getBlogPostUrl($post); ?>" class="block overflow-hidden h-44 sm:h-48 blog-thumb-placeholder">
-                            <i class="fa-solid fa-newspaper opacity-75"></i>
-                        </a>
-                        <?php endif; ?>
+                        <div class="blog-card-thumb-wrap">
+                            <?php if (!empty($post['image'])): ?>
+                            <a href="<?php echo getBlogPostUrl($post); ?>" class="block w-full h-full">
+                                <img src="<?php echo htmlspecialchars(getImageUrl($post['image'])); ?>" class="blog-card-thumb" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy">
+                            </a>
+                            <?php else: ?>
+                            <a href="<?php echo getBlogPostUrl($post); ?>" class="blog-thumb-placeholder block w-full h-full" style="height:100%;">
+                                <i class="fa-solid fa-newspaper opacity-75"></i>
+                            </a>
+                            <?php endif; ?>
 
-                        <div class="p-4 sm:p-5">
-                            <div class="flex items-center justify-between gap-2 mb-2.5">
-                                <?php if (!empty($post['category_name'])): ?>
-                                <a href="/blog/category/<?php echo urlencode($post['category_slug']); ?>" class="text-[11px] text-blue-600 font-bold uppercase tracking-wider bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100 hover:bg-blue-600 hover:text-white transition">
-                                    <?php echo htmlspecialchars($post['category_name']); ?>
-                                </a>
-                                <?php else: ?>
-                                <span class="text-[11px] text-gray-400 font-medium">Article</span>
-                                <?php endif; ?>
-                                <span class="text-[11px] text-gray-400 font-medium flex items-center gap-1">
+                            <?php if (!empty($post['category_name'])): ?>
+                            <a href="/blog/category/<?php echo urlencode($post['category_slug']); ?>" class="blog-card-badge">
+                                <?php echo htmlspecialchars($post['category_name']); ?>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="blog-card-body">
+                            <div class="blog-card-meta">
+                                <span class="flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar text-[10px] text-gray-400"></i> <?php echo date('d M Y', strtotime($post['created_at'])); ?>
+                                </span>
+                                <span class="flex items-center gap-1 text-blue-600 font-semibold">
                                     <i class="fa-regular fa-clock text-[10px]"></i> <?php echo getReadingTime($post['content']); ?> min
                                 </span>
                             </div>
 
-                            <h3 class="text-base font-bold mb-2 leading-snug">
-                                <a href="<?php echo getBlogPostUrl($post); ?>" class="text-gray-900 hover:text-blue-600 transition line-clamp-2">
+                            <h3 class="blog-card-title">
+                                <a href="<?php echo getBlogPostUrl($post); ?>">
                                     <?php echo htmlspecialchars($post['title']); ?>
                                 </a>
                             </h3>
                             
-                            <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                            <p class="blog-card-excerpt">
                                 <?php echo htmlspecialchars($post['excerpt'] ?: substr(strip_tags($post['content']), 0, 130) . '...'); ?>
                             </p>
                         </div>
                     </div>
 
-                    <div class="px-4 sm:px-5 pb-4 pt-2.5 flex items-center justify-between text-xs text-gray-400 border-t border-gray-100 mt-auto">
-                        <span class="font-medium text-gray-500 flex items-center gap-1">
-                            <i class="fa-regular fa-calendar text-[10px] text-gray-400"></i> <?php echo date('d M Y', strtotime($post['created_at'])); ?>
-                        </span>
-                        <a href="<?php echo getBlogPostUrl($post); ?>" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
+                    <div class="blog-card-footer">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[10px]">
+                                <?php echo strtoupper(substr($post['author'] ?: 'A', 0, 1)); ?>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-700"><?php echo htmlspecialchars($post['author'] ?: 'Admin'); ?></span>
+                        </div>
+                        <a href="<?php echo getBlogPostUrl($post); ?>" class="blog-card-readmore">
                             Read More <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </a>
                     </div>
-                </div>
+                </article>
                 <?php endwhile; ?>
             </div>
 
             <!-- Numbered Pagination -->
             <?php if ($pages > 1): ?>
-            <div class="flex justify-center items-center mt-10 gap-1.5 flex-wrap">
+            <nav class="blog-pagination" aria-label="Blog Pagination">
                 <?php if ($page > 1): ?>
-                <a href="?p=<?php echo ($page - 1); ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 transition">
+                <a href="?p=<?php echo ($page - 1); ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="blog-page-btn">
                     &larr; Prev
                 </a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $pages; $i++): ?>
-                <a href="?p=<?php echo $i; ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition <?php echo $i == $page ? 'bg-blue-600 text-white shadow-xs' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                <a href="?p=<?php echo $i; ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="blog-page-btn <?php echo $i == $page ? 'active' : ''; ?>">
                     <?php echo $i; ?>
                 </a>
                 <?php endfor; ?>
 
                 <?php if ($page < $pages): ?>
-                <a href="?p=<?php echo ($page + 1); ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 transition">
+                <a href="?p=<?php echo ($page + 1); ?><?php echo $cat_slug ? '&category='.urlencode($cat_slug) : ''; ?><?php echo $search_q ? '&search='.urlencode($search_q) : ''; ?>" class="blog-page-btn">
                     Next &rarr;
                 </a>
                 <?php endif; ?>
-            </div>
+            </nav>
             <?php endif; ?>
 
             <?php else: ?>
@@ -224,48 +238,94 @@ $total_all_posts = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*)
                 </a>
             </div>
             <?php endif; ?>
-        </div>
+        </main>
 
         <!-- Sidebar (Right) -->
-        <div class="w-full lg:w-80 space-y-6">
+        <aside class="blog-sidebar-column">
             
             <!-- Desktop Search Widget (Hidden on Mobile) -->
-            <div class="hidden lg:block bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
-                <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-magnifying-glass text-blue-600 text-xs"></i> Search Blog
-                </h3>
-                <form method="GET" action="/blog" class="blog-search-form">
-                    <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
-                    <div class="blog-search-input-wrapper">
-                        <i class="fa-solid fa-magnifying-glass blog-search-icon"></i>
-                        <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="blog-search-input" autocomplete="off">
-                    </div>
-                    <button type="submit" class="blog-search-submit">
-                        <span>Search</span>
-                    </button>
-                </form>
+            <div class="blog-desktop-search">
+                <div class="blog-search-card">
+                    <h3 class="blog-widget-title">
+                        <i class="fa-solid fa-magnifying-glass text-blue-600 text-xs"></i> Search Blog
+                    </h3>
+                    <form method="GET" action="/blog" class="blog-search-form">
+                        <?php if ($cat_slug): ?><input type="hidden" name="category" value="<?php echo htmlspecialchars($cat_slug); ?>"><?php endif; ?>
+                        <div class="blog-search-input-wrapper">
+                            <i class="fa-solid fa-magnifying-glass blog-search-icon"></i>
+                            <input type="text" name="search" value="<?php echo htmlspecialchars($search_q); ?>" placeholder="Search posts..." class="blog-search-input" autocomplete="off">
+                        </div>
+                        <button type="submit" class="blog-search-submit">
+                            <span>Search</span>
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <!-- Categories Widget -->
-            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
-                <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <div class="blog-sidebar-widget">
+                <h3 class="blog-widget-title">
                     <i class="fa-solid fa-folder-open text-blue-600 text-xs"></i> Categories
                 </h3>
-                <div class="space-y-1">
-                    <a href="/blog" class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition <?php echo empty($cat_slug) ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'; ?>">
+                <div class="blog-cat-list">
+                    <a href="/blog" class="blog-cat-link <?php echo empty($cat_slug) ? 'active' : ''; ?>">
                         <span>All Posts</span>
-                        <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"><?php echo $total_all_posts; ?></span>
+                        <span class="blog-cat-count"><?php echo $total_all_posts; ?></span>
                     </a>
                     <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
-                    <a href="/blog/category/<?php echo urlencode($cat['slug']); ?>" class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition <?php echo $cat_slug === $cat['slug'] ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'; ?>">
+                    <a href="/blog/category/<?php echo urlencode($cat['slug']); ?>" class="blog-cat-link <?php echo $cat_slug === $cat['slug'] ? 'active' : ''; ?>">
                         <span><?php echo htmlspecialchars($cat['name']); ?></span>
-                        <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"><?php echo $cat['post_count']; ?></span>
+                        <span class="blog-cat-count"><?php echo $cat['post_count']; ?></span>
                     </a>
                     <?php endwhile; ?>
                 </div>
             </div>
 
-        </div>
+            <!-- Recent Posts Widget -->
+            <?php if (!empty($recent_posts)): ?>
+            <div class="blog-sidebar-widget">
+                <h3 class="blog-widget-title">
+                    <i class="fa-solid fa-bolt text-amber-500 text-xs"></i> Recent Articles
+                </h3>
+                <div class="blog-recent-list">
+                    <?php foreach ($recent_posts as $rp): ?>
+                    <a href="<?php echo getBlogPostUrl($rp); ?>" class="blog-recent-item">
+                        <?php if (!empty($rp['image'])): ?>
+                        <img src="<?php echo htmlspecialchars(getImageUrl($rp['image'])); ?>" class="blog-recent-thumb" alt="" loading="lazy">
+                        <?php else: ?>
+                        <div class="blog-recent-thumb blog-thumb-placeholder" style="height:60px;width:60px;font-size:16px;">
+                            <i class="fa-solid fa-newspaper opacity-75"></i>
+                        </div>
+                        <?php endif; ?>
+                        <div class="blog-recent-info">
+                            <h4 class="blog-recent-title">
+                                <?php echo htmlspecialchars($rp['title']); ?>
+                            </h4>
+                            <div class="blog-recent-date">
+                                <i class="fa-regular fa-calendar text-[10px] mr-1"></i> <?php echo date('d M Y', strtotime($rp['created_at'])); ?>
+                            </div>
+                        </div>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Hosting Promo CTA Card -->
+            <div class="blog-promo-card">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-3 text-xl text-yellow-300">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <h4 class="text-base font-extrabold text-white mb-1.5">Fast NVMe Hosting</h4>
+                <p class="text-xs text-blue-100 leading-relaxed mb-0">
+                    Get premium cloud hosting with 99.9% uptime guarantee & 24/7 support.
+                </p>
+                <a href="/offers" class="blog-promo-btn">
+                    Explore Plans &rarr;
+                </a>
+            </div>
+
+        </aside>
 
     </div>
 
