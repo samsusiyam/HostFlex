@@ -57,8 +57,7 @@ foreach ($tree as $item):
         <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
         <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
     </button>
-    <div id="desktopCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl p-1.5 z-[999999] animate-fadeIn" style="min-width: 170px;">
-        <div class="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-400 border-b border-gray-100 mb-1">Select Currency</div>
+    <div id="desktopCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 rounded-2xl shadow-2xl p-1.5 z-[999999] animate-fadeIn" style="min-width: 160px;">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
         <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'; ?>">
             <div class="flex items-center gap-2.5">
@@ -77,28 +76,23 @@ foreach ($tree as $item):
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
 
-<!-- Mobile Drawer Navigation -->
-<div class="invisible fixed bottom-0 left-0 right-0 top-0 z-50 flex h-full w-full flex-col justify-between overflow-y-auto bg-white p-6 opacity-0 transition-all duration-300 xl:hidden" id="mobile-nav">
-<div class="flex items-center justify-between pb-4 border-b border-gray-100">
-    <a href="/"><img class="h-[40px]" src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>" /></a>
-    <button type="button" id="mobile-nav-close" aria-label="Close navigation" class="p-2 text-gray-500 hover:text-gray-800 transition cursor-pointer"><i class="fa fa-times text-xl"></i></button>
-</div>
-<div class="flex flex-col gap-1 py-4 font-normal">
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow-xl border-b xl:hidden flex flex-col gap-3 p-6 font-normal z-[99999]" style="opacity: 0; transform: scaleY(0); transform-origin: top; transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease; pointer-events: none;">
 <?php
 foreach ($tree as $item):
-    $has_children = !empty($item['children']);
+    $has_children = isset($item['children']) && !empty($item['children']);
     $url = htmlspecialchars($item['url']);
     $label = htmlspecialchars($item['label']);
     if ($has_children):
 ?>
-<div class="py-2 border-b border-gray-100">
-    <button type="button" onclick="toggleMobileSubmenu(this)" class="w-full flex items-center justify-between py-1 font-medium text-gray-800 hover:text-blue-600 transition">
+<div class="mobile-menu-item flex flex-col">
+    <div class="flex items-center justify-between py-2.5 border-b border-gray-100 font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition" onclick="toggleMobileAccordion(this)">
         <span><?php echo $label; ?></span>
-        <i class="fa fa-chevron-down text-xs text-gray-400 transition-transform duration-200"></i>
-    </button>
-    <div class="hidden flex-col pl-4 pt-2 space-y-2 border-l-2 border-blue-500 ml-1 mt-1">
+        <small class="text-xs ml-1 text-gray-400"><i class="fa fa-chevron-down transition-transform duration-200"></i></small>
+    </div>
+    <div class="mobile-submenu hidden flex-col bg-gray-50 text-sm border-b border-gray-100 p-2 mt-1 rounded-lg space-y-1">
         <?php foreach ($item['children'] as $child): ?>
-        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="py-1 text-sm text-gray-600 hover:text-blue-600 transition block"><?php echo htmlspecialchars($child['label']); ?></a>
+        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="whitespace-nowrap px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition"><?php echo htmlspecialchars($child['label']); ?></a>
         <?php endforeach; ?>
     </div>
 </div>
@@ -107,10 +101,9 @@ foreach ($tree as $item):
 <?php endif; endforeach; ?>
 
 <div class="pt-3">
-    <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold shadow-xs" data-ripple-light="true">
+    <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold shadow-xs" data-ripple-light="true">
         <i class="fa fa-display"></i> Client Area
     </a>
-</div>
 </div>
 </div>
 
@@ -124,8 +117,7 @@ foreach ($tree as $item):
         <span class="font-bold"><?php echo htmlspecialchars($user_curr['code']); ?></span>
         <i class="fa-solid fa-chevron-down text-[8px] text-gray-400 ml-0.5"></i>
     </button>
-    <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 shadow-2xl rounded-2xl p-1.5 z-[999999] animate-fadeIn" style="min-width: 165px;">
-        <div class="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-400 border-b border-gray-100 mb-1">Select Currency</div>
+    <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-44 bg-white border border-gray-100 shadow-2xl rounded-2xl p-1.5 z-[9999999] animate-fadeIn" style="min-width: 160px;">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
         <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2 text-xs rounded-xl transition font-bold <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'; ?>">
             <div class="flex items-center gap-2.5">
@@ -152,13 +144,39 @@ function toggleCurrencyMenu(id) {
     var target = document.getElementById(id);
     if (!target) return;
     var isHidden = target.classList.contains('hidden');
-    // close both
+    // close both dropdowns
     var d = document.getElementById('desktopCurrencyDropdown');
     var m = document.getElementById('mobileCurrencyDropdown');
     if (d) d.classList.add('hidden');
     if (m) m.classList.add('hidden');
+    
+    // Also close mobile nav drawer if open to prevent overlap
+    var mobileNav = document.getElementById("mobile-nav");
+    var mobileToggle = document.getElementById("mobile-nav-toggle");
+    if (mobileNav && isHidden) {
+        mobileNav.style.transform = "scaleY(0)";
+        mobileNav.style.opacity = "0";
+        mobileNav.style.pointerEvents = "none";
+        if (mobileToggle) mobileToggle.innerHTML = '<i class="fa fa-bars"></i>';
+    }
+
     if (isHidden) {
         target.classList.remove('hidden');
+    }
+}
+
+function toggleMobileAccordion(el) {
+    var submenu = el.nextElementSibling;
+    if (!submenu) return;
+    var arrow = el.querySelector('.fa-chevron-down');
+    if (submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+        submenu.classList.add('flex');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+    } else {
+        submenu.classList.add('hidden');
+        submenu.classList.remove('flex');
+        if (arrow) arrow.style.transform = '';
     }
 }
 
