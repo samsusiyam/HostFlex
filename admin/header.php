@@ -11,37 +11,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        .sidebar-overlay { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(2px);
-            z-index: 998; 
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-overlay.open { display: block; opacity: 1; }
-
-        @media (max-width: 768px) {
-            .admin-sidebar { 
-                position: fixed; 
-                left: -300px; 
-                top: 0; 
-                bottom: 0; 
-                z-index: 999; 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-                width: 280px; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            }
-            .admin-sidebar.open { left: 0; }
-        }
         
         .settings-sub { 
             overflow: hidden; 
@@ -61,7 +36,98 @@
             color: #2563eb !important;
             font-weight: 700 !important;
         }
+
+        /* Mobile specific sidebar drawer */
+        @media (max-width: 767.98px) {
+            #adminSidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                bottom: 0 !important;
+                width: 280px !important;
+                max-width: 85vw !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                z-index: 99999 !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                box-shadow: 4px 0 25px rgba(0,0,0,0.2) !important;
+                background: #ffffff !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            #adminSidebar.open {
+                transform: translateX(0) !important;
+            }
+            #sidebarOverlay {
+                position: fixed !important;
+                inset: 0 !important;
+                background: rgba(15, 23, 42, 0.6) !important;
+                backdrop-filter: blur(2px) !important;
+                z-index: 99998 !important;
+                display: none;
+                opacity: 0;
+                transition: opacity 0.25s ease !important;
+            }
+            #sidebarOverlay.open {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
+
+        /* Desktop specific sidebar */
+        @media (min-width: 768px) {
+            #adminSidebar {
+                transform: none !important;
+                position: sticky !important;
+                top: 3.5rem !important;
+                height: calc(100vh - 3.5rem) !important;
+                display: flex !important;
+            }
+            @media (min-width: 640px) {
+                #adminSidebar {
+                    top: 4rem !important;
+                    height: calc(100vh - 4rem) !important;
+                }
+            }
+            #sidebarOverlay {
+                display: none !important;
+            }
+        }
     </style>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('adminSidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+        }
+
+        function toggleSettings() {
+            var sub = document.getElementById('settingsSub');
+            var arrow = document.getElementById('settingsArrow');
+            if (!sub) return;
+            sub.classList.toggle('open');
+            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+
+        function toggleSecurity() {
+            var sub = document.getElementById('securitySub');
+            var arrow = document.getElementById('securityArrow');
+            if (!sub) return;
+            sub.classList.toggle('open');
+            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+
+        function toggleBlog() {
+            var sub = document.getElementById('blogSub');
+            var arrow = document.getElementById('blogArrow');
+            if (!sub) return;
+            sub.classList.toggle('open');
+            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 <?php if (isMaintenanceMode()): ?>
@@ -72,7 +138,7 @@
 <?php endif; ?>
 
 <!-- Backdrop Overlay for Mobile -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <!-- Top Navbar -->
 <nav class="bg-white shadow-xs border-b border-gray-200 sticky top-0 z-30">
@@ -81,7 +147,7 @@
             
             <!-- Left: Toggle & Logo -->
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition cursor-pointer" aria-label="Toggle navigation">
+                <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition cursor-pointer" aria-label="Toggle navigation">
                     <i class="fa-solid fa-bars-staggered text-lg"></i>
                 </button>
                 <a href="dashboard.php" class="flex items-center gap-2.5">
@@ -121,17 +187,17 @@
 <div class="flex min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)]">
     
     <!-- Sidebar -->
-    <aside class="admin-sidebar w-64 bg-white border-r border-gray-200 sticky top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar flex flex-col justify-between shrink-0" id="adminSidebar">
+    <aside class="admin-sidebar w-64 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar flex flex-col justify-between shrink-0" id="adminSidebar">
         
         <div>
             <!-- Mobile Sidebar Top Header with Close Button -->
             <div class="md:hidden flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
                 <div class="flex items-center gap-2">
                     <img src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" class="h-6 object-contain" alt="Logo">
-                    <span class="font-bold text-xs text-gray-800">Menu</span>
+                    <span class="font-bold text-xs text-gray-800">Admin Menu</span>
                 </div>
-                <button onclick="toggleSidebar()" class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition cursor-pointer">
-                    <i class="fa-solid fa-xmark text-base"></i>
+                <button type="button" onclick="toggleSidebar()" class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition cursor-pointer" aria-label="Close sidebar">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
@@ -379,37 +445,6 @@
     <main class="flex-1 p-3 sm:p-4 md:p-6 min-w-0 max-w-full overflow-x-hidden">
 
     <script>
-        function toggleSidebar() {
-            var sidebar = document.getElementById('adminSidebar');
-            var overlay = document.getElementById('sidebarOverlay');
-            if (sidebar) sidebar.classList.toggle('open');
-            if (overlay) overlay.classList.toggle('open');
-        }
-
-        function toggleSettings() {
-            var sub = document.getElementById('settingsSub');
-            var arrow = document.getElementById('settingsArrow');
-            if (!sub) return;
-            sub.classList.toggle('open');
-            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
-        }
-
-        function toggleSecurity() {
-            var sub = document.getElementById('securitySub');
-            var arrow = document.getElementById('securityArrow');
-            if (!sub) return;
-            sub.classList.toggle('open');
-            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
-        }
-
-        function toggleBlog() {
-            var sub = document.getElementById('blogSub');
-            var arrow = document.getElementById('blogArrow');
-            if (!sub) return;
-            sub.classList.toggle('open');
-            if (arrow) arrow.style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
-        }
-
         <?php if (strpos($_SERVER['PHP_SELF'], 'setting') !== false || strpos($_SERVER['PHP_SELF'], 'smtp') !== false): ?>
         document.addEventListener('DOMContentLoaded', function() {
             var s = document.getElementById('settingsSub');

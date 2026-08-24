@@ -112,17 +112,20 @@ $product_schema = [
         $display_period = ' /Month';
     }
 
-    $badge_text = trim($plan['badge'] ?? '');
-    if (empty($badge_text) && !empty($plan['is_popular']) && (int)$plan['is_popular'] === 1) {
+    $is_popular = !empty($plan['is_popular']) && (int)$plan['is_popular'] === 1;
+    $badge_raw = trim($plan['badge'] ?? '');
+    if ($is_popular && empty($badge_raw)) {
         $badge_text = 'Popular';
-    }
-    if (empty($badge_text)) {
+    } elseif (!empty($badge_raw)) {
+        $badge_text = $badge_raw;
+    } else {
         $badge_text = $plan['name'];
     }
+    $badge_bg_class = $is_popular ? 'bg-blue-600 text-white shadow-xs' : 'bg-gray-500 bg-opacity-50 text-white';
 ?>
 <div class="rounded-lg shadow-xl flex flex-col overflow-hidden bg-white border plan-pricing-card" data-billing-mode="<?php echo $billing_mode; ?>">
 <div class="p-5 text-center rounded-t-lg border-b border-white bg-opacity-95 overflow-hidden bg-blue-100">
-<span class="inline-block text-sm uppercase tracking-wider font-semibold px-3 py-1 <?php echo (!empty($plan['is_popular']) || ($plan['badge'] ?? '') !== '') ? 'bg-blue-600 text-white' : 'bg-gray-500 bg-opacity-50 text-white'; ?> rounded-full mb-4"><?php echo htmlspecialchars($badge_text); ?></span>
+<span class="inline-block text-sm uppercase tracking-wider font-semibold px-3 py-1 <?php echo $badge_bg_class; ?> rounded-full mb-4"><?php echo htmlspecialchars($badge_text); ?></span>
 <div class="flex gap-1 mb-1 justify-center items-center">
 <h3 class="text-xl xl:text-2xl font-extrabold"><?php echo htmlspecialchars($curr_symbol); ?> <span data-monthly="<?php echo $conv_monthly; ?>" data-yearly="<?php echo $conv_yearly; ?>" class="priceValue"><?php echo $display_price; ?></span></h3>
 <span class="priceFor text-sm font-semibold mt-1"><?php echo $display_period; ?></span>
