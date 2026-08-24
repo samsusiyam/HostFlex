@@ -7,6 +7,24 @@ checkAdminLogin();
 $error = '';
 $success = '';
 
+// Handle AJAX Quick Toggle Status
+if (isset($_POST['ajax_toggle_status'])) {
+    header('Content-Type: application/json');
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id > 0) {
+        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT status, title FROM offers WHERE id = $id"));
+        if ($curr) {
+            $new_val = (int)$curr['status'] === 1 ? 0 : 1;
+            mysqli_query($conn, "UPDATE offers SET status = $new_val WHERE id = $id");
+            logActivity('Toggled Offer Status', ($curr['title'] ?? 'Offer') . " -> $new_val (ID: $id)");
+            echo json_encode(['success' => true, 'new_val' => $new_val]);
+            exit;
+        }
+    }
+    echo json_encode(['success' => false]);
+    exit;
+}
+
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_offer_id'])) {
     $id = (int)$_POST['delete_offer_id'];
@@ -152,10 +170,10 @@ $total_offers = mysqli_num_rows($offers);
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3.5">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $offer['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>">
+                            <button type="button" onclick="toggleOfferStatus(<?php echo $offer['id']; ?>, this)" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $offer['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>" title="Click to toggle Active/Inactive">
                                 <span class="w-1.5 h-1.5 rounded-full <?php echo $offer['status'] ? 'bg-emerald-500' : 'bg-rose-500'; ?>"></span>
-                                <?php echo $offer['status'] ? 'Active' : 'Inactive'; ?>
-                            </span>
+                                <span><?php echo $offer['status'] ? 'Active' : 'Inactive'; ?></span>
+                            </button>
                         </td>
                         <td class="px-4 py-3.5 text-right">
                             <div class="flex items-center justify-end gap-2">
@@ -187,11 +205,11 @@ $total_offers = mysqli_num_rows($offers);
 <!-- ==========================================
      POPUP MODAL: ADD / EDIT OFFER
 =============================================== -->
-<div id="offerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 my-8 animate-in fade-in duration-200">
+<div id="offerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 my-auto sm:my-8 animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
         
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50/70">
+        <div class="shrink-0 flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b bg-gray-50/70">
             <div class="flex items-center gap-2">
                 <span class="p-2 bg-blue-100 text-blue-700 rounded-lg text-xs" id="offerModalIcon"><i class="fa-solid fa-plus"></i></span>
                 <h3 class="text-sm font-bold text-gray-900" id="offerModalTitle">Add New Offer</h3>
@@ -202,11 +220,11 @@ $total_offers = mysqli_num_rows($offers);
         </div>
 
         <!-- Modal Form Body -->
-        <form method="POST" id="offerModalForm">
+        <form method="POST" id="offerModalForm" class="flex flex-col flex-1 overflow-hidden">
             <input type="hidden" name="save_offer" value="1">
             <input type="hidden" name="offer_id" id="offer_id" value="">
 
-            <div class="p-6 space-y-4 text-xs max-h-[75vh] overflow-y-auto">
+            <div class="p-4 sm:p-6 space-y-4 text-xs flex-1 overflow-y-auto">
                 
                 <div>
                     <label class="block font-bold text-gray-700 mb-1">Offer Title <span class="text-red-500">*</span></label>
@@ -222,6 +240,14 @@ $total_offers = mysqli_num_rows($offers);
                     <div>
                         <label class="block font-bold text-gray-700 mb-1">Badge Tag</label>
                         <input type="text" name="badge" id="offer_badge" placeholder="e.g. LIMITED TIME, 50% OFF" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        
+                        <!-- Quick Badge Preset Chips -->
+                        <div class="flex flex-wrap gap-1 mt-1.5">
+                            <button type="button" onclick="document.getElementById('offer_badge').value = '50% OFF'" class="text-[10px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded border border-rose-200 hover:bg-rose-100 transition cursor-pointer">50% OFF</button>
+                            <button type="button" onclick="document.getElementById('offer_badge').value = 'LIMITED TIME'" class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-100 transition cursor-pointer">LIMITED TIME</button>
+                            <button type="button" onclick="document.getElementById('offer_badge').value = 'SPECIAL DEAL'" class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 transition cursor-pointer">SPECIAL DEAL</button>
+                            <button type="button" onclick="document.getElementById('offer_badge').value = 'FLASH SALE'" class="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded border border-purple-200 hover:bg-purple-100 transition cursor-pointer">FLASH SALE</button>
+                        </div>
                     </div>
 
                     <div>
@@ -257,9 +283,9 @@ $total_offers = mysqli_num_rows($offers);
             </div>
 
             <!-- Modal Footer -->
-            <div class="flex items-center justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+            <div class="shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-4 sm:px-6 py-3.5 sm:py-4 border-t bg-gray-50">
                 <button type="button" onclick="closeOfferModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
-                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Save Offer
                 </button>
             </div>
@@ -334,6 +360,26 @@ function openEditOfferModal(offer) {
 
 function closeOfferModal() {
     document.getElementById('offerModal').classList.add('hidden');
+}
+
+function toggleOfferStatus(id, btn) {
+    var fd = new FormData();
+    fd.append('ajax_toggle_status', '1');
+    fd.append('id', id);
+
+    fetch('offers.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.new_val === 1) {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-emerald-50 text-emerald-700 border border-emerald-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>Active</span>';
+            } else {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-rose-50 text-rose-700 border border-rose-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>Inactive</span>';
+            }
+        }
+    });
 }
 
 function openDeleteOfferModal(id, title, price) {

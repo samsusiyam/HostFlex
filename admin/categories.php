@@ -19,6 +19,24 @@ if (isset($_POST['reorder'])) {
     exit;
 }
 
+// Handle AJAX Quick Toggle Status
+if (isset($_POST['ajax_toggle_status'])) {
+    header('Content-Type: application/json');
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id > 0) {
+        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT status, name FROM categories WHERE id = $id"));
+        if ($curr) {
+            $new_val = (int)$curr['status'] === 1 ? 0 : 1;
+            mysqli_query($conn, "UPDATE categories SET status = $new_val WHERE id = $id");
+            logActivity('Toggled Category Status', ($curr['name'] ?? 'Category') . " -> $new_val (ID: $id)");
+            echo json_encode(['success' => true, 'new_val' => $new_val]);
+            exit;
+        }
+    }
+    echo json_encode(['success' => false]);
+    exit;
+}
+
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category_id'])) {
     $id = (int)$_POST['delete_category_id'];
@@ -121,7 +139,7 @@ $total_categories = mysqli_num_rows($categories);
                 Total Categories: <strong class="text-gray-900"><?php echo $total_categories; ?></strong>
             </div>
             <div class="text-[11px] text-gray-400">
-                <i class="fa-solid fa-arrows-up-down mr-1"></i> Drag rows to reorder order on frontend
+                <i class="fa-solid fa-arrows-up-down mr-1"></i> Drag rows to reorder on frontend
             </div>
         </div>
 
@@ -165,18 +183,21 @@ $total_categories = mysqli_num_rows($categories);
                             /category/<?php echo htmlspecialchars($cat['slug']); ?>
                         </td>
                         <td class="px-4 py-3.5 text-center">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                            <a href="plans.php" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition" title="View plans in this category">
                                 <?php echo $cat['plan_count']; ?> plans
-                            </span>
+                            </a>
                         </td>
                         <td class="px-4 py-3.5">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $cat['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>">
+                            <button type="button" onclick="toggleCategoryStatus(<?php echo $cat['id']; ?>, this)" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $cat['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>" title="Click to toggle Active/Inactive">
                                 <span class="w-1.5 h-1.5 rounded-full <?php echo $cat['status'] ? 'bg-emerald-500' : 'bg-rose-500'; ?>"></span>
-                                <?php echo $cat['status'] ? 'Active' : 'Inactive'; ?>
-                            </span>
+                                <span><?php echo $cat['status'] ? 'Active' : 'Inactive'; ?></span>
+                            </button>
                         </td>
                         <td class="px-4 py-3.5 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="/category/<?php echo urlencode($cat['slug']); ?>" target="_blank" class="p-1.5 bg-gray-50 hover:bg-emerald-50 text-emerald-600 rounded-lg border border-gray-200 hover:border-emerald-200 transition cursor-pointer" title="View Public Page">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                </a>
                                 <button type="button" onclick='openEditCategoryModal(<?php echo $cat_json; ?>)' class="p-1.5 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 transition cursor-pointer" title="Edit Category">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
@@ -205,11 +226,11 @@ $total_categories = mysqli_num_rows($categories);
 <!-- ==========================================
      POPUP MODAL: ADD / EDIT CATEGORY
 =============================================== -->
-<div id="categoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 my-8 animate-in fade-in duration-200">
+<div id="categoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 my-auto sm:my-8 animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
         
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50/70">
+        <div class="shrink-0 flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b bg-gray-50/70">
             <div class="flex items-center gap-2">
                 <span class="p-2 bg-blue-100 text-blue-700 rounded-lg text-xs" id="catModalIcon"><i class="fa-solid fa-plus"></i></span>
                 <h3 class="text-sm font-bold text-gray-900" id="catModalTitle">Add New Category</h3>
@@ -220,11 +241,11 @@ $total_categories = mysqli_num_rows($categories);
         </div>
 
         <!-- Modal Form Body -->
-        <form method="POST" id="catModalForm" enctype="multipart/form-data">
+        <form method="POST" id="catModalForm" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden">
             <input type="hidden" name="save_category" value="1">
             <input type="hidden" name="category_id" id="cat_id" value="">
 
-            <div class="p-6 space-y-4 text-xs max-h-[75vh] overflow-y-auto">
+            <div class="p-4 sm:p-6 space-y-4 text-xs flex-1 overflow-y-auto">
                 
                 <div>
                     <label class="block font-bold text-gray-700 mb-1">Category Name <span class="text-red-500">*</span></label>
@@ -270,9 +291,9 @@ $total_categories = mysqli_num_rows($categories);
             </div>
 
             <!-- Modal Footer -->
-            <div class="flex items-center justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+            <div class="shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-4 sm:px-6 py-3.5 sm:py-4 border-t bg-gray-50">
                 <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
-                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Save Category
                 </button>
             </div>
@@ -349,6 +370,26 @@ function openEditCategoryModal(cat) {
 
 function closeCategoryModal() {
     document.getElementById('categoryModal').classList.add('hidden');
+}
+
+function toggleCategoryStatus(id, btn) {
+    var fd = new FormData();
+    fd.append('ajax_toggle_status', '1');
+    fd.append('id', id);
+
+    fetch('categories.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.new_val === 1) {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-emerald-50 text-emerald-700 border border-emerald-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>Active</span>';
+            } else {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-rose-50 text-rose-700 border border-rose-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>Inactive</span>';
+            }
+        }
+    });
 }
 
 function autoGenerateSlug(val) {

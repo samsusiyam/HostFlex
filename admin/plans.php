@@ -7,6 +7,25 @@ checkAdminLogin();
 $error = '';
 $success = '';
 
+// Handle AJAX Quick Toggle Status & Popular
+if (isset($_POST['ajax_toggle_field'])) {
+    header('Content-Type: application/json');
+    $id = (int)($_POST['id'] ?? 0);
+    $field = $_POST['field'] ?? '';
+    if ($id > 0 && in_array($field, ['status', 'is_popular'])) {
+        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT $field, name FROM hosting_plans WHERE id = $id"));
+        if ($curr) {
+            $new_val = (int)$curr[$field] === 1 ? 0 : 1;
+            mysqli_query($conn, "UPDATE hosting_plans SET $field = $new_val WHERE id = $id");
+            logActivity('Toggled Plan ' . ucfirst($field), ($curr['name'] ?? 'Plan') . " -> $new_val (ID: $id)");
+            echo json_encode(['success' => true, 'new_val' => $new_val]);
+            exit;
+        }
+    }
+    echo json_encode(['success' => false]);
+    exit;
+}
+
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_plan_id'])) {
     $id = (int)$_POST['delete_plan_id'];
@@ -21,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_plan_id'])) {
 
 // Handle Add / Edit via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_plan'])) {
-    $category = trim($_POST['category'] ?? '');
-    $name = trim($_POST['name'] ?? '');
-    $subtitle = trim($_POST['subtitle'] ?? '');
-    $badge = trim($_POST['badge'] ?? '');
+    $category = sanitize(trim($_POST['category'] ?? ''));
+    $name = sanitize(trim($_POST['name'] ?? ''));
+    $subtitle = sanitize(trim($_POST['subtitle'] ?? ''));
+    $badge = sanitize(trim($_POST['badge'] ?? ''));
     $monthly_price = (float)($_POST['monthly_price'] ?? 0);
     $yearly_price = (float)($_POST['yearly_price'] ?? 0);
     $features_lines = array_values(array_filter(array_map('trim', explode("\n", $_POST['features'] ?? ''))));
@@ -87,7 +106,7 @@ while ($plan = mysqli_fetch_assoc($plans)) {
                 <span class="p-2 bg-blue-50 text-blue-600 rounded-lg text-sm"><i class="fa-solid fa-server"></i></span>
                 <h1 class="text-2xl font-bold text-gray-900">Hosting Plans</h1>
             </div>
-            <p class="text-xs text-gray-500">Create, edit, and organize web hosting packages and pricing tiers.</p>
+            <p class="text-xs text-gray-500">Create, clone, edit, and organize web hosting packages and pricing tiers.</p>
         </div>
         <div class="flex items-center gap-3">
             <button type="button" onclick="openAddPlanModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
@@ -117,86 +136,102 @@ while ($plan = mysqli_fetch_assoc($plans)) {
     </div>
     <?php endif; ?>
 
-    <!-- Category Filter Tabs & Real-Time Search -->
-    <?php if ($total_plans > 0): ?>
+    <!-- Category Filter Bar & Live Search -->
     <div class="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
-            <button type="button" onclick="filterCategory('all', this)" class="cat-tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-blue-50 text-blue-700 border border-blue-200 shadow-xs whitespace-nowrap">
+        
+        <!-- Category Tab Buttons -->
+        <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 text-xs font-semibold">
+            <button type="button" onclick="filterCategoryTab('all', this)" class="cat-tab-btn px-3.5 py-1.5 rounded-xl transition cursor-pointer bg-blue-600 text-white shadow-xs">
                 All Categories (<?php echo $total_plans; ?>)
             </button>
-            <?php foreach ($plans_by_cat as $c_slug => $c_plans): ?>
-            <button type="button" onclick="filterCategory('<?php echo $c_slug; ?>', this)" class="cat-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 whitespace-nowrap">
-                <?php echo htmlspecialchars($cat_lookup[$c_slug] ?? ucfirst($c_slug)); ?> (<?php echo count($c_plans); ?>)
+            <?php foreach ($cat_lookup as $c_slug => $c_name): 
+                $count = count($plans_by_cat[$c_slug] ?? []);
+            ?>
+            <button type="button" onclick="filterCategoryTab('<?php echo $c_slug; ?>', this)" class="cat-tab-btn px-3.5 py-1.5 rounded-xl transition cursor-pointer text-gray-600 hover:bg-gray-100 whitespace-nowrap">
+                <?php echo htmlspecialchars($c_name); ?> <span class="text-[10px] text-gray-400 font-normal">(<?php echo $count; ?>)</span>
             </button>
             <?php endforeach; ?>
         </div>
+
+        <!-- Live Search Bar -->
         <div class="relative w-full md:w-64">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
             <input type="text" id="planSearchInput" onkeyup="filterPlanCards(this.value)" placeholder="Search plans..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-gray-800 focus:bg-white focus:outline-none focus:border-blue-600 transition">
         </div>
+
     </div>
 
-    <!-- Plans Display by Category -->
-    <?php foreach ($plans_by_cat as $cat_slug => $cat_plans): ?>
-    <?php $cat_name = isset($cat_lookup[$cat_slug]) ? $cat_lookup[$cat_slug] : ucfirst($cat_slug); ?>
-    <div class="category-block mb-8" data-category="<?php echo $cat_slug; ?>">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2 uppercase tracking-wider">
-                <i class="fa-solid fa-folder-open text-blue-600"></i> <?php echo htmlspecialchars($cat_name); ?>
-                <span class="text-xs font-normal text-gray-400 normal-case">(<?php echo count($cat_plans); ?> plans)</span>
+    <!-- Plans Grouped By Category -->
+    <?php if (!empty($plans_by_cat)): ?>
+    <?php foreach ($plans_by_cat as $cat_slug => $category_plans): 
+        $cat_name = $cat_lookup[$cat_slug] ?? ucfirst(str_replace('-', ' ', $cat_slug));
+    ?>
+    <div class="category-block space-y-4" data-category="<?php echo $cat_slug; ?>">
+        
+        <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+            <h2 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-folder-open text-blue-600"></i>
+                <span><?php echo htmlspecialchars($cat_name); ?></span>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-normal"><?php echo count($category_plans); ?> plans</span>
             </h2>
+            <a href="/category/<?php echo urlencode($cat_slug); ?>" target="_blank" class="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                <span>View Public Page</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <?php foreach ($cat_plans as $plan): 
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <?php foreach ($category_plans as $plan): 
                 $feats = json_decode($plan['features'] ?? '[]', true) ?: [];
                 $plan_json = htmlspecialchars(json_encode($plan), ENT_QUOTES, 'UTF-8');
             ?>
-            <div class="plan-card bg-white rounded-2xl shadow-xs hover:shadow-md transition duration-200 border border-gray-200/80 flex flex-col justify-between relative overflow-hidden" data-name="<?php echo strtolower($plan['name'] . ' ' . $plan['subtitle'] . ' ' . $cat_name); ?>" data-category="<?php echo $cat_slug; ?>">
+            <div class="plan-card bg-white rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition flex flex-col justify-between p-5 relative overflow-hidden" data-name="<?php echo strtolower($plan['name'] . ' ' . $cat_name . ' ' . $plan['subtitle']); ?>">
                 
-                <?php if ($plan['is_popular']): ?>
-                <div class="absolute top-0 right-0">
-                    <span class="bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-bl-xl shadow-xs flex items-center gap-1">
-                        <i class="fa-solid fa-star text-[9px]"></i> POPULAR
-                    </span>
-                </div>
-                <?php endif; ?>
-
-                <div class="p-5">
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                        <div class="pr-12">
-                            <h3 class="text-base font-bold text-gray-900 leading-tight"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                            <?php if ($plan['subtitle']): ?>
-                            <p class="text-xs text-gray-400 mt-0.5"><?php echo htmlspecialchars($plan['subtitle']); ?></p>
+                <!-- Top Badge & Quick Actions -->
+                <div>
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <?php if ($plan['badge']): ?>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200">
+                                <?php echo htmlspecialchars($plan['badge']); ?>
+                            </span>
                             <?php endif; ?>
+                            
+                            <!-- Quick Popular Star Toggle Button -->
+                            <button type="button" onclick="togglePlanField(<?php echo $plan['id']; ?>, 'is_popular', this)" class="p-1 rounded-lg text-xs cursor-pointer transition <?php echo $plan['is_popular'] ? 'text-amber-500 bg-amber-50' : 'text-gray-300 hover:text-amber-400'; ?>" title="Toggle Featured / Popular">
+                                <i class="fa-solid fa-star"></i>
+                            </button>
                         </div>
-                    </div>
 
-                    <div class="flex flex-wrap items-center gap-1.5 my-3">
-                        <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-200"><?php echo htmlspecialchars($cat_name); ?></span>
-                        <?php if ($plan['badge']): ?>
-                        <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200"><?php echo htmlspecialchars($plan['badge']); ?></span>
-                        <?php endif; ?>
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border <?php echo $plan['status'] ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'; ?>">
+                        <!-- Quick Active/Inactive Toggle Badge -->
+                        <button type="button" onclick="togglePlanField(<?php echo $plan['id']; ?>, 'status', this)" class="status-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $plan['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>" title="Click to toggle Active/Inactive">
                             <span class="w-1.5 h-1.5 rounded-full <?php echo $plan['status'] ? 'bg-emerald-500' : 'bg-rose-500'; ?>"></span>
-                            <?php echo $plan['status'] ? 'Active' : 'Inactive'; ?>
-                        </span>
+                            <span><?php echo $plan['status'] ? 'Active' : 'Inactive'; ?></span>
+                        </button>
                     </div>
 
-                    <!-- Pricing -->
-                    <div class="bg-gray-50/70 p-3 rounded-xl border border-gray-100 mb-4">
+                    <h3 class="font-bold text-base text-gray-900 mb-0.5"><?php echo htmlspecialchars($plan['name']); ?></h3>
+                    <?php if ($plan['subtitle']): ?>
+                    <p class="text-xs text-gray-400 mb-3 line-clamp-2"><?php echo htmlspecialchars($plan['subtitle']); ?></p>
+                    <?php else: ?>
+                    <div class="h-4"></div>
+                    <?php endif; ?>
+
+                    <!-- Price Box -->
+                    <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100 mb-4">
                         <div class="flex items-baseline gap-1">
-                            <span class="text-2xl font-extrabold text-gray-900">৳<?php echo number_format($plan['monthly_price'], 0); ?></span>
-                            <span class="text-xs text-gray-500 font-medium">/ month</span>
+                            <span class="text-xs text-gray-500 font-bold">BDT</span>
+                            <span class="text-xl font-extrabold text-gray-900"><?php echo number_format($plan['monthly_price'], 0); ?></span>
+                            <span class="text-xs text-gray-400 font-medium">/month</span>
                         </div>
                         <?php if ($plan['yearly_price'] > 0): ?>
-                        <div class="text-[11px] text-gray-500 mt-0.5">
-                            ৳<?php echo number_format($plan['yearly_price'], 0); ?> / year (save more)
+                        <div class="text-[11px] text-gray-500 font-semibold mt-0.5">
+                            Yearly: <strong>৳<?php echo number_format($plan['yearly_price'], 0); ?></strong>
                         </div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Features Preview -->
+                    <!-- Features Snippet -->
                     <ul class="space-y-1.5 text-xs text-gray-600 mb-4">
                         <?php foreach (array_slice($feats, 0, 4) as $f): ?>
                         <li class="flex items-center gap-2 truncate">
@@ -205,17 +240,22 @@ while ($plan = mysqli_fetch_assoc($plans)) {
                         </li>
                         <?php endforeach; ?>
                         <?php if (count($feats) > 4): ?>
-                        <li class="text-[11px] text-gray-400 font-semibold pl-4">+<?php echo (count($feats) - 4); ?> more features</li>
+                        <li class="text-[11px] text-blue-600 font-semibold pl-4">
+                            +<?php echo count($feats) - 4; ?> more features
+                        </li>
                         <?php endif; ?>
                     </ul>
                 </div>
 
-                <!-- Footer Actions -->
-                <div class="px-5 py-3 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl flex items-center justify-between text-xs">
-                    <span class="text-[11px] text-gray-400 font-semibold">#<?php echo $plan['id']; ?> • Order: <?php echo $plan['sort_order']; ?></span>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick='openEditPlanModal(<?php echo $plan_json; ?>)' class="bg-white hover:bg-blue-50 text-blue-600 border border-gray-200 hover:border-blue-200 px-2.5 py-1.5 rounded-lg font-bold transition shadow-xs flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-pen text-[10px]"></i> Edit
+                <!-- Footer Action Buttons -->
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2 text-xs">
+                    <span class="text-[10px] text-gray-400">Order: <?php echo $plan['sort_order']; ?></span>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick='openDuplicatePlanModal(<?php echo $plan_json; ?>)' class="bg-white hover:bg-purple-50 text-purple-600 border border-gray-200 hover:border-purple-200 p-1.5 rounded-lg transition shadow-xs cursor-pointer" title="Duplicate / Clone Plan">
+                            <i class="fa-solid fa-clone"></i>
+                        </button>
+                        <button type="button" onclick='openEditPlanModal(<?php echo $plan_json; ?>)' class="bg-white hover:bg-blue-50 text-blue-600 border border-gray-200 hover:border-blue-200 p-1.5 rounded-lg transition shadow-xs cursor-pointer" title="Edit Plan">
+                            <i class="fa-solid fa-pen"></i>
                         </button>
                         <button type="button" onclick="openDeletePlanModal(<?php echo $plan['id']; ?>, '<?php echo addslashes($plan['name']); ?>', '<?php echo number_format($plan['monthly_price'], 0); ?>', '<?php echo addslashes($cat_name); ?>')" class="bg-white hover:bg-red-50 text-red-600 border border-gray-200 hover:border-red-200 p-1.5 rounded-lg transition shadow-xs cursor-pointer" title="Delete Plan">
                             <i class="fa-solid fa-trash-can"></i>
@@ -246,13 +286,13 @@ while ($plan = mysqli_fetch_assoc($plans)) {
 </div>
 
 <!-- ==========================================
-     POPUP MODAL: ADD / EDIT HOSTING PLAN
+     POPUP MODAL: ADD / EDIT / DUPLICATE PLAN
 =============================================== -->
-<div id="planModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-100 my-8 animate-in fade-in duration-200">
+<div id="planModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-100 my-auto sm:my-8 animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
         
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50/70">
+        <div class="shrink-0 flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b bg-gray-50/70">
             <div class="flex items-center gap-2">
                 <span class="p-2 bg-blue-100 text-blue-700 rounded-lg text-xs" id="planModalIcon"><i class="fa-solid fa-plus"></i></span>
                 <h3 class="text-sm font-bold text-gray-900" id="planModalTitle">Add New Hosting Plan</h3>
@@ -263,11 +303,11 @@ while ($plan = mysqli_fetch_assoc($plans)) {
         </div>
 
         <!-- Modal Form Body -->
-        <form method="POST" id="planModalForm">
+        <form method="POST" id="planModalForm" class="flex flex-col flex-1 overflow-hidden">
             <input type="hidden" name="save_plan" value="1">
             <input type="hidden" name="plan_id" id="plan_id" value="">
 
-            <div class="p-6 space-y-5 text-xs max-h-[75vh] overflow-y-auto">
+            <div class="p-4 sm:p-6 space-y-4 text-xs flex-1 overflow-y-auto">
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -321,30 +361,45 @@ while ($plan = mysqli_fetch_assoc($plans)) {
                     </div>
                 </div>
 
+                <!-- Features Textarea + Instant Helper Chips -->
                 <div>
-                    <label class="block font-bold text-gray-700 mb-1"><i class="fa-solid fa-list-check text-blue-600 mr-1"></i> Feature List (One feature per line)</label>
-                    <textarea name="features" id="plan_features" rows="6" placeholder="5 GB NVMe SSD Storage&#10;Unlimited Bandwidth&#10;Free SSL Certificate&#10;cPanel Control Panel&#10;24/7 Priority Support" class="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono"></textarea>
-                    <p class="text-[11px] text-gray-400 mt-1">Each line will be rendered as a bullet point item on the pricing cards.</p>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="font-bold text-gray-700"><i class="fa-solid fa-list-check text-blue-600 mr-1"></i> Package Features (One per line)</label>
+                        <span class="text-[11px] text-gray-400">Click chips below to insert</span>
+                    </div>
+                    <textarea name="features" id="plan_features" rows="5" placeholder="10 GB NVMe Storage&#10;Unlimited Bandwidth&#10;Free SSL Certificate&#10;cPanel Control Panel&#10;24/7 Support" class="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono"></textarea>
+                    
+                    <!-- Quick Helper Chips -->
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        <button type="button" onclick="insertFeatureChip('10 GB NVMe SSD Storage')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ 10 GB NVMe</button>
+                        <button type="button" onclick="insertFeatureChip('Unlimited Bandwidth')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ Unmetered Bandwidth</button>
+                        <button type="button" onclick="insertFeatureChip('Free Let\'s Encrypt SSL')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ Free SSL</button>
+                        <button type="button" onclick="insertFeatureChip('cPanel Control Panel')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ cPanel Access</button>
+                        <button type="button" onclick="insertFeatureChip('LiteSpeed Web Server + LSCache')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ LiteSpeed</button>
+                        <button type="button" onclick="insertFeatureChip('Daily Automated Backups')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ Daily Backups</button>
+                        <button type="button" onclick="insertFeatureChip('24/7 Priority Ticket Support')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ 24/7 Support</button>
+                        <button type="button" onclick="insertFeatureChip('99.9% Uptime SLA')" class="text-[10px] bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 px-2 py-0.5 rounded-lg border border-gray-200 transition cursor-pointer">+ 99.9% SLA</button>
+                    </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-6 pt-2 border-t border-gray-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
                     <label class="flex items-center gap-2 cursor-pointer select-none font-semibold text-gray-700">
                         <input type="checkbox" name="is_popular" id="plan_is_popular" value="1" class="rounded text-amber-500 focus:ring-amber-400 w-4 h-4">
-                        <span><i class="fa-solid fa-star text-amber-500 mr-1"></i> Mark as Popular / Featured</span>
+                        <span><i class="fa-solid fa-star text-amber-500 mr-1"></i> Mark as Popular / Highlighted</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer select-none font-semibold text-gray-700">
                         <input type="checkbox" name="status" id="plan_status" value="1" checked class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                        <span><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Active (Visible on site)</span>
+                        <span><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Active (Visible to visitors)</span>
                     </label>
                 </div>
 
             </div>
 
             <!-- Modal Footer -->
-            <div class="flex items-center justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+            <div class="shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-4 sm:px-6 py-3.5 sm:py-4 border-t bg-gray-50">
                 <button type="button" onclick="closePlanModal()" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition text-xs cursor-pointer">Cancel</button>
-                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Save Plan
                 </button>
             </div>
@@ -359,18 +414,21 @@ while ($plan = mysqli_fetch_assoc($plans)) {
 <div id="deletePlanModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in duration-200">
         <form method="POST">
-            <input type="hidden" name="delete_plan_id" id="delete_plan_id" value="">
+            <input type="hidden" name="delete_plan_id" id="delete_plan_id_input" value="">
             
             <div class="p-6 text-center">
                 <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl mx-auto mb-4">
                     <i class="fa-solid fa-trash-can"></i>
                 </div>
                 <h3 class="text-base font-bold text-gray-900 mb-1">Delete Hosting Plan?</h3>
-                <p class="text-xs text-gray-500 mb-4">Are you sure you want to delete this plan? Visitors will no longer see it on the website.</p>
+                <p class="text-xs text-gray-500 mb-4">Are you sure you want to delete this plan? This action cannot be undone.</p>
                 
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs text-left mb-4">
-                    <div class="font-bold text-gray-900" id="deletePlanName">Plan Name</div>
-                    <div class="text-gray-500 mt-0.5" id="deletePlanDetails">Category: Shared • ৳0/mo</div>
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs text-left mb-2">
+                    <div class="font-bold text-gray-900" id="deletePlanName">Starter NVMe</div>
+                    <div class="text-gray-500 mt-0.5 flex justify-between">
+                        <span id="deletePlanCat">Shared Hosting</span>
+                        <span class="font-bold text-gray-700" id="deletePlanPrice">৳99/mo</span>
+                    </div>
                 </div>
             </div>
 
@@ -394,9 +452,9 @@ function openAddPlanModal() {
     document.getElementById('plan_badge').value = '';
     document.getElementById('plan_monthly_price').value = '';
     document.getElementById('plan_yearly_price').value = '';
+    document.getElementById('plan_features').value = '';
     document.getElementById('plan_order_url').value = '';
     document.getElementById('plan_sort_order').value = '0';
-    document.getElementById('plan_features').value = '';
     document.getElementById('plan_is_popular').checked = false;
     document.getElementById('plan_status').checked = true;
 
@@ -404,7 +462,7 @@ function openAddPlanModal() {
 }
 
 function openEditPlanModal(plan) {
-    document.getElementById('planModalTitle').innerText = 'Edit Hosting Plan: ' + plan.name;
+    document.getElementById('planModalTitle').innerText = 'Edit Plan: ' + plan.name;
     document.getElementById('planModalIcon').innerHTML = '<i class="fa-solid fa-pen"></i>';
     document.getElementById('plan_id').value = plan.id;
     document.getElementById('plan_category').value = plan.category;
@@ -412,18 +470,39 @@ function openEditPlanModal(plan) {
     document.getElementById('plan_subtitle').value = plan.subtitle || '';
     document.getElementById('plan_badge').value = plan.badge || '';
     document.getElementById('plan_monthly_price').value = plan.monthly_price;
-    document.getElementById('plan_yearly_price').value = plan.yearly_price > 0 ? plan.yearly_price : '';
-    document.getElementById('plan_order_url').value = plan.order_url || '';
-    document.getElementById('plan_sort_order').value = plan.sort_order || 0;
+    document.getElementById('plan_yearly_price').value = plan.yearly_price || '';
     
     var feats = [];
-    try {
-        feats = JSON.parse(plan.features || '[]');
-    } catch(e) {}
+    try { feats = JSON.parse(plan.features) || []; } catch(e) { feats = []; }
     document.getElementById('plan_features').value = feats.join('\n');
-    
+
+    document.getElementById('plan_order_url').value = plan.order_url || '';
+    document.getElementById('plan_sort_order').value = plan.sort_order || 0;
     document.getElementById('plan_is_popular').checked = (parseInt(plan.is_popular) === 1);
     document.getElementById('plan_status').checked = (parseInt(plan.status) === 1);
+
+    document.getElementById('planModal').classList.remove('hidden');
+}
+
+function openDuplicatePlanModal(plan) {
+    document.getElementById('planModalTitle').innerText = 'Clone Plan: ' + plan.name;
+    document.getElementById('planModalIcon').innerHTML = '<i class="fa-solid fa-clone"></i>';
+    document.getElementById('plan_id').value = ''; // Empty ID triggers new INSERT
+    document.getElementById('plan_category').value = plan.category;
+    document.getElementById('plan_name').value = plan.name + ' (Copy)';
+    document.getElementById('plan_subtitle').value = plan.subtitle || '';
+    document.getElementById('plan_badge').value = plan.badge || '';
+    document.getElementById('plan_monthly_price').value = plan.monthly_price;
+    document.getElementById('plan_yearly_price').value = plan.yearly_price || '';
+    
+    var feats = [];
+    try { feats = JSON.parse(plan.features) || []; } catch(e) { feats = []; }
+    document.getElementById('plan_features').value = feats.join('\n');
+
+    document.getElementById('plan_order_url').value = plan.order_url || '';
+    document.getElementById('plan_sort_order').value = (parseInt(plan.sort_order) || 0) + 1;
+    document.getElementById('plan_is_popular').checked = false;
+    document.getElementById('plan_status').checked = true;
 
     document.getElementById('planModal').classList.remove('hidden');
 }
@@ -432,10 +511,51 @@ function closePlanModal() {
     document.getElementById('planModal').classList.add('hidden');
 }
 
-function openDeletePlanModal(id, name, price, cat) {
-    document.getElementById('delete_plan_id').value = id;
+function insertFeatureChip(text) {
+    var ta = document.getElementById('plan_features');
+    var val = ta.value.trim();
+    if (val.length > 0) {
+        ta.value = val + '\n' + text;
+    } else {
+        ta.value = text;
+    }
+    ta.focus();
+}
+
+function togglePlanField(id, field, btn) {
+    var fd = new FormData();
+    fd.append('ajax_toggle_field', '1');
+    fd.append('id', id);
+    fd.append('field', field);
+
+    fetch('plans.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (field === 'status') {
+                if (data.new_val === 1) {
+                    btn.className = 'status-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-emerald-50 text-emerald-700 border border-emerald-200';
+                    btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>Active</span>';
+                } else {
+                    btn.className = 'status-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-rose-50 text-rose-700 border border-rose-200';
+                    btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>Inactive</span>';
+                }
+            } else if (field === 'is_popular') {
+                if (data.new_val === 1) {
+                    btn.className = 'p-1 rounded-lg text-xs cursor-pointer transition text-amber-500 bg-amber-50';
+                } else {
+                    btn.className = 'p-1 rounded-lg text-xs cursor-pointer transition text-gray-300 hover:text-amber-400';
+                }
+            }
+        }
+    });
+}
+
+function openDeletePlanModal(id, name, price, category) {
+    document.getElementById('delete_plan_id_input').value = id;
     document.getElementById('deletePlanName').innerText = name;
-    document.getElementById('deletePlanDetails').innerText = 'Category: ' + cat + ' • ৳' + price + '/mo';
+    document.getElementById('deletePlanCat').innerText = category;
+    document.getElementById('deletePlanPrice').innerText = '৳' + price + '/mo';
     document.getElementById('deletePlanModal').classList.remove('hidden');
 }
 
@@ -443,38 +563,36 @@ function closeDeletePlanModal() {
     document.getElementById('deletePlanModal').classList.add('hidden');
 }
 
-// Category filter tabs
-function filterCategory(cat, btn) {
+function filterCategoryTab(slug, btn) {
     document.querySelectorAll('.cat-tab-btn').forEach(b => {
-        b.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-200', 'shadow-xs');
-        b.classList.add('bg-gray-50', 'text-gray-600');
+        b.classList.remove('bg-blue-600', 'text-white', 'shadow-xs');
+        b.classList.add('text-gray-600');
     });
-    btn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200', 'shadow-xs');
-    btn.classList.remove('bg-gray-50', 'text-gray-600');
+    btn.classList.add('bg-blue-600', 'text-white', 'shadow-xs');
+    btn.classList.remove('text-gray-600');
 
     document.querySelectorAll('.category-block').forEach(block => {
-        if (cat === 'all' || block.dataset.category === cat) {
-            block.style.display = 'block';
+        if (slug === 'all' || block.dataset.category === slug) {
+            block.style.display = '';
         } else {
             block.style.display = 'none';
         }
     });
 }
 
-// Search filter
 function filterPlanCards(q) {
     q = q.trim().toLowerCase();
     document.querySelectorAll('.plan-card').forEach(card => {
         var text = card.dataset.name || '';
         if (!q || text.includes(q)) {
-            card.style.display = 'flex';
+            card.style.display = '';
         } else {
             card.style.display = 'none';
         }
     });
 }
 
-// Keyboard ESC to close modals
+// Keyboard ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closePlanModal();
