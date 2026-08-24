@@ -107,14 +107,14 @@ foreach ($tree as $item):
 </div>
 
 <!-- Mobile Right Side Header Action Buttons -->
-<div class="xl:hidden flex items-center gap-2.5 ml-auto">
+<div class="xl:hidden flex items-center gap-2.5 ml-auto shrink-0">
 <?php if ($multi_curr_enabled): ?>
 <!-- Mobile Custom Currency Dropdown in Topbar -->
-<div class="relative" id="mobileCurrencyWrapper">
-    <button type="button" onclick="toggleCurrencyMenu('mobileCurrencyDropdown')" class="inline-flex items-center justify-center gap-2 px-3.5 h-[42px] min-w-[85px] rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 text-xs font-bold text-gray-800 transition cursor-pointer shadow-2xs">
+<div class="relative shrink-0" id="mobileCurrencyWrapper">
+    <button type="button" onclick="toggleCurrencyMenu('mobileCurrencyDropdown')" class="flex items-center justify-center gap-2 px-3 h-10 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 text-xs font-bold text-gray-800 transition cursor-pointer shadow-2xs shrink-0 select-none">
         <span class="text-blue-600 font-extrabold text-sm"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
         <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
-        <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
+        <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
     </button>
     <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-40 bg-white border border-gray-100 rounded-2xl shadow-2xl p-1.5 z-[999999] animate-fadeIn">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
@@ -132,7 +132,7 @@ foreach ($tree as $item):
 </div>
 <?php endif; ?>
 
-<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn h-[42px] w-[42px] flex items-center justify-center bg-gray-50 border border-gray-200 text-blue-600 text-base rounded-xl hover:bg-gray-100 transition cursor-pointer"><i class="fa fa-bars"></i></button>
+<button type="button" id="mobile-nav-toggle" aria-label="Toggle navigation" class="w-10 h-10 shrink-0 flex items-center justify-center bg-gray-50 border border-gray-200 text-blue-600 text-base rounded-xl hover:bg-gray-100 active:bg-gray-200 transition cursor-pointer"><i class="fa fa-bars"></i></button>
 </div>
 
 </div>
