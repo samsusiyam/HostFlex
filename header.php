@@ -19,10 +19,10 @@
     <i class="fa fa-tools mr-1"></i> Maintenance Mode is ACTIVE. Visitors see a maintenance page.
 </div>
 <?php endif; ?>
-<header class="relative w-full h-[90px] flex items-center bg-white dark:bg-gray-900 sticky border-b top-0 left-0 right-0 z-[99999]">
-<div class="content flex items-center justify-between w-full">
+<header class="flex h-[90px] items-center bg-white dark:bg-gray-900 sticky border-b inset-x-0 m-auto top-0 z-[99999]">
+<div class="content flex items-center justify-between">
 <a href="/"><img class="h-[50px]" src="/<?php echo ltrim(getSetting('header_logo') ?: 'images/bg.png', '/'); ?>" alt="<?php echo htmlspecialchars(getSetting('site_name') ?: 'Host Nibo'); ?>" /></a>
-<div class="desktop-nav-menu hidden xl:flex items-center gap-6 font-normal">
+<div class="hidden xl:flex items-center gap-6 font-normal">
 <?php
 $menu_items = getMenuItems('header');
 $tree = buildMenuTree($menu_items);
@@ -47,75 +47,36 @@ foreach ($tree as $item):
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
 
-<div class="xl:hidden w-fit ml-auto">
-<button type="button" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-100 border text-blue-600 text-xl px-3 py-2 rounded-lg cursor-pointer"><i class="fa fa-bars"></i></button>
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow-xl border-b xl:hidden flex flex-col gap-3 p-8 font-normal transition-all transform origin-top z-[999999]" style="transform: scaleY(0);">
+<?php foreach ($tree as $item):
+    $has_children = isset($item['children']) && !empty($item['children']);
+    $url = htmlspecialchars($item['url']);
+    $label = htmlspecialchars($item['label']);
+    if ($has_children):
+?>
+<div class="group relative flex flex-col">
+    <div class="flex items-center justify-between py-2 border-b border-gray-100 font-medium text-gray-800 cursor-pointer" onclick="var s = this.nextElementSibling; if(s.classList.contains('hidden')){ s.classList.remove('hidden'); s.classList.add('flex'); } else { s.classList.remove('flex'); s.classList.add('hidden'); }">
+        <span><?php echo $label; ?></span>
+        <small class="text-xs ml-1"><i class="fa fa-chevron-down"></i></small>
+    </div>
+    <div class="hidden flex-col bg-gray-50 text-sm shadow p-2 mt-1 rounded space-y-1">
+        <?php foreach ($item['children'] as $child): ?>
+        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="whitespace-nowrap px-4 py-2 hover:text-blue-600 border-b border-gray-100 last:border-b-0"><?php echo htmlspecialchars($child['label']); ?></a>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php else: ?>
+<a href="<?php echo $url; ?>" class="py-2 border-b border-gray-100 font-medium text-gray-800 hover:text-blue-600"><?php echo $label; ?></a>
+<?php endif; endforeach; ?>
+<div class="pt-3">
+    <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold" data-ripple-light="true">
+        <i class="fa fa-display"></i> Client Area
+    </a>
 </div>
 </div>
 
-<!-- Full-Width Mobile Drawer -->
-<div id="mobile-nav" class="mobile-nav-drawer xl:hidden">
-    <div class="flex flex-col space-y-1">
-    <?php foreach ($tree as $item):
-        $has_children = isset($item['children']) && !empty($item['children']);
-        $url = htmlspecialchars($item['url']);
-        $label = htmlspecialchars($item['label']);
-        if ($has_children):
-    ?>
-    <div class="mobile-nav-group">
-        <button type="button" class="mobile-dropdown-btn" onclick="toggleMobileSubmenu(this)">
-            <span><?php echo $label; ?></span>
-            <i class="chevron-icon fa fa-chevron-down"></i>
-        </button>
-        <div class="mobile-sub-menu">
-            <?php foreach ($item['children'] as $child): ?>
-            <a href="<?php echo htmlspecialchars($child['url']); ?>" class="mobile-sub-link">
-                <?php echo htmlspecialchars($child['label']); ?>
-            </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    <?php else: ?>
-    <a href="<?php echo $url; ?>" class="mobile-nav-item"><?php echo $label; ?></a>
-    <?php endif; endforeach; ?>
-    </div>
-    <div class="pt-4 mt-2 border-t border-gray-100">
-        <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full py-3 flex items-center justify-center gap-2 rounded-lg font-semibold shadow-sm hover:bg-cyan-700 transition" data-ripple-light="true">
-            <i class="fa fa-display"></i> Client Area
-        </a>
-    </div>
+<div class="xl:hidden w-fit ml-auto">
+<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-100 border text-blue-600 text-xl px-3 py-2 rounded-lg cursor-pointer"><i class="fa fa-bars"></i></button>
+</div>
 </div>
 </header>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var toggleBtn = document.getElementById("mobile-nav-toggle");
-    var mobileNav = document.getElementById("mobile-nav");
-    if (toggleBtn && mobileNav) {
-        toggleBtn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            var isOpen = mobileNav.classList.toggle("active");
-            toggleBtn.innerHTML = isOpen ? '<i class="fa fa-times"></i>' : '<i class="fa fa-bars"></i>';
-        });
-        document.addEventListener("click", function(e) {
-            if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
-                mobileNav.classList.remove("active");
-                toggleBtn.innerHTML = '<i class="fa fa-bars"></i>';
-            }
-        });
-    }
-});
-
-function toggleMobileSubmenu(btn) {
-    var wasOpen = btn.classList.contains('open');
-    document.querySelectorAll('.mobile-dropdown-btn').forEach(function(b) {
-        b.classList.remove('open');
-        var sm = b.nextElementSibling;
-        if (sm) sm.classList.remove('open');
-    });
-    if (!wasOpen) {
-        btn.classList.add('open');
-        var sm = btn.nextElementSibling;
-        if (sm) sm.classList.add('open');
-    }
-}
-</script>
