@@ -278,13 +278,15 @@ $site_url = getSiteUrl();
 
             <!-- Content Area with TinyMCE -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-3 bg-gray-50 border-b flex items-center justify-between">
+                <div class="p-3 bg-gray-50 border-b flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-gray-600"><i class="fa fa-paragraph mr-1"></i> Post Content</span>
+                        <span id="autoSaveIndicator" class="text-[11px] text-emerald-600 font-medium hidden"><i class="fa-solid fa-cloud-arrow-up"></i> Auto-saved locally</span>
                     </div>
-                    <div class="text-xs text-gray-400 flex items-center gap-3">
-                        <span id="wordCount">0 words</span>
-                        <span id="charCount">0 characters</span>
+                    <div class="text-xs text-gray-400 flex items-center gap-3 font-medium">
+                        <span id="wordCount"><i class="fa-solid fa-pen-nib mr-1"></i>0 words</span>
+                        <span id="readingTime"><i class="fa-regular fa-clock mr-1"></i>0 min read</span>
+                        <span id="charCount">0 chars</span>
                     </div>
                 </div>
                 <div>
@@ -595,11 +597,36 @@ $(document).ready(function() {
 
     function updateStats(editor) {
         var text = editor.getContent({ format: 'text' }).trim();
-        var words = text ? text.split(/\s+/).length : 0;
+        var words = text ? text.split(/\s+/).filter(Boolean).length : 0;
         var chars = text.length;
-        $('#wordCount').text(words + ' words');
-        $('#charCount').text(chars + ' characters');
+        var minutes = Math.max(1, Math.ceil(words / 200));
+        $('#wordCount').html('<i class="fa-solid fa-pen-nib mr-1"></i>' + words + ' words');
+        $('#readingTime').html('<i class="fa-regular fa-clock mr-1"></i>' + minutes + ' min read');
+        $('#charCount').text(chars + ' chars');
     }
+
+    // Auto-save draft to localStorage every 20 seconds
+    const draftKey = 'hostnibo_blog_draft_<?php echo $post['id']; ?>';
+    setInterval(function() {
+        if (typeof tinymce !== 'undefined' && tinymce.get('blogContent')) {
+            var content = tinymce.get('blogContent').getContent();
+            var title = $('#postTitle').val();
+            if (title || content) {
+                var draftData = {
+                    title: title,
+                    slug: $('#slugInput').val(),
+                    content: content,
+                    excerpt: $('#postExcerpt').val(),
+                    meta_description: $('#seoDescInput').val(),
+                    saved_at: new Date().toLocaleTimeString()
+                };
+                try {
+                    localStorage.setItem(draftKey, JSON.stringify(draftData));
+                    $('#autoSaveIndicator').html('<i class="fa-solid fa-cloud-arrow-up"></i> Auto-saved ' + draftData.saved_at).removeClass('hidden').fadeIn();
+                } catch(e) {}
+            }
+        }
+    }, 20000);
 
     // Auto generate slug from title when new
     <?php if (!$is_edit): ?>

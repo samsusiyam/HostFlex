@@ -7,6 +7,24 @@ checkAdminLogin();
 $msg = '';
 $error = '';
 
+// Handle AJAX Quick Toggle Status
+if (isset($_POST['ajax_toggle_status'])) {
+    header('Content-Type: application/json');
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id > 0) {
+        $curr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT status, title FROM pages WHERE id = $id"));
+        if ($curr) {
+            $new_val = (int)$curr['status'] === 1 ? 0 : 1;
+            mysqli_query($conn, "UPDATE pages SET status = $new_val WHERE id = $id");
+            logActivity('Toggled Page Status', ($curr['title'] ?? 'Page') . " -> $new_val (ID: $id)");
+            echo json_encode(['success' => true, 'new_val' => $new_val]);
+            exit;
+        }
+    }
+    echo json_encode(['success' => false]);
+    exit;
+}
+
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_page_id'])) {
     $id = (int)$_POST['delete_page_id'];
@@ -144,10 +162,10 @@ $total_pages = mysqli_num_rows($pages);
                             <?php echo htmlspecialchars($p['meta_description'] ?: '—'); ?>
                         </td>
                         <td class="px-4 py-3.5">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold <?php echo $p['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>">
+                            <button type="button" onclick="togglePageStatus(<?php echo $p['id']; ?>, this)" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition <?php echo $p['status'] ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'; ?>" title="Click to toggle Active/Inactive">
                                 <span class="w-1.5 h-1.5 rounded-full <?php echo $p['status'] ? 'bg-emerald-500' : 'bg-rose-500'; ?>"></span>
-                                <?php echo $p['status'] ? 'Active' : 'Inactive'; ?>
-                            </span>
+                                <span><?php echo $p['status'] ? 'Active' : 'Inactive'; ?></span>
+                            </button>
                         </td>
                         <td class="px-4 py-3.5 text-right">
                             <div class="flex items-center justify-end gap-2">
@@ -376,6 +394,26 @@ function openDeletePageModal(id, title, slug) {
 
 function closeDeletePageModal() {
     document.getElementById('deletePageModal').classList.add('hidden');
+}
+
+function togglePageStatus(id, btn) {
+    var fd = new FormData();
+    fd.append('ajax_toggle_status', '1');
+    fd.append('id', id);
+
+    fetch('pages.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.new_val === 1) {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-emerald-50 text-emerald-700 border border-emerald-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>Active</span>';
+            } else {
+                btn.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition bg-rose-50 text-rose-700 border border-rose-200';
+                btn.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>Inactive</span>';
+            }
+        }
+    });
 }
 
 function filterPageRows(q) {
