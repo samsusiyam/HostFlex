@@ -164,6 +164,7 @@
                 <i class="fa fa-external-link-alt w-5"></i><span>View Website</span>
             </a>
         </nav>
+    </aside>
     <main class="flex-1 p-3 sm:p-4 md:p-6 min-w-0 max-w-full overflow-x-hidden">
     <script>
         function toggleSidebar() {
