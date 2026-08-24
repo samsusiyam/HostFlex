@@ -107,24 +107,24 @@ foreach ($tree as $item):
 </div>
 
 <!-- Mobile Right Side Header Action Buttons -->
-<div class="xl:hidden flex items-center gap-2.5 ml-auto shrink-0">
+<div class="xl:hidden flex items-center gap-2 ml-auto w-fit">
 <?php if ($multi_curr_enabled): ?>
-<!-- Mobile Custom Currency Dropdown in Topbar -->
+<!-- Mobile Currency Pill synced with Menu button -->
 <div class="relative shrink-0" id="mobileCurrencyWrapper">
-    <button type="button" onclick="toggleCurrencyMenu('mobileCurrencyDropdown')" class="flex items-center justify-center gap-2 px-3 h-10 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 text-xs font-bold text-gray-800 transition cursor-pointer shadow-2xs shrink-0 select-none">
-        <span class="text-blue-600 font-extrabold text-sm"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
+    <button type="button" onclick="toggleCurrencyMenu('mobileCurrencyDropdown')" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-800 transition cursor-pointer shrink-0">
+        <span class="text-blue-600 font-extrabold"><?php echo htmlspecialchars($user_curr['symbol']); ?></span>
         <span><?php echo htmlspecialchars($user_curr['code']); ?></span>
-        <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
+        <i class="fa fa-chevron-down text-[9px] text-gray-400"></i>
     </button>
-    <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-2 w-40 bg-white border border-gray-100 rounded-2xl shadow-2xl p-1.5 z-[999999] animate-fadeIn">
+    <div id="mobileCurrencyDropdown" class="hidden absolute right-0 top-full mt-1.5 w-36 bg-white border border-gray-200 shadow-xl rounded-xl p-1.5 z-[999999] animate-fadeIn">
         <?php foreach ($active_currencies as $c_code => $c_item): ?>
-        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-xl transition <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'; ?>">
+        <a href="<?php echo htmlspecialchars(getCurrencySwitchUrl($c_code)); ?>" class="flex items-center justify-between px-3 py-1.5 text-xs rounded-lg transition font-semibold <?php echo $user_curr['code'] === $c_code ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'; ?>">
             <span class="flex items-center gap-2">
-                <span class="w-5 text-center text-blue-600 font-extrabold"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
+                <span class="w-4 text-center text-blue-600 font-extrabold"><?php echo htmlspecialchars($c_item['symbol']); ?></span>
                 <span><?php echo htmlspecialchars($c_code); ?></span>
             </span>
             <?php if ($user_curr['code'] === $c_code): ?>
-            <i class="fa-solid fa-check text-[10px] text-blue-600"></i>
+            <i class="fa fa-check text-[10px] text-blue-600"></i>
             <?php endif; ?>
         </a>
         <?php endforeach; ?>
@@ -132,7 +132,7 @@ foreach ($tree as $item):
 </div>
 <?php endif; ?>
 
-<button type="button" id="mobile-nav-toggle" aria-label="Toggle navigation" class="w-10 h-10 shrink-0 flex items-center justify-center bg-gray-50 border border-gray-200 text-blue-600 text-base rounded-xl hover:bg-gray-100 active:bg-gray-200 transition cursor-pointer"><i class="fa fa-bars"></i></button>
+<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="bg-gray-50 border border-gray-200 text-blue-600 text-lg px-3 py-2 rounded-lg hover:bg-gray-100 transition cursor-pointer flex items-center justify-center shrink-0"><i class="fa fa-bars"></i></button>
 </div>
 
 </div>
