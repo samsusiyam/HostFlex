@@ -47,36 +47,37 @@ foreach ($tree as $item):
 <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white" data-ripple-light="true"><i class="fa fa-display"></i> Client Area</a>
 </div>
 
-<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow-xl border-b xl:hidden flex flex-col gap-3 p-8 font-normal transition-all transform origin-top z-[999999]" style="transform: scaleY(0);">
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-nav" class="absolute top-full left-0 w-full bg-white shadow-xl border-b xl:hidden flex flex-col gap-3 p-6 font-normal z-[999999]" style="opacity: 0; transform: scaleY(0); transform-origin: top; transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease; pointer-events: none;">
 <?php foreach ($tree as $item):
     $has_children = isset($item['children']) && !empty($item['children']);
     $url = htmlspecialchars($item['url']);
     $label = htmlspecialchars($item['label']);
     if ($has_children):
 ?>
-<div class="group relative flex flex-col">
-    <div class="flex items-center justify-between py-2 border-b border-gray-100 font-medium text-gray-800 cursor-pointer" onclick="var s = this.nextElementSibling; if(s.classList.contains('hidden')){ s.classList.remove('hidden'); s.classList.add('flex'); } else { s.classList.remove('flex'); s.classList.add('hidden'); }">
+<div class="mobile-menu-item flex flex-col">
+    <div class="flex items-center justify-between py-2.5 border-b border-gray-100 font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition" onclick="toggleMobileAccordion(this)">
         <span><?php echo $label; ?></span>
-        <small class="text-xs ml-1"><i class="fa fa-chevron-down"></i></small>
+        <small class="text-xs ml-1 text-gray-400"><i class="fa fa-chevron-down transition-transform duration-200"></i></small>
     </div>
-    <div class="hidden flex-col bg-gray-50 text-sm shadow p-2 mt-1 rounded space-y-1">
+    <div class="mobile-submenu hidden flex-col bg-gray-50 text-sm border-b border-gray-100 p-2 mt-1 rounded-lg space-y-1">
         <?php foreach ($item['children'] as $child): ?>
-        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="whitespace-nowrap px-4 py-2 hover:text-blue-600 border-b border-gray-100 last:border-b-0"><?php echo htmlspecialchars($child['label']); ?></a>
+        <a href="<?php echo htmlspecialchars($child['url']); ?>" class="whitespace-nowrap px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition"><?php echo htmlspecialchars($child['label']); ?></a>
         <?php endforeach; ?>
     </div>
 </div>
 <?php else: ?>
-<a href="<?php echo $url; ?>" class="py-2 border-b border-gray-100 font-medium text-gray-800 hover:text-blue-600"><?php echo $label; ?></a>
+<a href="<?php echo $url; ?>" class="py-2.5 border-b border-gray-100 font-medium text-gray-800 hover:text-blue-600 transition"><?php echo $label; ?></a>
 <?php endif; endforeach; ?>
 <div class="pt-3">
-    <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold" data-ripple-light="true">
+    <a href="<?php echo getSetting('whmcs_client_area_url') ?: '#'; ?>" class="btn bg-cyan-600 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold shadow-xs" data-ripple-light="true">
         <i class="fa fa-display"></i> Client Area
     </a>
 </div>
 </div>
 
 <div class="xl:hidden w-fit ml-auto">
-<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-100 border text-blue-600 text-xl px-3 py-2 rounded-lg cursor-pointer"><i class="fa fa-bars"></i></button>
+<button data-ripple-dark="true" id="mobile-nav-toggle" aria-label="Toggle navigation" class="btn bg-gray-50 border border-gray-200 text-blue-600 text-lg px-3 py-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"><i class="fa fa-bars"></i></button>
 </div>
 </div>
 </header>

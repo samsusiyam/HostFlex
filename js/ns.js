@@ -66,6 +66,7 @@ all_tutorial_btn.forEach((btn) => {
     });
 });
 
+// Mobile Nav Toggle with Smooth Scale & Fade Animation
 (() => {
     const mobile_nav = document.getElementById("mobile-nav");
     const mobile_nav_toggle = document.getElementById("mobile-nav-toggle");
@@ -77,9 +78,13 @@ all_tutorial_btn.forEach((btn) => {
             if (open_nav) {
                 mobile_nav_toggle.innerHTML = '<i class="fa fa-times"></i>';
                 mobile_nav.style.transform = "scaleY(1)";
+                mobile_nav.style.opacity = "1";
+                mobile_nav.style.pointerEvents = "auto";
             } else {
                 mobile_nav_toggle.innerHTML = '<i class="fa fa-bars"></i>';
                 mobile_nav.style.transform = "scaleY(0)";
+                mobile_nav.style.opacity = "0";
+                mobile_nav.style.pointerEvents = "none";
             }
         });
         document.addEventListener("click", function (e) {
@@ -87,10 +92,37 @@ all_tutorial_btn.forEach((btn) => {
                 open_nav = false;
                 mobile_nav_toggle.innerHTML = '<i class="fa fa-bars"></i>';
                 mobile_nav.style.transform = "scaleY(0)";
+                mobile_nav.style.opacity = "0";
+                mobile_nav.style.pointerEvents = "none";
             }
         });
     }
 })();
+
+// Accordion Submenu Toggle (Auto-closes other submenus)
+window.toggleMobileAccordion = function(btn) {
+    const submenu = btn.nextElementSibling;
+    const icon = btn.querySelector('.fa-chevron-down');
+    const isCurrentlyOpen = submenu && !submenu.classList.contains('hidden');
+    
+    // Close all open submenus
+    document.querySelectorAll('.mobile-submenu').forEach(function(sm) {
+        sm.classList.add('hidden');
+        sm.classList.remove('flex');
+    });
+    document.querySelectorAll('.mobile-menu-item .fa-chevron-down').forEach(function(i) {
+        i.style.transform = 'rotate(0deg)';
+    });
+    
+    // Open this submenu if it was closed
+    if (!isCurrentlyOpen && submenu) {
+        submenu.classList.remove('hidden');
+        submenu.classList.add('flex');
+        if (icon) {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+};
 
 const all_priceValue = document.querySelectorAll(".priceValue");
 const all_priceFor = document.querySelectorAll(".priceFor");
