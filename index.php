@@ -99,23 +99,25 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 
 <?php if ($type === 'hero'): ?>
 <!-- Hero Section -->
-<section class="py-16 bg-white">
-<div class="content grid-cols-2 lg:grid">
-<div class="flex flex-col justify-center gap-6 md:gap-12">
-<h1 class="flex flex-col gap-2 text-[36px] font-extrabold capitalize leading-[45px] xl:text-[46px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
-<p class="md:max-w-[600px] lg:pr-12 text-gray-600"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
-<div class="flex w-fit gap-x-2">
-<a href="<?php echo htmlspecialchars($c['button_url'] ?: (getSetting('whmcs_domain_register_url') ?: '/contact')); ?>" data-ripple-light="true" class="btn !px-8 btn-purple font-semibold shadow-xs"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right"></i> </a>
-<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(typeof Tawk_API !== "undefined" ? Tawk_API.toggle() : (document.getElementById("popupNotice") ? toggleFab() : window.location.href="/contact"))'); ?>" data-ripple-light="true" class="btn btn-blue !px-8 font-semibold shadow-xs"> <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
+<section class="pt-8 pb-6 md:pt-12 md:pb-8 bg-white">
+<div class="content grid-cols-2 lg:grid items-center gap-8">
+<div class="flex flex-col justify-center gap-5 md:gap-6">
+<h1 class="flex flex-col gap-2 text-[32px] font-extrabold capitalize leading-[40px] xl:text-[44px]"><span class="text-[#111827]"><?php echo htmlspecialchars($c['tagline'] ?? ''); ?></span></h1>
+<p class="md:max-w-[600px] lg:pr-12 text-gray-600 text-sm md:text-base leading-relaxed"><?php echo htmlspecialchars($c['description'] ?? ''); ?></p>
+<div class="flex w-fit gap-x-3 pt-1">
+<a href="<?php echo htmlspecialchars($c['button_url'] ?: (getSetting('whmcs_domain_register_url') ?: '/contact')); ?>" data-ripple-light="true" class="btn !px-7 btn-purple font-semibold shadow-xs"> <?php echo htmlspecialchars($c['button_text'] ?? 'Get Started'); ?> <i class="fa fa-arrow-right ml-1"></i> </a>
+<a href="<?php echo htmlspecialchars($c['chat_url'] ?: 'javascript:void(typeof Tawk_API !== "undefined" ? Tawk_API.toggle() : (document.getElementById("popupNotice") ? toggleFab() : window.location.href="/contact"))'); ?>" data-ripple-light="true" class="btn btn-blue !px-7 font-semibold shadow-xs"> <i class="fa fa-envelope mr-1"></i> <?php echo htmlspecialchars($c['chat_text'] ?? 'Live Chat'); ?></a>
 </div>
 </div>
 <div class="hidden px-6 lg:block"><img src="<?php echo htmlspecialchars($c['image'] ?? 'images/cloud.jpg'); ?>" alt="Cloud Web Hosting" class="rounded-xl shadow-lg" loading="lazy"></div>
 </div>
+</section>
 
 <?php elseif ($type === 'domain_search'): ?>
 <!-- Domain Search -->
-<div class="content mt-32 mb-10">
-<div class="flex flex-col justify-between gap-12 rounded-xl bg-blue-50 py-8 px-4 shadow-xl dark:bg-gray-800 sm:gap-8 sm:px-6 2xl:flex-row">
+<section class="pt-2 pb-10 bg-white">
+<div class="content">
+<div class="flex flex-col justify-between gap-8 rounded-xl bg-blue-50 py-6 px-4 shadow-lg dark:bg-gray-800 sm:gap-6 sm:px-6 2xl:flex-row items-center">
 <form method="post" action="<?php echo htmlspecialchars($c['search_url'] ?: (getSetting('whmcs_domain_search_url') ?: '#')); ?>" class="flex w-auto">
 <input name="domain" placeholder="Search domain name..." class="input !py-3 lg:!w-[500px]" type="search" />
 <div class="ml-2 w-fit">
@@ -124,15 +126,15 @@ $pricing_url = getSetting('whmcs_domain_pricing_url');
 </button>
 </div>
 </form>
-<div class="flex justify-between gap-4 md:gap-8">
+<div class="flex justify-between gap-4 md:gap-8 w-full 2xl:w-auto">
 <?php $pricing_items = $c['pricing'] ?? []; if (!empty($pricing_items)): foreach ($pricing_items as $item): 
     $tld_conv = convertPriceAmount($item['price'] ?? 0, $user_curr);
 ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto flex flex-grow items-center justify-center"><span class="text-sm dark:text-gray-100 sm:text-base font-bold"><?php echo htmlspecialchars($item['tld'] ?? ''); ?> <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo $tld_conv; ?></span></span></a>
 <?php endforeach; else: ?>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(999, $user_curr); ?></span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(455, $user_curr); ?></span></span></a>
-<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto mt-2 flex flex-grow items-center justify-center sm:mt-0 sm:mr-0"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(250, $user_curr); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto flex flex-grow items-center justify-center"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.com <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(999, $user_curr); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto flex flex-grow items-center justify-center"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.online <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(455, $user_curr); ?></span></span></a>
+<a href="<?php echo $pricing_url ?: '#'; ?>" class="mx-auto flex flex-grow items-center justify-center"><span class="text-sm dark:text-gray-100 sm:text-base font-bold">.xyz <span class="ml-1 text-blue-700"><?php echo $currency_symbol; ?><?php echo convertPriceAmount(250, $user_curr); ?></span></span></a>
 <?php endif; ?>
 </div>
 </div>
