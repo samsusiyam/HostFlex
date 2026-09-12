@@ -121,88 +121,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include "contact-btn.php"; ?>
 <section class="section_gap flex items-center bg-gray-50 font-poppins dark:bg-gray-800">
 <div class="content">
-<div class="mb-14 text-center pb-4">
+<div class="mb-20 text-center pb-7">
 <h2 class="pb-2 mb-2 text-xl font-bold text-gray-800 md:text-4xl dark:text-gray-300"><?php echo getSetting('contact_page_heading') ?: 'Contact Us'; ?></h2>
 <p class="text-lg text-gray-500 sm:text-xl dark:text-gray-400"><?php echo getSetting('contact_page_subheading') ?: 'We would love to hear from you.'; ?></p>
 </div>
 
-<!-- Beautiful Alert Notifications -->
 <?php if ($success): ?>
-<div class="max-w-4xl mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-    <div class="p-5 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border-2 border-emerald-500/30 text-emerald-900 dark:text-emerald-200 shadow-lg shadow-emerald-500/5 flex items-start gap-4">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20 text-lg">
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <div class="flex-1 min-w-0 pt-0.5">
-            <h4 class="text-base font-bold text-emerald-800 dark:text-emerald-300 mb-1">Message Sent Successfully!</h4>
-            <p class="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed"><?php echo htmlspecialchars($success); ?></p>
-        </div>
-        <button onclick="this.closest('.animate-in').remove()" class="text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-300 p-1.5 transition cursor-pointer">
-            <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
+<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span><?php echo htmlspecialchars($success); ?></span>
     </div>
+    <button onclick="this.parentElement.remove()" class="text-green-500 hover:text-green-700 cursor-pointer">&times;</button>
 </div>
 <?php endif; ?>
 
 <?php if ($error): ?>
-<div class="max-w-4xl mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-    <div class="p-5 rounded-2xl bg-red-50/90 dark:bg-red-950/40 border-2 border-red-500/30 text-red-900 dark:text-red-200 shadow-lg shadow-red-500/5 flex items-start gap-4">
-        <div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-red-500/20 text-lg">
-            <i class="fa-solid fa-circle-exclamation"></i>
-        </div>
-        <div class="flex-1 min-w-0 pt-0.5">
-            <h4 class="text-base font-bold text-red-800 dark:text-red-300 mb-1">Submission Failed</h4>
-            <p class="text-xs text-red-700 dark:text-red-400 leading-relaxed"><?php echo htmlspecialchars($error); ?></p>
-        </div>
-        <button onclick="this.closest('.animate-in').remove()" class="text-red-500 hover:text-red-700 dark:hover:text-red-300 p-1.5 transition cursor-pointer">
-            <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
+<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 max-w-4xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-exclamation text-red-600"></i>
+        <span><?php echo htmlspecialchars($error); ?></span>
     </div>
+    <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 cursor-pointer">&times;</button>
 </div>
 <?php endif; ?>
 
-<div class="px-3 py-4">
-<form method="POST" id="publicContactForm" class="rounded-3xl shadow-xl shadow-blue-900/5 border border-gray-100 dark:border-gray-800 dark:bg-gray-900 bg-white p-8 md:p-12 max-w-4xl mx-auto transition">
-<div class="flex flex-wrap -mx-3">
-<div class="w-full md:w-1/2 px-3 mb-5">
-<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-    <i class="fa-solid fa-user text-blue-600 text-[11px]"></i> Your Name <span class="text-red-500">*</span>
-</label>
-<input name="name" type="text" placeholder="e.g. John Doe" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<div class="px-3 py-6">
+<form method="POST" id="publicContactForm" class="rounded shadow dark:bg-gray-900 bg-gray-50 p-12 max-w-4xl mx-auto">
+<div class="flex flex-wrap">
+<div class="w-full md:w-1/2 px-3 md:mb-4">
+<label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Name</label>
+<input name="name" type="text" placeholder="Your Name" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded lg:mb-0 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
-<div class="w-full md:w-1/2 px-3 mb-5">
-<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-    <i class="fa-solid fa-envelope text-blue-600 text-[11px]"></i> Your Email <span class="text-red-500">*</span>
-</label>
-<input name="email" type="email" placeholder="e.g. john@example.com" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<div class="w-full px-3 md:w-1/2 md:mb-0">
+<label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Email</label>
+<input name="email" type="email" placeholder="Your Email" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
 </div>
-<div class="mb-5">
-<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-    <i class="fa-solid fa-tag text-blue-600 text-[11px]"></i> Subject <span class="text-red-500">*</span>
-</label>
-<input name="subject" type="text" placeholder="e.g. Inquiry regarding Cloud Hosting" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<div class="px-3 mb-6">
+<label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Subject</label>
+<input name="subject" type="text" placeholder="Your Subject" required class="block w-full px-4 py-3 mb-3 leading-tight text-gray-700 bg-gray-100 border rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800">
 </div>
-<div class="mb-6">
-<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-    <i class="fa-solid fa-message text-blue-600 text-[11px]"></i> Message <span class="text-red-500">*</span>
-</label>
-<textarea name="message" rows="5" placeholder="Write your message or inquiry here..." required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition"></textarea>
+<div class="px-3 mb-6">
+<label class="block mb-3 font-bold text-gray-700 uppercase dark:text-gray-400">Message</label>
+<textarea name="message" placeholder="Write your message here..." required class="block w-full px-4 py-10 leading-tight text-gray-700 bg-gray-100 rounded dark:placeholder-gray-500 dark:text-gray-400 dark:border-gray-800 dark:bg-gray-800"></textarea>
 </div>
-<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+<div class="px-6">
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
-<div><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
-<?php else: ?>
-<div class="text-xs text-gray-400 flex items-center gap-1.5">
-    <i class="fa-solid fa-shield-halved text-blue-500"></i> We usually respond within 24 hours.
-</div>
+<div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
 <?php endif; ?>
-<button type="submit" id="contactSubmitBtn" class="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 active:scale-[0.98] rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/35 transition-all duration-200 cursor-pointer overflow-hidden">
-    <span class="relative z-10 flex items-center gap-2.5">
-        <span>Send Message</span>
-        <i class="fa-solid fa-paper-plane text-xs transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5"></i>
-    </span>
-    <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+<button type="submit" id="contactSubmitBtn" data-ripple-light="true" class="btn btn-blue !px-8 font-semibold shadow-xs">
+    Send Message
 </button>
 </div>
 </form>
