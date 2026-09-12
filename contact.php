@@ -170,8 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
 <div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
 <?php endif; ?>
-<button type="submit" id="contactSubmitBtn" class="px-8 py-3.5 text-base font-bold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 rounded shadow hover:shadow-md transition inline-flex items-center justify-center gap-2 cursor-pointer">
-    <i class="fa fa-paper-plane text-sm"></i> <span>Send Message</span>
+<button type="submit" id="contactSubmitBtn" class="px-6 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 rounded shadow hover:shadow-md transition cursor-pointer">
+    Send Message
 </button>
 </div>
 </form>
