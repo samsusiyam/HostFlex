@@ -4,12 +4,66 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminRole(['admin']);
 
-$upload_dir = '../uploads/branding/';
-if (!is_dir($upload_dir)) @mkdir($upload_dir, 0755, true);
+$upload_dir = dirname(__DIR__) . '/uploads/branding/';
+if (!is_dir($upload_dir)) {
+    @mkdir($upload_dir, 0755, true);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $errors = [];
+    $updated_files = [];
+
+    $file_fields = [
+        'header_logo_file' => 'header_logo',
+        'footer_logo_file' => 'footer_logo',
+        'favicon_file' => 'favicon'
+    ];
+
+    // Handle File Uploads first
+    foreach ($file_fields as $input_name => $setting_key) {
+        if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] !== UPLOAD_ERR_NO_FILE) {
+            $file_err = $_FILES[$input_name]['error'];
+            if ($file_err === UPLOAD_ERR_OK) {
+                $ext = strtolower(pathinfo($_FILES[$input_name]['name'], PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'];
+                if (in_array($ext, $allowed)) {
+                    $fname = $setting_key . '_' . time() . '.' . $ext;
+                    $target = $upload_dir . $fname;
+                    if (move_uploaded_file($_FILES[$input_name]['tmp_name'], $target)) {
+                        if ($ext === 'svg') {
+                            $svg_c = file_get_contents($target);
+                            $svg_c = preg_replace('/<script[\s\S]*?<\/script>/i', '', $svg_c);
+                            $svg_c = preg_replace('/(?:\bon\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))/i', '', $svg_c);
+                            $svg_c = preg_replace('/javascript:[^"\'\s>]+/i', '', $svg_c);
+                            file_put_contents($target, $svg_c);
+                        }
+                        $path = 'uploads/branding/' . $fname;
+                        $path_esc = mysqli_real_escape_string($conn, $path);
+                        $check = mysqli_query($conn, "SELECT id FROM settings WHERE setting_key = '$setting_key'");
+                        if (mysqli_num_rows($check) > 0) {
+                            mysqli_query($conn, "UPDATE settings SET setting_value = '$path_esc' WHERE setting_key = '$setting_key'");
+                        } else {
+                            mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('$setting_key', '$path_esc')");
+                        }
+                        $updated_files[] = $setting_key;
+                    } else {
+                        $errors[] = "Failed to move uploaded file for " . ucwords(str_replace('_', ' ', $setting_key)) . ". Please verify upload directory permissions.";
+                    }
+                } else {
+                    $errors[] = "Invalid file format for " . ucwords(str_replace('_', ' ', $setting_key)) . ". Allowed: " . implode(', ', $allowed);
+                }
+            } elseif ($file_err === UPLOAD_ERR_INI_SIZE || $file_err === UPLOAD_ERR_FORM_SIZE) {
+                $errors[] = "File uploaded for " . ucwords(str_replace('_', ' ', $setting_key)) . " exceeds server upload size limit.";
+            } else {
+                $errors[] = "Upload error ($file_err) occurred while uploading " . ucwords(str_replace('_', ' ', $setting_key)) . ".";
+            }
+        }
+    }
+
+    // Handle remaining text fields (skip fields that were just updated by uploaded files)
     foreach ($_POST as $key => $value) {
         if ($key === 'submit') continue;
+        if (in_array($key, $updated_files)) continue; // Don't overwrite newly uploaded file with old text path
         $s_key = sanitize($key);
         $s_value = mysqli_real_escape_string($conn, $value);
         $check = mysqli_query($conn, "SELECT id FROM settings WHERE setting_key = '$s_key'");
@@ -20,39 +74,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $file_fields = [
-        'header_logo_file' => 'header_logo',
-        'footer_logo_file' => 'footer_logo',
-        'favicon_file' => 'favicon'
-    ];
-
-    foreach ($file_fields as $input_name => $setting_key) {
-        if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES[$input_name]['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg','jpeg','png','gif','webp','svg','ico'])) {
-                $fname = $setting_key . '_' . time() . '.' . $ext;
-                $target = $upload_dir . $fname;
-                if (move_uploaded_file($_FILES[$input_name]['tmp_name'], $target)) {
-                    if ($ext === 'svg') {
-                        $svg_c = file_get_contents($target);
-                        $svg_c = preg_replace('/<script[\s\S]*?<\/script>/i', '', $svg_c);
-                        $svg_c = preg_replace('/(?:\bon\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))/i', '', $svg_c);
-                        $svg_c = preg_replace('/javascript:[^"\'\s>]+/i', '', $svg_c);
-                        file_put_contents($target, $svg_c);
-                    }
-                    $path = 'uploads/branding/' . $fname;
-                    mysqli_query($conn, "UPDATE settings SET setting_value = '$path' WHERE setting_key = '$setting_key'");
-                }
-            }
-        }
-    }
-
     logActivity('Updated Branding', 'Logo and brand assets updated');
-    header('Location: settings-branding.php?s=1');
+    if (!empty($errors)) {
+        $_SESSION['admin_error'] = implode('<br>', $errors);
+    } else {
+        $_SESSION['admin_success'] = 'Branding settings and media assets updated successfully!';
+    }
+    header('Location: settings-branding.php');
     exit;
 }
 
-$success = isset($_GET['s']) ? 'Branding settings updated successfully!' : '';
+$success = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+
 $settings_result = mysqli_query($conn, "SELECT * FROM settings ORDER BY setting_key");
 $s = [];
 while ($row = mysqli_fetch_assoc($settings_result)) {
@@ -74,14 +109,24 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
         </div>
     </div>
 
-    <!-- Alert Notification -->
+    <!-- Alert Notifications -->
     <?php if ($success): ?>
     <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between bg-emerald-50 text-emerald-800 border border-emerald-200">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-            <span><?php echo htmlspecialchars($success); ?></span>
+            <span><?php echo $success; ?></span>
         </div>
         <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+    <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between bg-red-50 text-red-800 border border-red-200">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation text-red-600 text-sm"></i>
+            <span><?php echo $error; ?></span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
     </div>
     <?php endif; ?>
 
@@ -96,9 +141,12 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
                     <h2 class="text-sm font-bold text-gray-900">Header Logo</h2>
                 </div>
 
-                <?php $header_logo = $s['header_logo'] ?? 'images/bg.png'; ?>
+                <?php 
+                $header_logo = $s['header_logo'] ?? 'images/bg.png'; 
+                $header_logo_url = preg_match('/^https?:\/\//i', $header_logo) ? $header_logo : '/' . ltrim($header_logo, '/');
+                ?>
                 <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center min-h-[90px] overflow-hidden">
-                    <img id="headerLogoPreview" src="/<?php echo ltrim($header_logo, '/'); ?>" class="max-h-12 object-contain" alt="Header Logo">
+                    <img id="headerLogoPreview" src="<?php echo htmlspecialchars($header_logo_url); ?>" class="max-h-12 object-contain" alt="Header Logo">
                 </div>
 
                 <div>
@@ -119,9 +167,12 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
                     <h2 class="text-sm font-bold text-gray-900">Footer Logo</h2>
                 </div>
 
-                <?php $footer_logo = $s['footer_logo'] ?? 'images/bg.png'; ?>
+                <?php 
+                $footer_logo = $s['footer_logo'] ?? 'images/bg.png'; 
+                $footer_logo_url = preg_match('/^https?:\/\//i', $footer_logo) ? $footer_logo : '/' . ltrim($footer_logo, '/');
+                ?>
                 <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center min-h-[90px] overflow-hidden">
-                    <img id="footerLogoPreview" src="/<?php echo ltrim($footer_logo, '/'); ?>" class="max-h-12 object-contain" alt="Footer Logo">
+                    <img id="footerLogoPreview" src="<?php echo htmlspecialchars($footer_logo_url); ?>" class="max-h-12 object-contain" alt="Footer Logo">
                 </div>
 
                 <div>
@@ -142,14 +193,17 @@ while ($row = mysqli_fetch_assoc($settings_result)) {
                     <h2 class="text-sm font-bold text-gray-900">Browser Favicon</h2>
                 </div>
 
-                <?php $favicon = $s['favicon'] ?? 'images/favicon.ico'; ?>
+                <?php 
+                $favicon = $s['favicon'] ?? 'images/favicon.ico'; 
+                $favicon_url = preg_match('/^https?:\/\//i', $favicon) ? $favicon : '/' . ltrim($favicon, '/');
+                ?>
                 <div class="p-4 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center min-h-[90px] overflow-hidden">
-                    <img id="faviconPreview" src="/<?php echo ltrim($favicon, '/'); ?>" class="w-10 h-10 object-contain p-1 bg-white rounded-lg border border-gray-200 shadow-xs" alt="Favicon">
+                    <img id="faviconPreview" src="<?php echo htmlspecialchars($favicon_url); ?>" class="w-10 h-10 object-contain p-1 bg-white rounded-lg border border-gray-200 shadow-xs" alt="Favicon">
                 </div>
 
                 <div>
                     <label class="block font-bold text-gray-700 mb-1">Upload New Favicon (.ico, .png)</label>
-                    <input type="file" name="favicon_file" accept=".ico,image/png,image/x-icon" class="w-full border border-gray-300 rounded-xl p-1.5 text-[11px] bg-gray-50 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:bg-amber-50 file:text-amber-700 file:font-bold" onchange="previewFile(this, 'faviconPreview')">
+                    <input type="file" name="favicon_file" accept=".ico,image/png,image/x-icon,image/webp,image/svg+xml" class="w-full border border-gray-300 rounded-xl p-1.5 text-[11px] bg-gray-50 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:bg-amber-50 file:text-amber-700 file:font-bold" onchange="previewFile(this, 'faviconPreview')">
                 </div>
 
                 <div>

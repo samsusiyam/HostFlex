@@ -160,6 +160,26 @@ function getSetting($key) {
     return '';
 }
 
+function getFaviconUrl() {
+    $fav = getSetting('favicon');
+    if (empty($fav)) return '/images/favicon.ico';
+    return '/' . ltrim($fav, '/');
+}
+
+function getFaviconHtml() {
+    $url = getFaviconUrl();
+    $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+    $type = 'image/x-icon';
+    if ($ext === 'png') $type = 'image/png';
+    elseif ($ext === 'svg') $type = 'image/svg+xml';
+    elseif ($ext === 'webp') $type = 'image/webp';
+    elseif ($ext === 'gif') $type = 'image/gif';
+    elseif ($ext === 'jpg' || $ext === 'jpeg') $type = 'image/jpeg';
+    
+    return '<link rel="shortcut icon" href="' . htmlspecialchars($url) . '" type="' . $type . '" />' . "\n" .
+           '    <link rel="icon" href="' . htmlspecialchars($url) . '" type="' . $type . '" />';
+}
+
 function getPlans($category = null) {
     global $conn;
     if ($category) {

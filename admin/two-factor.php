@@ -103,8 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2FA Verification - <?php echo htmlspecialchars($site_name); ?> Admin</title>
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
-    <link rel="shortcut icon" href="/<?php echo ltrim($favicon, '/'); ?>" type="image/x-icon" />
-    <link rel="icon" href="/<?php echo ltrim($favicon, '/'); ?>" type="image/x-icon" />
+    <?php echo getFaviconHtml(); ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
