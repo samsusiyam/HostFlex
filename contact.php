@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="px-3 py-6">
 <form method="POST" id="publicContactForm" class="rounded shadow dark:bg-gray-900 bg-gray-50 p-8 md:p-12 max-w-4xl mx-auto">
-<div class="flex flex-wrap -mx-3">
+<div class="flex flex-wrap">
 <div class="w-full md:w-1/2 px-3 mb-5">
 <label class="block mb-2 font-bold text-sm text-gray-700 uppercase dark:text-gray-400">Name</label>
 <input name="name" type="text" placeholder="Your Name" required class="block w-full h-[52px] px-4 py-3 text-base text-gray-700 bg-gray-100 border border-gray-300 rounded focus:bg-white focus:outline-none focus:border-blue-600 dark:placeholder-gray-500 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800 transition">
@@ -158,15 +158,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <input name="email" type="email" placeholder="Your Email" required class="block w-full h-[52px] px-4 py-3 text-base text-gray-700 bg-gray-100 border border-gray-300 rounded focus:bg-white focus:outline-none focus:border-blue-600 dark:placeholder-gray-500 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800 transition">
 </div>
 </div>
-<div class="mb-5">
+<div class="px-3 mb-5">
 <label class="block mb-2 font-bold text-sm text-gray-700 uppercase dark:text-gray-400">Subject</label>
 <input name="subject" type="text" placeholder="Your Subject" required class="block w-full h-[52px] px-4 py-3 text-base text-gray-700 bg-gray-100 border border-gray-300 rounded focus:bg-white focus:outline-none focus:border-blue-600 dark:placeholder-gray-500 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800 transition">
 </div>
-<div class="mb-6">
+<div class="px-3 mb-6">
 <label class="block mb-2 font-bold text-sm text-gray-700 uppercase dark:text-gray-400">Message</label>
 <textarea name="message" rows="8" placeholder="Write your message here..." required class="block w-full min-h-[220px] p-4 text-base leading-relaxed text-gray-700 bg-gray-100 border border-gray-300 rounded focus:bg-white focus:outline-none focus:border-blue-600 dark:placeholder-gray-500 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800 transition"></textarea>
 </div>
-<div>
+<div class="px-3">
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
 <div class="mb-4"><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
 <?php endif; ?>
