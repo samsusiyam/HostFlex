@@ -2,10 +2,19 @@
 $page_title = 'Contact Inquiries';
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/mail.php';
 checkAdminLogin();
 
 $success = '';
 $error = '';
+
+function cleanContactText($str) {
+    if ($str === null) return '';
+    $str = stripslashes((string)$str);
+    // Replace literal escape sequences '\r\n', '\n', '\r' if stored as literal string characters
+    $str = str_replace(['\r\n', '\r', '\n', '\t'], ["\n", "\n", "\n", "    "], $str);
+    return $str;
+}
 
 // Handle Mark Read via POST / AJAX
 if (isset($_POST['mark_read_id'])) {
@@ -34,18 +43,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_contact_id']))
 
 // Handle Reply via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_reply'])) {
-    $to_email = sanitize($_POST['reply_to'] ?? '');
-    $to_name = sanitize($_POST['reply_name'] ?? '');
-    $subject = sanitize($_POST['reply_subject'] ?? '');
-    $message = $_POST['reply_message'] ?? '';
+    $to_email = trim($_POST['reply_to'] ?? '');
+    $to_name = trim($_POST['reply_name'] ?? '');
+    $subject = trim($_POST['reply_subject'] ?? '');
+    $message = trim($_POST['reply_message'] ?? '');
 
     if ($to_email && $subject && $message) {
-        $res = sendMail($to_email, $subject, nl2br(htmlspecialchars($message)), $to_name);
+        $site_name = getSetting('site_name') ?: 'Host Nibo';
+        $site_email = getSetting('site_email');
+        
+        $email_body = "
+        <div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;\">
+            <div style=\"background: #2563eb; padding: 20px 24px;\">
+                <h2 style=\"color: #ffffff; margin: 0; font-size: 20px; font-weight: 700;\">" . htmlspecialchars($site_name) . "</h2>
+            </div>
+            <div style=\"padding: 24px; color: #334155; font-size: 14px; line-height: 1.7;\">
+                " . nl2br(htmlspecialchars($message)) . "
+            </div>
+            <div style=\"background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;\">
+                This email is a response to your inquiry submitted on " . htmlspecialchars($site_name) . ".
+            </div>
+        </div>";
+
+        $res = sendMail($to_email, $subject, $email_body, $site_email);
         if ($res === true) {
             logActivity('Sent Contact Reply', "To: $to_name <$to_email> Subject: $subject");
             $success = "Reply email sent successfully to $to_name ($to_email)!";
         } else {
-            $error = "Failed to send email: " . (is_string($res) ? $res : 'SMTP Error');
+            $error = "Failed to send email. Please verify your SMTP settings in Settings > SMTP Configuration.";
         }
     } else {
         $error = "All reply fields are required.";
@@ -125,9 +150,16 @@ $unread_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FRO
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-xs">
                     <?php if ($total_messages > 0): while ($msg = mysqli_fetch_assoc($contacts)): 
-                        $msg_json = htmlspecialchars(json_encode($msg), ENT_QUOTES, 'UTF-8');
+                        $clean_msg = $msg;
+                        $clean_msg['name'] = cleanContactText($msg['name']);
+                        $clean_msg['email'] = cleanContactText($msg['email']);
+                        $clean_msg['subject'] = cleanContactText($msg['subject']);
+                        $clean_msg['message'] = cleanContactText($msg['message']);
+                        $msg_json = htmlspecialchars(json_encode($clean_msg), ENT_QUOTES, 'UTF-8');
+                        $table_preview = cleanContactText($msg['message']);
+                        $table_preview = preg_replace('/\s+/', ' ', $table_preview);
                     ?>
-                    <tr class="contact-row hover:bg-blue-50/20 transition <?php echo !$msg['is_read'] ? 'bg-blue-50/30 font-semibold' : ''; ?>" data-name="<?php echo strtolower($msg['name'] . ' ' . $msg['email'] . ' ' . $msg['subject'] . ' ' . $msg['message']); ?>" id="contactRow_<?php echo $msg['id']; ?>">
+                    <tr class="contact-row hover:bg-blue-50/20 transition <?php echo !$msg['is_read'] ? 'bg-blue-50/30 font-semibold' : ''; ?>" data-name="<?php echo strtolower($clean_msg['name'] . ' ' . $clean_msg['email'] . ' ' . $clean_msg['subject'] . ' ' . $clean_msg['message']); ?>" id="contactRow_<?php echo $msg['id']; ?>">
                         <td class="px-4 py-3.5 text-center">
                             <?php if (!$msg['is_read']): ?>
                             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-[11px]" title="Unread Message">
@@ -140,12 +172,12 @@ $unread_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FRO
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3.5">
-                            <div class="text-gray-900 font-bold"><?php echo htmlspecialchars($msg['name']); ?></div>
-                            <div class="text-[11px] text-gray-500 font-normal"><?php echo htmlspecialchars($msg['email']); ?></div>
+                            <div class="text-gray-900 font-bold"><?php echo htmlspecialchars($clean_msg['name']); ?></div>
+                            <div class="text-[11px] text-gray-500 font-normal"><?php echo htmlspecialchars($clean_msg['email']); ?></div>
                         </td>
                         <td class="px-4 py-3.5 text-gray-800 max-w-sm truncate">
-                            <span class="font-medium"><?php echo htmlspecialchars($msg['subject']); ?></span>
-                            <span class="text-[11px] text-gray-400 block truncate font-normal"><?php echo htmlspecialchars(substr($msg['message'], 0, 80)); ?>...</span>
+                            <span class="font-medium"><?php echo htmlspecialchars($clean_msg['subject']); ?></span>
+                            <span class="text-[11px] text-gray-400 block truncate font-normal"><?php echo htmlspecialchars(mb_substr($table_preview, 0, 80)); ?>...</span>
                         </td>
                         <td class="px-4 py-3.5 text-gray-500 whitespace-nowrap">
                             <div><?php echo date('d M Y', strtotime($msg['created_at'])); ?></div>
@@ -156,7 +188,7 @@ $unread_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FRO
                                 <button type="button" onclick='openViewContactModal(<?php echo $msg_json; ?>)' class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-200 transition text-xs font-bold flex items-center gap-1 cursor-pointer">
                                     <i class="fa-solid fa-eye"></i> View & Reply
                                 </button>
-                                <button type="button" onclick="openDeleteContactModal(<?php echo $msg['id']; ?>, '<?php echo addslashes($msg['name']); ?>', '<?php echo addslashes($msg['subject']); ?>')" class="p-1.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200 hover:border-red-200 transition cursor-pointer" title="Delete Message">
+                                <button type="button" onclick="openDeleteContactModal(<?php echo $msg['id']; ?>, '<?php echo addslashes($clean_msg['name']); ?>', '<?php echo addslashes($clean_msg['subject']); ?>')" class="p-1.5 bg-gray-50 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200 hover:border-red-200 transition cursor-pointer" title="Delete Message">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </div>
@@ -251,12 +283,12 @@ $unread_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FRO
 
                     <div>
                         <label class="block font-bold text-gray-700 mb-1">Reply Message</label>
-                        <textarea name="reply_message" id="reply_message" rows="4" required placeholder="Type your response to the customer..." class="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                        <textarea name="reply_message" id="reply_message" rows="5" required placeholder="Type your response to the customer..." class="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-1">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-                            <i class="fa-solid fa-paper-plane"></i> Send Reply Email
+                        <button type="submit" id="replySubmitBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                            <i class="fa-solid fa-paper-plane"></i> <span id="replySubmitBtnText">Send Reply Email</span>
                         </button>
                     </div>
                 </form>
@@ -310,13 +342,25 @@ function openViewContactModal(msg) {
     document.getElementById('msgModalSenderEmailLink').href = 'mailto:' + msg.email;
     document.getElementById('msgModalDate').innerText = msg.created_at;
     document.getElementById('msgModalSubject').innerText = msg.subject;
-    document.getElementById('msgModalBody').innerText = msg.message;
+
+    // Normalize any residual literal escaped characters
+    var bodyText = msg.message || '';
+    bodyText = bodyText.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\\'/g, "'").replace(/\\"/g, '"');
+    document.getElementById('msgModalBody').innerText = bodyText;
 
     // Reply Form Fields
     document.getElementById('reply_to_email').value = msg.email;
     document.getElementById('reply_to_name').value = msg.name;
     document.getElementById('reply_subject').value = 'Re: ' + msg.subject;
     document.getElementById('reply_message').value = "Dear " + msg.name + ",\n\nThank you for reaching out to us.\n\n\n\nBest regards,\nSupport Team\n" + window.location.hostname;
+
+    // Reset Submit Button State
+    var btn = document.getElementById('replySubmitBtn');
+    if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span id="replySubmitBtnText">Send Reply Email</span>';
+    }
 
     // Attachment
     var attachBox = document.getElementById('msgModalAttachmentBox');
@@ -343,6 +387,15 @@ function openViewContactModal(msg) {
 
     document.getElementById('contactModal').classList.remove('hidden');
 }
+
+document.getElementById('replyForm').addEventListener('submit', function() {
+    var btn = document.getElementById('replySubmitBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending Reply...';
+    }
+});
 
 function closeContactModal() {
     document.getElementById('contactModal').classList.add('hidden');

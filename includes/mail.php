@@ -27,13 +27,16 @@ function sendMail($to, $subject, $body, $replyTo = '') {
         $mail->CharSet = 'UTF-8';
         $mail->setFrom(getSetting('smtp_from_email') ?: getSetting('site_email'), getSetting('smtp_from_name') ?: getSetting('site_name'));
         $mail->addAddress($to);
-        if ($replyTo) $mail->addReplyTo($replyTo);
+        if ($replyTo && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $mail->addReplyTo($replyTo);
+        }
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $body;
         $mail->send();
         return true;
     } catch (Exception $e) {
+        error_log("sendMail Error: " . $e->getMessage());
         return false;
     }
 }
