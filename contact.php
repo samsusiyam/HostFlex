@@ -162,33 +162,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php endif; ?>
 
 <div class="px-3 py-4">
-<form method="POST" id="publicContactForm" class="rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 dark:bg-gray-900 bg-white p-8 md:p-12 max-w-4xl mx-auto transition">
+<form method="POST" id="publicContactForm" class="rounded-3xl shadow-xl shadow-blue-900/5 border border-gray-100 dark:border-gray-800 dark:bg-gray-900 bg-white p-8 md:p-12 max-w-4xl mx-auto transition">
 <div class="flex flex-wrap -mx-3">
 <div class="w-full md:w-1/2 px-3 mb-5">
-<label class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Your Name <span class="text-red-500">*</span></label>
-<input name="name" type="text" placeholder="e.g. John Doe" required class="block w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+    <i class="fa-solid fa-user text-blue-600 text-[11px]"></i> Your Name <span class="text-red-500">*</span>
+</label>
+<input name="name" type="text" placeholder="e.g. John Doe" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
 </div>
 <div class="w-full md:w-1/2 px-3 mb-5">
-<label class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Your Email <span class="text-red-500">*</span></label>
-<input name="email" type="email" placeholder="e.g. john@example.com" required class="block w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+    <i class="fa-solid fa-envelope text-blue-600 text-[11px]"></i> Your Email <span class="text-red-500">*</span>
+</label>
+<input name="email" type="email" placeholder="e.g. john@example.com" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
 </div>
 </div>
 <div class="mb-5">
-<label class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Subject <span class="text-red-500">*</span></label>
-<input name="subject" type="text" placeholder="e.g. Inquiry regarding Cloud Hosting" required class="block w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
+<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+    <i class="fa-solid fa-tag text-blue-600 text-[11px]"></i> Subject <span class="text-red-500">*</span>
+</label>
+<input name="subject" type="text" placeholder="e.g. Inquiry regarding Cloud Hosting" required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition">
 </div>
 <div class="mb-6">
-<label class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Message <span class="text-red-500">*</span></label>
-<textarea name="message" rows="5" placeholder="Write your message or inquiry here..." required class="block w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition"></textarea>
+<label class="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+    <i class="fa-solid fa-message text-blue-600 text-[11px]"></i> Message <span class="text-red-500">*</span>
+</label>
+<textarea name="message" rows="5" placeholder="Write your message or inquiry here..." required class="block w-full px-4 py-3.5 text-sm text-gray-800 bg-gray-50/80 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-900/30 dark:text-gray-200 dark:border-gray-700 dark:bg-gray-800 transition"></textarea>
 </div>
-<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-gray-100 dark:border-gray-800">
 <?php if ($recaptcha_enabled && $recaptcha_site_key): ?>
 <div><div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_site_key; ?>"></div></div>
 <?php else: ?>
-<div></div>
+<div class="text-xs text-gray-400 flex items-center gap-1.5">
+    <i class="fa-solid fa-shield-halved text-blue-500"></i> We usually respond within 24 hours.
+</div>
 <?php endif; ?>
-<button type="submit" id="contactSubmitBtn" class="w-full sm:w-auto px-8 py-3.5 font-bold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
-    <i class="fa-solid fa-paper-plane text-xs"></i> <span>Send Message</span>
+<button type="submit" id="contactSubmitBtn" class="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 active:scale-[0.98] rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/35 transition-all duration-200 cursor-pointer overflow-hidden">
+    <span class="relative z-10 flex items-center gap-2.5">
+        <span>Send Message</span>
+        <i class="fa-solid fa-paper-plane text-xs transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5"></i>
+    </span>
+    <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
 </button>
 </div>
 </form>
