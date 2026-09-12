@@ -6,8 +6,9 @@ checkAdminLogin();
 
 ensureBlogSchema();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle AJAX Quick Toggle Status (Only for non-trashed posts)
 if (isset($_POST['ajax_toggle_status'])) {
@@ -27,6 +28,8 @@ if (isset($_POST['ajax_toggle_status'])) {
     exit;
 }
 
+$redirect_url = $_SERVER['REQUEST_URI'] ?? 'blogs.php';
+
 // Handle Single Move to Trash
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trash_post_id'])) {
     $id = (int)$_POST['trash_post_id'];
@@ -34,8 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trash_post_id'])) {
     if ($post) {
         mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NOW() WHERE id = $id");
         logActivity('Moved Post to Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" moved to Trash.';
+        $_SESSION['admin_success'] = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" moved to Trash.';
     }
+    header('Location: ' . $redirect_url);
+    exit;
 }
 
 // Handle Single Restore from Trash
@@ -45,8 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_post_id'])) {
     if ($post) {
         mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NULL WHERE id = $id");
         logActivity('Restored Post from Trash', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" restored from Trash.';
+        $_SESSION['admin_success'] = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" restored from Trash.';
     }
+    header('Location: ' . $redirect_url);
+    exit;
 }
 
 // Handle Single Permanent (Force) Delete
@@ -58,10 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['force_delete_post_id'
     }
     if (mysqli_query($conn, "DELETE FROM blog_posts WHERE id = $id")) {
         logActivity('Permanently Deleted Post', ($post['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" permanently deleted.';
+        $_SESSION['admin_success'] = 'Post "' . htmlspecialchars($post['title'] ?? '') . '" permanently deleted.';
     } else {
-        $error = 'Failed to delete post: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Failed to delete post: ' . mysqli_error($conn);
     }
+    header('Location: ' . $redirect_url);
+    exit;
 }
 
 // Handle Empty Trash
@@ -76,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['empty_trash'])) {
     }
     mysqli_query($conn, "DELETE FROM blog_posts WHERE deleted_at IS NOT NULL");
     logActivity('Emptied Blog Trash', "Permanently deleted $deleted_count trashed posts");
-    $msg = "Trash emptied. $deleted_count posts permanently deleted.";
+    $_SESSION['admin_success'] = "Trash emptied. $deleted_count posts permanently deleted.";
+    header('Location: ' . $redirect_url);
+    exit;
 }
 
 // Handle Bulk Actions
@@ -88,11 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action']) && !em
     if ($bulk_type === 'trash') {
         mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NOW() WHERE id IN ($id_list)");
         logActivity('Bulk Moved Posts to Trash', count($ids) . ' posts moved to trash');
-        $msg = count($ids) . ' posts moved to Trash.';
+        $_SESSION['admin_success'] = count($ids) . ' posts moved to Trash.';
     } elseif ($bulk_type === 'restore') {
         mysqli_query($conn, "UPDATE blog_posts SET deleted_at = NULL WHERE id IN ($id_list)");
         logActivity('Bulk Restored Posts', count($ids) . ' posts restored from trash');
-        $msg = count($ids) . ' posts restored from Trash.';
+        $_SESSION['admin_success'] = count($ids) . ' posts restored from Trash.';
     } elseif ($bulk_type === 'force_delete') {
         $img_q = mysqli_query($conn, "SELECT image FROM blog_posts WHERE id IN ($id_list)");
         while ($r = mysqli_fetch_assoc($img_q)) {
@@ -102,8 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action']) && !em
         }
         mysqli_query($conn, "DELETE FROM blog_posts WHERE id IN ($id_list)");
         logActivity('Bulk Deleted Posts', count($ids) . ' posts permanently deleted');
-        $msg = count($ids) . ' posts permanently deleted.';
+        $_SESSION['admin_success'] = count($ids) . ' posts permanently deleted.';
     }
+    header('Location: ' . $redirect_url);
+    exit;
 }
 
 if (isset($_GET['msg'])) {

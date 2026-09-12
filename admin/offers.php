@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$error = '';
-$success = '';
+$error = $_SESSION['admin_error'] ?? '';
+$success = $_SESSION['admin_success'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle AJAX Quick Toggle Status
 if (isset($_POST['ajax_toggle_status'])) {
@@ -31,10 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_offer_id'])) {
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title FROM offers WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM offers WHERE id = $id")) {
         logActivity('Deleted Offer', ($del['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $success = 'Special offer deleted successfully.';
+        $_SESSION['admin_success'] = 'Special offer deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: offers.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -53,19 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_offer'])) {
         $query = "UPDATE offers SET title='$title', description='$description', badge='$badge', price_label='$price_label', link_url='$link_url', link_text='$link_text', sort_order=$sort_order, status=$status WHERE id=$id";
         if (mysqli_query($conn, $query)) {
             logActivity('Updated Offer', $title . ' (ID: ' . $id . ')');
-            $success = 'Special offer "' . htmlspecialchars($title) . '" updated successfully!';
+            $_SESSION['admin_success'] = 'Special offer "' . htmlspecialchars($title) . '" updated successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     } else {
         $query = "INSERT INTO offers (title, description, badge, price_label, link_url, link_text, sort_order, status) VALUES ('$title', '$description', '$badge', '$price_label', '$link_url', '$link_text', $sort_order, $status)";
         if (mysqli_query($conn, $query)) {
             logActivity('Created Offer', $title);
-            $success = 'New special offer "' . htmlspecialchars($title) . '" added successfully!';
+            $_SESSION['admin_success'] = 'New special offer "' . htmlspecialchars($title) . '" added successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     }
+    header('Location: offers.php');
+    exit;
 }
 
 $offers = mysqli_query($conn, "SELECT * FROM offers ORDER BY sort_order ASC, id DESC");

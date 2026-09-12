@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle Reorder via AJAX
 if (isset($_POST['reorder'])) {
@@ -24,10 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_menu_id'])) {
     $m = mysqli_fetch_assoc(mysqli_query($conn, "SELECT label FROM menu_items WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM menu_items WHERE id = $id OR parent_id = $id")) {
         logActivity('Deleted Menu Item', ($m['label'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Menu item and any sub-items deleted successfully.';
+        $_SESSION['admin_success'] = 'Menu item and any sub-items deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: menus.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -41,14 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_menu_item'])) {
     $edit_id = (int)($_POST['menu_id'] ?? 0);
 
     if (!$label) {
-        $error = 'Menu item label is required!';
+        $_SESSION['admin_error'] = 'Menu item label is required!';
     } else {
         if ($edit_id > 0) {
             if (mysqli_query($conn, "UPDATE menu_items SET label='$label', url='$url', parent_id=$parent_id, location='$location', sort_order=$sort_order, status=$status WHERE id=$edit_id")) {
                 logActivity('Updated Menu Item', $label . ' (ID: ' . $edit_id . ')');
-                $msg = 'Menu item "' . htmlspecialchars($label) . '" updated successfully!';
+                $_SESSION['admin_success'] = 'Menu item "' . htmlspecialchars($label) . '" updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (!$sort_order) {
@@ -57,12 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_menu_item'])) {
             }
             if (mysqli_query($conn, "INSERT INTO menu_items (label, url, parent_id, location, sort_order, status) VALUES ('$label', '$url', $parent_id, '$location', $sort_order, $status)")) {
                 logActivity('Created Menu Item', $label);
-                $msg = 'New menu item "' . htmlspecialchars($label) . '" added successfully!';
+                $_SESSION['admin_success'] = 'New menu item "' . htmlspecialchars($label) . '" added successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: menus.php');
+    exit;
 }
 
 $parent_items_query = mysqli_query($conn, "SELECT * FROM menu_items WHERE parent_id = 0 ORDER BY sort_order ASC");

@@ -7,8 +7,9 @@ ensureDomainPricingSchema();
 
 $base_currency = strtoupper(getSetting('base_currency') ?: 'BDT');
 $currencies = getCurrenciesList();
-$msg = '';
-$err = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$err = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Helper to get exchange rate multiplier to Base Currency
 function getRateToBase($from_currency) {
@@ -64,7 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 
-    $msg = "Bulk profit margin ($margin_value" . ($margin_type === 'percentage' ? '%' : ' ' . $base_currency) . ") applied successfully to $updated_count TLD(s)!";
+    $_SESSION['admin_success'] = "Bulk profit margin ($margin_value" . ($margin_type === 'percentage' ? '%' : ' ' . $base_currency) . ") applied successfully to $updated_count TLD(s)!";
+    header('Location: domain-pricing.php');
+    exit;
 }
 
 // 2. Handle 1-Click Preset Importer / Reset
@@ -136,8 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
             $count++;
         }
-        $msg = "Successfully synced $count TLD(s) from " . ucfirst($preset_type) . " wholesale preset catalogue!";
+        $_SESSION['admin_success'] = "Successfully synced $count TLD(s) from " . ucfirst($preset_type) . " wholesale preset catalogue!";
     }
+    header('Location: domain-pricing.php');
+    exit;
 }
 
 // 3. Handle Add / Edit TLD
@@ -165,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
     $sort_order = (int)($_POST['sort_order'] ?? 0);
 
     if (empty($extension)) {
-        $err = "Domain extension (TLD) is required (e.g. .com).";
+        $_SESSION['admin_error'] = "Domain extension (TLD) is required (e.g. .com).";
     } else {
         $ext_esc = mysqli_real_escape_string($conn, $extension);
         $cat_esc = mysqli_real_escape_string($conn, $category);
@@ -174,15 +179,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
         if ($_POST['action'] === 'add') {
             $chk = mysqli_query($conn, "SELECT id FROM domain_pricing WHERE extension = '$ext_esc'");
             if (mysqli_num_rows($chk) > 0) {
-                $err = "TLD $extension already exists in database. You can edit it instead.";
+                $_SESSION['admin_error'] = "TLD $extension already exists in database. You can edit it instead.";
             } else {
                 $sql = "INSERT INTO domain_pricing 
                     (extension, category, cost_currency, cost_price, margin_type, margin_value, register_price, renew_price, transfer_price, promo_price, registrar, is_featured, is_popular, is_promo, status, sort_order) 
                     VALUES ('$ext_esc', '$cat_esc', '$cost_currency', $cost_price, '$margin_type', $margin_value, $register_price, $renew_price, $transfer_price, $promo_sql, '$reg_esc', $is_featured, $is_popular, $is_promo, $status, $sort_order)";
                 if (mysqli_query($conn, $sql)) {
-                    $msg = "New TLD $extension added successfully!";
+                    $_SESSION['admin_success'] = "New TLD $extension added successfully!";
                 } else {
-                    $err = "Database error: " . mysqli_error($conn);
+                    $_SESSION['admin_error'] = "Database error: " . mysqli_error($conn);
                 }
             }
         } elseif ($_POST['action'] === 'edit') {
@@ -194,19 +199,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 is_popular=$is_popular, is_promo=$is_promo, status=$status, sort_order=$sort_order 
                 WHERE id=$id";
             if (mysqli_query($conn, $sql)) {
-                $msg = "TLD $extension updated successfully!";
+                $_SESSION['admin_success'] = "TLD $extension updated successfully!";
             } else {
-                $err = "Database error: " . mysqli_error($conn);
+                $_SESSION['admin_error'] = "Database error: " . mysqli_error($conn);
             }
         }
     }
+    header('Location: domain-pricing.php');
+    exit;
 }
 
 // 4. Handle Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $id = (int)$_POST['id'];
     mysqli_query($conn, "DELETE FROM domain_pricing WHERE id = $id");
-    $msg = "TLD deleted successfully!";
+    $_SESSION['admin_success'] = "TLD deleted successfully!";
+    header('Location: domain-pricing.php');
+    exit;
 }
 
 // 5. Handle AJAX toggle

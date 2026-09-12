@@ -4,14 +4,15 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminRole(['admin']);
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
     $id = (int)$_POST['delete_user_id'];
     if ($id == $_SESSION['admin_id']) {
-        $error = 'You cannot delete your own logged-in admin account!';
+        $_SESSION['admin_error'] = 'You cannot delete your own logged-in admin account!';
     } else {
         $stmt = mysqli_prepare($conn, "SELECT username, email FROM users WHERE id = ?");
         mysqli_stmt_bind_param($stmt, "i", $id);
@@ -25,8 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
         mysqli_stmt_close($del_stmt);
 
         logActivity('Deleted User', ($del['username'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'User account deleted successfully.';
+        $_SESSION['admin_success'] = 'User account deleted successfully.';
     }
+    header('Location: users.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -39,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
     $edit_id = (int)($_POST['user_id'] ?? 0);
 
     if (!$username || !$email) {
-        $error = 'Username and email are required!';
+        $_SESSION['admin_error'] = 'Username and email are required!';
     } else {
         if ($edit_id) {
             $stmt = mysqli_prepare($conn, "SELECT id FROM users WHERE username = ? AND id != ?");
@@ -51,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
         mysqli_stmt_execute($stmt);
         $check = mysqli_stmt_get_result($stmt);
         if (mysqli_num_rows($check) > 0) {
-            $error = 'Username already exists! Choose a unique username.';
+            $_SESSION['admin_error'] = 'Username already exists! Choose a unique username.';
             mysqli_stmt_close($stmt);
         } else {
             mysqli_stmt_close($stmt);
@@ -67,10 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
                 mysqli_stmt_execute($up);
                 mysqli_stmt_close($up);
                 logActivity('Updated User', $username . ' (ID: ' . $edit_id . ')');
-                $msg = 'User account "' . htmlspecialchars($username) . '" updated successfully!';
+                $_SESSION['admin_success'] = 'User account "' . htmlspecialchars($username) . '" updated successfully!';
             } else {
                 if (!$password) {
-                    $error = 'Password is required for new accounts!';
+                    $_SESSION['admin_error'] = 'Password is required for new accounts!';
                 } else {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
                     $ins = mysqli_prepare($conn, "INSERT INTO users (username, email, password, role, status) VALUES (?, ?, ?, ?, ?)");
@@ -78,11 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_user'])) {
                     mysqli_stmt_execute($ins);
                     mysqli_stmt_close($ins);
                     logActivity('Created User', $username);
-                    $msg = 'New user "' . htmlspecialchars($username) . '" created successfully!';
+                    $_SESSION['admin_success'] = 'New user "' . htmlspecialchars($username) . '" created successfully!';
                 }
             }
         }
     }
+    header('Location: users.php');
+    exit;
 }
 
 $users = mysqli_query($conn, "SELECT * FROM users ORDER BY id ASC");

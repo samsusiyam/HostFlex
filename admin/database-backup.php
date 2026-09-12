@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminRole(['admin']);
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 $backup_dir = '../backups/';
 if (!is_dir($backup_dir)) @mkdir($backup_dir, 0755, true);
@@ -45,7 +46,7 @@ if (isset($_GET['download']) && $_GET['download'] == '1') {
     }
     $output .= "SET FOREIGN_KEY_CHECKS=1;\n";
 
-    $filename = 'hostnibo_db_' . date('Y-m-d_H-i-s') . '.sql';
+    $filename = 'backup_live_' . date('Y-m-d_H-i-s') . '.sql';
     header('Content-Type: application/octet-stream');
     header("Content-Disposition: attachment; filename=$filename");
     echo $output;
@@ -84,10 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_server_backup'])
     $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
     if (file_put_contents($backup_dir . $filename, $output)) {
         logActivity('Created DB Backup', $filename);
-        $msg = "Backup $filename saved successfully to server storage.";
+        $_SESSION['admin_success'] = "Backup $filename saved successfully to server storage.";
     } else {
-        $error = 'Failed to write backup file to server disk.';
+        $_SESSION['admin_error'] = 'Failed to write backup file to server disk.';
     }
+    header('Location: database-backup.php');
+    exit;
 }
 
 // Handle Delete Stored Backup File
@@ -97,8 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_backup_file'])
     if (file_exists($target)) {
         unlink($target);
         logActivity('Deleted DB Backup File', $fname);
-        $msg = "Backup file $fname deleted.";
+        $_SESSION['admin_success'] = "Backup file $fname deleted.";
     }
+    header('Location: database-backup.php');
+    exit;
 }
 
 // Handle Download Stored Backup File
@@ -122,20 +127,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
         if (file_exists($target)) {
             $sql = file_get_contents($target);
         } else {
-            $error = 'Selected backup file not found.';
+            $_SESSION['admin_error'] = 'Selected backup file not found.';
         }
     } elseif (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($_FILES['backup_file']['name'], PATHINFO_EXTENSION));
         if ($ext !== 'sql') {
-            $error = 'Only .sql database files are allowed.';
+            $_SESSION['admin_error'] = 'Only .sql database files are allowed.';
         } else {
             $sql = file_get_contents($_FILES['backup_file']['tmp_name']);
         }
     } else {
-        $error = 'Please provide a valid .sql backup file to restore.';
+        $_SESSION['admin_error'] = 'Please provide a valid .sql backup file to restore.';
     }
 
-    if ($sql && empty($error)) {
+    if ($sql && empty($_SESSION['admin_error'])) {
         try {
             mysqli_query($conn, "SET FOREIGN_KEY_CHECKS=0");
             if (mysqli_multi_query($conn, $sql)) {
@@ -147,11 +152,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
             }
             mysqli_query($conn, "SET FOREIGN_KEY_CHECKS=1");
             logActivity('Restored Database Backup', 'Database restore executed');
-            $msg = 'Database restored successfully!';
+            $_SESSION['admin_success'] = 'Database restored successfully!';
         } catch (Exception $e) {
-            $error = 'Database restore failed: ' . $e->getMessage();
+            $_SESSION['admin_error'] = 'Database restore failed: ' . $e->getMessage();
         }
     }
+    header('Location: database-backup.php');
+    exit;
 }
 
 // Compute Metrics

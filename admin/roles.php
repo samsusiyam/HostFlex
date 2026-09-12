@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminRole(['admin']);
 
-$msg = '';
-$msg_type = 'success';
+$msg = $_SESSION['admin_msg'] ?? '';
+$msg_type = $_SESSION['admin_msg_type'] ?? 'success';
+unset($_SESSION['admin_msg'], $_SESSION['admin_msg_type']);
 $perm_key = 'admin_permissions';
 
 $roles = ['admin', 'manager', 'editor'];
@@ -116,7 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_perms'])) {
         mysqli_query($conn, "INSERT INTO settings (setting_key, setting_value) VALUES ('$perm_key', '$json')");
     }
     logActivity('Updated Roles & Permissions', 'Modified role access controls');
-    $msg = 'Roles and permissions saved successfully!';
+    $_SESSION['admin_msg'] = 'Roles and permissions saved successfully!';
+    $_SESSION['admin_msg_type'] = 'success';
+    header('Location: roles.php');
+    exit;
 }
 
 $raw = getSetting($perm_key);

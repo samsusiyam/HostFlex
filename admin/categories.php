@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$success = '';
-$error = '';
+$success = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle Reorder via AJAX
 if (isset($_POST['reorder'])) {
@@ -43,10 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category_id'])
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, slug FROM categories WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM categories WHERE id = $id")) {
         logActivity('Deleted Category', ($del['name'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $success = 'Category deleted successfully.';
+        $_SESSION['admin_success'] = 'Category deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: categories.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -74,18 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
         $id = (int)$_POST['category_id'];
         if (mysqli_query($conn, "UPDATE categories SET name='$name', slug='$slug', description='$description', image='$image', sort_order=$sort_order, status=$status WHERE id=$id")) {
             logActivity('Updated Category', $name . ' (ID: ' . $id . ')');
-            $success = 'Category "' . htmlspecialchars($name) . '" updated successfully!';
+            $_SESSION['admin_success'] = 'Category "' . htmlspecialchars($name) . '" updated successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     } else {
         if (mysqli_query($conn, "INSERT INTO categories (name, slug, description, image, sort_order, status) VALUES ('$name', '$slug', '$description', '$image', $sort_order, $status)")) {
             logActivity('Created Category', $name);
-            $success = 'New category "' . htmlspecialchars($name) . '" created successfully!';
+            $_SESSION['admin_success'] = 'New category "' . htmlspecialchars($name) . '" created successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     }
+    header('Location: categories.php');
+    exit;
 }
 
 $categories = mysqli_query($conn, "SELECT c.*, (SELECT COUNT(*) FROM hosting_plans p WHERE p.category = c.slug) as plan_count FROM categories c ORDER BY c.sort_order ASC");

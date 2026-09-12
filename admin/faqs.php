@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle Delete via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_faq_id'])) {
@@ -13,10 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_faq_id'])) {
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT question FROM faqs WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM faqs WHERE id = $id")) {
         logActivity('Deleted FAQ', ($del['question'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'FAQ item deleted successfully.';
+        $_SESSION['admin_success'] = 'FAQ item deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: faqs.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -27,15 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_faq'])) {
     $edit_id = (int)($_POST['faq_id'] ?? 0);
 
     if (!$question || !$answer) {
-        $error = 'Both Question and Answer are required!';
+        $_SESSION['admin_error'] = 'Both Question and Answer are required!';
     } else {
         $answer_esc = mysqli_real_escape_string($conn, $answer);
         if ($edit_id > 0) {
             if (mysqli_query($conn, "UPDATE faqs SET question='$question', answer='$answer_esc', sort_order=$sort_order WHERE id=$edit_id")) {
                 logActivity('Updated FAQ', $question . ' (ID: ' . $edit_id . ')');
-                $msg = 'FAQ updated successfully!';
+                $_SESSION['admin_success'] = 'FAQ updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (!$sort_order) {
@@ -44,12 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_faq'])) {
             }
             if (mysqli_query($conn, "INSERT INTO faqs (question, answer, sort_order) VALUES ('$question', '$answer_esc', $sort_order)")) {
                 logActivity('Created FAQ', $question);
-                $msg = 'New FAQ created successfully!';
+                $_SESSION['admin_success'] = 'New FAQ created successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: faqs.php');
+    exit;
 }
 
 $items = mysqli_query($conn, "SELECT * FROM faqs ORDER BY sort_order ASC, id ASC");

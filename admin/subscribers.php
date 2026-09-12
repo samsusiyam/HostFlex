@@ -5,8 +5,9 @@ require_once '../includes/functions.php';
 require_once '../includes/mail.php';
 checkAdminLogin();
 
-$msg = '';
-$msg_type = 'success';
+$msg = $_SESSION['admin_msg'] ?? '';
+$msg_type = $_SESSION['admin_msg_type'] ?? 'success';
+unset($_SESSION['admin_msg'], $_SESSION['admin_msg_type']);
 
 // Handle AJAX Quick Toggle Status
 if (isset($_POST['ajax_toggle_status'])) {
@@ -48,31 +49,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_subscriber'])) {
     $sub_id = (int)($_POST['subscriber_id'] ?? 0);
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $msg = 'Please enter a valid email address.';
-        $msg_type = 'danger';
+        $_SESSION['admin_msg'] = 'Please enter a valid email address.';
+        $_SESSION['admin_msg_type'] = 'danger';
     } else {
         if ($sub_id > 0) {
             $check = mysqli_query($conn, "SELECT id FROM subscribers WHERE email = '$email' AND id != $sub_id");
             if (mysqli_num_rows($check) > 0) {
-                $msg = 'Subscriber with this email already exists.';
-                $msg_type = 'danger';
+                $_SESSION['admin_msg'] = 'Subscriber with this email already exists.';
+                $_SESSION['admin_msg_type'] = 'danger';
             } else {
                 mysqli_query($conn, "UPDATE subscribers SET email = '$email', name = '$name', status = '$status' WHERE id = $sub_id");
                 logActivity('Updated Subscriber', "$email (ID: $sub_id)");
-                $msg = "Subscriber $email updated successfully.";
+                $_SESSION['admin_msg'] = "Subscriber $email updated successfully.";
+                $_SESSION['admin_msg_type'] = 'success';
             }
         } else {
             $check = mysqli_query($conn, "SELECT id FROM subscribers WHERE email = '$email'");
             if (mysqli_num_rows($check) > 0) {
-                $msg = 'Subscriber with this email already exists.';
-                $msg_type = 'danger';
+                $_SESSION['admin_msg'] = 'Subscriber with this email already exists.';
+                $_SESSION['admin_msg_type'] = 'danger';
             } else {
                 mysqli_query($conn, "INSERT INTO subscribers (email, name, status) VALUES ('$email', '$name', '$status')");
                 logActivity('Added Subscriber', $email);
-                $msg = "New subscriber $email added successfully.";
+                $_SESSION['admin_msg'] = "New subscriber $email added successfully.";
+                $_SESSION['admin_msg_type'] = 'success';
             }
         }
     }
+    header('Location: subscribers.php');
+    exit;
 }
 
 // Handle Delete via POST
@@ -81,22 +86,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single_id'])) 
     $sub = mysqli_fetch_assoc(mysqli_query($conn, "SELECT email FROM subscribers WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM subscribers WHERE id = $id")) {
         logActivity('Deleted Subscriber', ($sub['email'] ?? 'Unknown') . " (ID: $id)");
-        $msg = 'Subscriber deleted successfully.';
+        $_SESSION['admin_msg'] = 'Subscriber deleted successfully.';
+        $_SESSION['admin_msg_type'] = 'success';
     } else {
-        $msg = 'Database error: ' . mysqli_error($conn);
-        $msg_type = 'danger';
+        $_SESSION['admin_msg'] = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_msg_type'] = 'danger';
     }
+    header('Location: subscribers.php');
+    exit;
 }
 
 // Handle Delete All
 if (isset($_POST['delete_all_subscribers'])) {
     if (mysqli_query($conn, "DELETE FROM subscribers")) {
         logActivity('Deleted All Subscribers', 'All records cleared');
-        $msg = 'All subscribers have been cleared successfully.';
+        $_SESSION['admin_msg'] = 'All subscribers have been cleared successfully.';
+        $_SESSION['admin_msg_type'] = 'success';
     } else {
-        $msg = 'Database error: ' . mysqli_error($conn);
-        $msg_type = 'danger';
+        $_SESSION['admin_msg'] = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_msg_type'] = 'danger';
     }
+    header('Location: subscribers.php');
+    exit;
 }
 
 // Handle Bulk Delete Selected
@@ -108,15 +119,18 @@ if (isset($_POST['bulk_delete_subscribers'])) {
         if (mysqli_query($conn, "DELETE FROM subscribers WHERE id IN ($ids_str)")) {
             $count = count($ids);
             logActivity('Bulk Deleted Subscribers', "$count subscribers deleted");
-            $msg = "$count selected subscriber(s) deleted successfully.";
+            $_SESSION['admin_msg'] = "$count selected subscriber(s) deleted successfully.";
+            $_SESSION['admin_msg_type'] = 'success';
         } else {
-            $msg = 'Database error: ' . mysqli_error($conn);
-            $msg_type = 'danger';
+            $_SESSION['admin_msg'] = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_msg_type'] = 'danger';
         }
     } else {
-        $msg = 'No subscribers selected for deletion.';
-        $msg_type = 'danger';
+        $_SESSION['admin_msg'] = 'No subscribers selected for deletion.';
+        $_SESSION['admin_msg_type'] = 'danger';
     }
+    header('Location: subscribers.php');
+    exit;
 }
 
 // Handle Send Newsletter
@@ -137,11 +151,14 @@ if (isset($_POST['send_newsletter'])) {
             $personalized = "<p>Dear " . htmlspecialchars($sub['name'] ?: 'Subscriber') . ",</p>\n" . nl2br(htmlspecialchars($message));
             if (sendMail($sub['email'], $subject, $personalized)) $sent++;
         }
-        $msg = "Newsletter sent to $sent of $total_subs recipients.";
+        $_SESSION['admin_msg'] = "Newsletter sent to $sent of $total_subs recipients.";
+        $_SESSION['admin_msg_type'] = 'success';
     } else {
-        $msg = 'Please fill in both subject and message.';
-        $msg_type = 'danger';
+        $_SESSION['admin_msg'] = 'Please fill in both subject and message.';
+        $_SESSION['admin_msg_type'] = 'danger';
     }
+    header('Location: subscribers.php');
+    exit;
 }
 
 $search = trim($_GET['search'] ?? '');

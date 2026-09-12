@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle AJAX Quick Toggle Status
 if (isset($_POST['ajax_toggle_status'])) {
@@ -31,10 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_page_id'])) {
     $p = mysqli_fetch_assoc(mysqli_query($conn, "SELECT title FROM pages WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM pages WHERE id = $id")) {
         logActivity('Deleted Page', ($p['title'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Page deleted successfully.';
+        $_SESSION['admin_success'] = 'Page deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: pages.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -54,27 +57,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_page'])) {
     }
 
     if (!$title || !$slug) {
-        $error = 'Page title and URL slug are required!';
+        $_SESSION['admin_error'] = 'Page title and URL slug are required!';
     } else {
         $check = mysqli_query($conn, "SELECT id FROM pages WHERE slug = '$slug'" . ($edit_id ? " AND id != $edit_id" : ""));
         if (mysqli_num_rows($check) > 0) {
-            $error = 'Page slug already exists. Please choose a different slug.';
+            $_SESSION['admin_error'] = 'Page slug already exists. Please choose a different slug.';
         } elseif ($edit_id > 0) {
             if (mysqli_query($conn, "UPDATE pages SET title='$title', slug='$slug', content='$content', meta_description='$meta_description', meta_keywords='$meta_keywords', status=$status WHERE id=$edit_id")) {
                 logActivity('Updated Page', $title . ' (ID: ' . $edit_id . ')');
-                $msg = 'Page "' . htmlspecialchars($title) . '" updated successfully!';
+                $_SESSION['admin_success'] = 'Page "' . htmlspecialchars($title) . '" updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (mysqli_query($conn, "INSERT INTO pages (title, slug, content, meta_description, meta_keywords, status) VALUES ('$title', '$slug', '$content', '$meta_description', '$meta_keywords', $status)")) {
                 logActivity('Created Page', $title);
-                $msg = 'New page "' . htmlspecialchars($title) . '" created successfully!';
+                $_SESSION['admin_success'] = 'New page "' . htmlspecialchars($title) . '" created successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: pages.php');
+    exit;
 }
 
 $pages = mysqli_query($conn, "SELECT * FROM pages ORDER BY title ASC");

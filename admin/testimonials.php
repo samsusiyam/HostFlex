@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 $upload_dir = '../uploads/testimonials/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -19,10 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_testimonial_id
     }
     if (mysqli_query($conn, "DELETE FROM testimonials WHERE id = $id")) {
         logActivity('Deleted Testimonial', ($t['name'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Testimonial deleted successfully.';
+        $_SESSION['admin_success'] = 'Testimonial deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: testimonials.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -35,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_testimonial'])) 
     $edit_id = (int)($_POST['testimonial_id'] ?? 0);
 
     if (!$name || !$review) {
-        $error = 'Client name and review content are required!';
+        $_SESSION['admin_error'] = 'Client name and review content are required!';
     } else {
         $photo = isset($_POST['existing_photo']) ? sanitize($_POST['existing_photo']) : '';
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
@@ -52,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_testimonial'])) 
         if ($edit_id > 0) {
             if (mysqli_query($conn, "UPDATE testimonials SET name='$name', company='$company', photo='$photo', rating=$rating, review='$review', sort_order=$sort_order WHERE id=$edit_id")) {
                 logActivity('Updated Testimonial', $name . ' (ID: ' . $edit_id . ')');
-                $msg = 'Testimonial updated successfully!';
+                $_SESSION['admin_success'] = 'Testimonial updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (!$sort_order) {
@@ -63,12 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_testimonial'])) 
             }
             if (mysqli_query($conn, "INSERT INTO testimonials (name, company, photo, rating, review, sort_order) VALUES ('$name', '$company', '$photo', $rating, '$review', $sort_order)")) {
                 logActivity('Created Testimonial', $name);
-                $msg = 'New testimonial added successfully!';
+                $_SESSION['admin_success'] = 'New testimonial added successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: testimonials.php');
+    exit;
 }
 
 $items = mysqli_query($conn, "SELECT * FROM testimonials ORDER BY sort_order ASC, id DESC");

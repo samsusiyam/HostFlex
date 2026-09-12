@@ -5,8 +5,9 @@ require_once '../includes/functions.php';
 require_once '../includes/mail.php';
 checkAdminLogin();
 
-$success = '';
-$error = '';
+$success = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 function cleanContactText($str) {
     if ($str === null) return '';
@@ -24,6 +25,9 @@ if (isset($_POST['mark_read_id'])) {
         echo json_encode(['status' => 'success']);
         exit;
     }
+    $_SESSION['admin_success'] = 'Marked as read.';
+    header('Location: contacts.php');
+    exit;
 }
 
 // Handle Delete via POST
@@ -35,10 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_contact_id']))
     }
     if (mysqli_query($conn, "DELETE FROM contacts WHERE id = $id")) {
         logActivity('Deleted Contact Inquiry', ($del['name'] ?? 'Unknown') . ' <' . ($del['email'] ?? '') . '> (ID: ' . $id . ')');
-        $success = 'Message inquiry deleted successfully.';
+        $_SESSION['admin_success'] = 'Message inquiry deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: contacts.php');
+    exit;
 }
 
 // Handle Reply via POST
@@ -68,13 +74,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_reply'])) {
         $res = sendMail($to_email, $subject, $email_body, $site_email);
         if ($res === true) {
             logActivity('Sent Contact Reply', "To: $to_name <$to_email> Subject: $subject");
-            $success = "Reply email sent successfully to $to_name ($to_email)!";
+            $_SESSION['admin_success'] = "Reply email sent successfully to $to_name ($to_email)!";
         } else {
-            $error = "Failed to send email. Please verify your SMTP settings in Settings > SMTP Configuration.";
+            $_SESSION['admin_error'] = "Failed to send email. Please verify your SMTP settings in Settings > SMTP Configuration.";
         }
     } else {
-        $error = "All reply fields are required.";
+        $_SESSION['admin_error'] = "All reply fields are required.";
     }
+    header('Location: contacts.php');
+    exit;
 }
 
 $contacts = mysqli_query($conn, "SELECT * FROM contacts ORDER BY is_read ASC, created_at DESC");

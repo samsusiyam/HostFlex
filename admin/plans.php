@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$error = '';
-$success = '';
+$error = $_SESSION['admin_error'] ?? '';
+$success = $_SESSION['admin_success'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle AJAX Quick Toggle Status & Popular
 if (isset($_POST['ajax_toggle_field'])) {
@@ -32,10 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_plan_id'])) {
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name FROM hosting_plans WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM hosting_plans WHERE id = $id")) {
         logActivity('Deleted Plan', ($del['name'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $success = 'Hosting plan deleted successfully.';
+        $_SESSION['admin_success'] = 'Hosting plan deleted successfully.';
     } else {
-        $error = 'Failed to delete plan: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Failed to delete plan: ' . mysqli_error($conn);
     }
+    header('Location: plans.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -61,9 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_plan'])) {
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
             logActivity('Updated Plan', $name . ' (ID: ' . $id . ')');
-            $success = 'Hosting plan "' . htmlspecialchars($name) . '" updated successfully!';
+            $_SESSION['admin_success'] = 'Hosting plan "' . htmlspecialchars($name) . '" updated successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     } else {
         $stmt = mysqli_prepare($conn, "INSERT INTO hosting_plans (category, name, subtitle, badge, monthly_price, yearly_price, features, order_url, is_popular, sort_order, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -72,11 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_plan'])) {
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
             logActivity('Created Plan', $name);
-            $success = 'New hosting plan "' . htmlspecialchars($name) . '" added successfully!';
+            $_SESSION['admin_success'] = 'New hosting plan "' . htmlspecialchars($name) . '" added successfully!';
         } else {
-            $error = 'Database error: ' . mysqli_error($conn);
+            $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
         }
     }
+    header('Location: plans.php');
+    exit;
 }
 
 $plans = mysqli_query($conn, "SELECT * FROM hosting_plans ORDER BY category, sort_order ASC");

@@ -5,8 +5,9 @@ require_once '../includes/functions.php';
 require_once '../includes/mail.php';
 checkAdminRole(['admin']);
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Ensure table exists and seed defaults
 $check = mysqli_query($conn, "SHOW TABLES LIKE 'email_templates'");
@@ -84,25 +85,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_template'])) {
     $variables = sanitize($_POST['variables'] ?? '');
 
     if (!$name || !$subject || !$body) {
-        $error = 'Template name, subject, and HTML body are required!';
+        $_SESSION['admin_error'] = 'Template name, subject, and HTML body are required!';
     } else {
         if (isset($_POST['template_id']) && !empty($_POST['template_id'])) {
             $id = (int)$_POST['template_id'];
             if (mysqli_query($conn, "UPDATE email_templates SET name='$name', subject='$subject', body='$body', variables='$variables' WHERE id=$id")) {
                 logActivity('Updated Email Template', "$name (ID: $id)");
-                $msg = 'Email template "' . htmlspecialchars($name) . '" updated successfully!';
+                $_SESSION['admin_success'] = 'Email template "' . htmlspecialchars($name) . '" updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (mysqli_query($conn, "INSERT INTO email_templates (name, subject, body, variables) VALUES ('$name', '$subject', '$body', '$variables')")) {
                 logActivity('Created Email Template', $name);
-                $msg = 'New email template "' . htmlspecialchars($name) . '" created successfully!';
+                $_SESSION['admin_success'] = 'New email template "' . htmlspecialchars($name) . '" created successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: email-templates.php');
+    exit;
 }
 
 // Handle Delete via POST
@@ -111,10 +114,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_template_id'])
     $del = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name FROM email_templates WHERE id = $id"));
     if (mysqli_query($conn, "DELETE FROM email_templates WHERE id = $id")) {
         logActivity('Deleted Email Template', ($del['name'] ?? 'Unknown') . " (ID: $id)");
-        $msg = 'Email template deleted successfully.';
+        $_SESSION['admin_success'] = 'Email template deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: email-templates.php');
+    exit;
 }
 
 $templates = mysqli_query($conn, "SELECT * FROM email_templates ORDER BY name ASC");

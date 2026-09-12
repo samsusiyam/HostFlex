@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 // Handle Delete Category via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category_id'])) {
@@ -14,10 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category_id'])
     mysqli_query($conn, "UPDATE blog_posts SET category_id = NULL WHERE category_id = $id");
     if (mysqli_query($conn, "DELETE FROM blog_categories WHERE id = $id")) {
         logActivity('Deleted Category', ($cat['name'] ?? 'Unknown') . " (ID: $id)");
-        $msg = 'Blog category deleted successfully! Associated posts set to Uncategorized.';
+        $_SESSION['admin_success'] = 'Blog category deleted successfully! Associated posts set to Uncategorized.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: blog-categories.php');
+    exit;
 }
 
 // Handle Add / Edit Category via POST
@@ -34,30 +37,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
     }
 
     if (!$name) {
-        $error = 'Category name is required!';
+        $_SESSION['admin_error'] = 'Category name is required!';
     } elseif (!$slug) {
-        $error = 'Category slug is required!';
+        $_SESSION['admin_error'] = 'Category slug is required!';
     } else {
         $check = mysqli_query($conn, "SELECT id FROM blog_categories WHERE slug = '$slug'" . ($edit_id ? " AND id != $edit_id" : ""));
         if (mysqli_num_rows($check) > 0) {
-            $error = 'Category slug already exists. Please choose a different slug.';
+            $_SESSION['admin_error'] = 'Category slug already exists. Please choose a different slug.';
         } elseif ($edit_id) {
             if (mysqli_query($conn, "UPDATE blog_categories SET name='$name', slug='$slug', description='$description' WHERE id=$edit_id")) {
                 logActivity('Updated Category', "$name (ID: $edit_id)");
-                $msg = 'Category "' . htmlspecialchars($name) . '" updated successfully!';
+                $_SESSION['admin_success'] = 'Category "' . htmlspecialchars($name) . '" updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (mysqli_query($conn, "INSERT INTO blog_categories (name, slug, description, status) VALUES ('$name', '$slug', '$description', 1)")) {
                 $new_id = mysqli_insert_id($conn);
                 logActivity('Created Category', "$name (ID: $new_id)");
-                $msg = 'New blog category "' . htmlspecialchars($name) . '" created successfully!';
+                $_SESSION['admin_success'] = 'New blog category "' . htmlspecialchars($name) . '" created successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: blog-categories.php');
+    exit;
 }
 
 $categories_query = "SELECT c.*, (SELECT COUNT(*) FROM blog_posts p WHERE p.category_id = c.id AND p.deleted_at IS NULL) as post_count FROM blog_categories c ORDER BY c.name ASC";

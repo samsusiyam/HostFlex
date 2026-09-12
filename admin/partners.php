@@ -4,8 +4,9 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 checkAdminLogin();
 
-$msg = '';
-$error = '';
+$msg = $_SESSION['admin_success'] ?? '';
+$error = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 
 $upload_dir = '../uploads/partners/';
 if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -19,10 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_partner_id']))
     }
     if (mysqli_query($conn, "DELETE FROM partners WHERE id = $id")) {
         logActivity('Deleted Partner', ($p['name'] ?? 'Unknown') . ' (ID: ' . $id . ')');
-        $msg = 'Partner logo deleted successfully.';
+        $_SESSION['admin_success'] = 'Partner logo deleted successfully.';
     } else {
-        $error = 'Database error: ' . mysqli_error($conn);
+        $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
     }
+    header('Location: partners.php');
+    exit;
 }
 
 // Handle Add / Edit via POST
@@ -32,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_partner'])) {
     $edit_id = (int)($_POST['partner_id'] ?? 0);
 
     if (!$name) {
-        $error = 'Partner/Brand name is required!';
+        $_SESSION['admin_error'] = 'Partner/Brand name is required!';
     } else {
         $photo = isset($_POST['existing_photo']) ? sanitize($_POST['existing_photo']) : '';
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
@@ -49,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_partner'])) {
         if ($edit_id > 0) {
             if (mysqli_query($conn, "UPDATE partners SET name='$name', photo='$photo', sort_order=$sort_order WHERE id=$edit_id")) {
                 logActivity('Updated Partner', $name . ' (ID: ' . $edit_id . ')');
-                $msg = 'Partner logo updated successfully!';
+                $_SESSION['admin_success'] = 'Partner logo updated successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         } else {
             if (!$sort_order) {
@@ -60,12 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_partner'])) {
             }
             if (mysqli_query($conn, "INSERT INTO partners (name, photo, sort_order) VALUES ('$name', '$photo', $sort_order)")) {
                 logActivity('Created Partner', $name);
-                $msg = 'New partner brand added successfully!';
+                $_SESSION['admin_success'] = 'New partner brand added successfully!';
             } else {
-                $error = 'Database error: ' . mysqli_error($conn);
+                $_SESSION['admin_error'] = 'Database error: ' . mysqli_error($conn);
             }
         }
     }
+    header('Location: partners.php');
+    exit;
 }
 
 $items = mysqli_query($conn, "SELECT * FROM partners ORDER BY sort_order ASC, id DESC");
